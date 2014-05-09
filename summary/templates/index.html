@@ -1,0 +1,80 @@
+<html>
+
+<head>
+	<script src="/static/js/jquery.js"></script>
+	<script src="/static/js/sparklines.js"></script>
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+      <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>	
+	
+	<script>
+	$(function() {
+		$('.spark').sparkline('html',
+      {
+        type: 'bar',
+        fillColor: '#8aaaea',
+        width: "400px",
+        height: "30px"
+      });
+
+	});
+	</script>
+	
+	<style>
+	@import url(http://fonts.googleapis.com/css?family=Carme);
+	@import url(http://fonts.googleapis.com/css?family=Open+Sans:300);
+	body { font-family: open sans; margin-left: 50px; width: 950px;
+	margin-right: auto; margin-left: auto; }
+	div.container {}
+	.word {font-family: Open Sans; font-size: 10pt; text-align: right;}
+	td {text-align: right;}
+	.spark { height: 70px; margin: 5px;}
+	table {float:left; margin-right: 20px; }
+	p {font-size: 12pt; width: 700px; margin: 15px; margin-bottom: 3ex; font-family: open sans;}
+	h1 {margin-top: 30px; font-family: open sans;}
+  h2 { color: rgb(151, 158, 170); font-size: 13pt; }
+	.count {font-size: 10pt;}
+	table.topk {margin: 20px; width: 120px}
+	.year {font-weight: bold;}
+	b {color: steelblue; font-weight: bold;}
+	.footer {display: block; clear:both; text-align: center; font-size: 10pt; margin-top: 5em;}
+  .row { margin-top: 2.5em; }
+	</style>
+</head>
+
+<div class="row">
+  <form action="/" method="post">
+    <input name="db" value="bt"/>
+    <input name="table" value="sample"/>
+    <input name="nbuckets" value="50" length=3 />
+    <input type="submit"/>
+  </form>
+</div>
+
+{% for col, stats, stat_str in data %}
+<div class="row">
+<div class='span2' style="text-align: right">{{col}}</div>
+<div class='span10' style='text-align: left;height: 40px'>
+  <span id="chart_{{col}}"/>
+  <script type="text/javascript">
+    var svg = dimple.newSvg("#chart_{{col}}", 500, 40);
+    var data = [
+      {% for k,v in stats %}
+        { 'x':'{{k}}', 'y':{{v}}},
+      {% endfor %}
+    ];
+    var chart = new dimple.chart(svg, data);
+    chart.addCategoryAxis("x", "x");
+    chart.addMeasureAxis("y", "y").ticks=2;
+    chart.addSeries(null, dimple.plot.bar);
+    chart.draw();
+  </script>
+  <!--<span class='spark'>{{stat_str}}</span>-->
+</div>
+</div>
+{% endfor %}
+
+<div class="row">&nbsp;</div>
+
+</html>
