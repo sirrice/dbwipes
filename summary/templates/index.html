@@ -5,7 +5,8 @@
 	<script src="/static/js/sparklines.js"></script>
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
-      <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+    <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+    <script src="/static/js/chart.js"></script>
 	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>	
 	
 	<script>
@@ -58,17 +59,19 @@
 <div class='span10' style='text-align: left;height: 40px'>
   <span id="chart_{{col}}"/>
   <script type="text/javascript">
-    var svg = dimple.newSvg("#chart_{{col}}", 500, 40);
-    var data = [
-      {% for k,v in stats %}
-        { 'x':'{{k}}', 'y':{{v}}},
-      {% endfor %}
-    ];
-    var chart = new dimple.chart(svg, data);
-    chart.addCategoryAxis("x", "x");
-    chart.addMeasureAxis("y", "y").ticks=2;
-    chart.addSeries(null, dimple.plot.bar);
-    chart.draw();
+    $(function() {
+      var svg = dimple.newSvg("#chart_{{col}}", 500, 40);
+      var data = [
+        {% for k,v in stats %}
+          { 'x':'{{k}}', 'y':{{v}}},
+        {% endfor %}
+      ];
+      var chart = new dimple.chart(svg, data);
+      chart.addCategoryAxis("x", "x").ticks=3;
+      chart.addMeasureAxis("y", "y").ticks=2;
+      chart.addSeries(null, dimple.plot.bar);
+      chart.draw();
+    });
   </script>
   <!--<span class='spark'>{{stat_str}}</span>-->
 </div>
