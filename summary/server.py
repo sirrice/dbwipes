@@ -5,7 +5,6 @@ import json
 import md5
 import traceback
 from datetime import datetime
-from monetdb import sql as msql
 
 from summary import *
 import pdb
@@ -14,14 +13,17 @@ app = Flask(__name__)
 
 @app.route('/', methods=["POST", "GET"])
 def index():
-  dbname = request.form.get('db', 'bt')
-  tablename = request.form.get('table', 'sample')
+  dbname = request.form.get('db', 'intel')
+  tablename = request.form.get('table', 'readings')
   try:
-    nbuckets = int(request.form.get('nbuckets', 50))
+    nbuckets = int(request.form.get('nbuckets', 20))
   except:
     nbuckets = 50
 
-  foo = Foo(dbname, tablename, nbuckets=nbuckets)
+  from monetdb import sql as msql
+  db = dbname
+  #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
+  foo = Summary(db, tablename, nbuckets=nbuckets)
   stats = foo()
   data = []
   for col, col_stats in stats:
