@@ -84,6 +84,7 @@ class Summary(object):
       else:
         print "\tgot %d" % (len(col_stats))
       stats.append((col, col_stats))
+      break
     return stats
 
 
@@ -140,7 +141,7 @@ class Summary(object):
   def get_group_stats(self, col_name, groupby):
     q = "select %s as GRP, count(*) from %s group by GRP order by GRP limit %d"
     q = q % (groupby, self.tablename, self.nbuckets)#groupby, groupby, self.nbuckets)
-    rows = [(x, count) for (x, count) in self.query(q)]
+    rows = [{ 'val': x, 'count': count, 'range':[]} for (x, count) in self.query(q)]
     return rows
 
   def get_num_stats(self, col_name):
