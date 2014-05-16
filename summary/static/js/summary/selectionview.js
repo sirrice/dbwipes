@@ -3,7 +3,8 @@ define(function(require) {
       $ = require('jquery'),
       d3 = require('d3'),
       _ = require('underscore'),
-      Where = require('summary/where');
+      Where = require('summary/where'),
+      util = require('summary/util')
 
   // View to render the selected stuff for debugging
   var SelectionView = Backbone.View.extend({
@@ -22,10 +23,7 @@ define(function(require) {
         return this;
       }
 
-      var s = "("+vals.join(', ')+")";
-      if (type != 'str') {
-        var s = JSON.stringify(d3.min(vals)) + " - " + JSON.stringify(d3.max(vals));
-      }
+      var s = this.model.toSQLWhere();
       this.$el.html("<div>" + this.model.get('col') + " = " + s + "</div>");
       this.$el.show();
       return this;

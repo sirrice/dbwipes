@@ -11,6 +11,8 @@ from summary import *
 import pdb
 app = Flask(__name__)
 
+summaries = {}
+
 
 def json_handler(o):
   if hasattr(o, 'isoformat'):
@@ -34,11 +36,20 @@ def query():
   if not dbname or not query:
     return json.dumps({})
 
-  db = create_engine('postgresql://localhost/%s' % dbname)
-  cur = db.execute(query)
-  rows = cur.fetchall()
-  data = [dict(zip(cur.keys(), vals)) for vals in rows]
-  cur.close()
+  print query
+  data = []
+
+  try:
+    db = create_engine('postgresql://localhost/%s' % dbname)
+    conn = db.connect()
+    cur = conn.execute(query)
+    rows = cur.fetchall()
+    data = [dict(zip(cur.keys(), vals)) for vals in rows]
+    cur.close()
+    conn.close()
+    db.dispose()
+  except Exception as e:
+    print e
   return json.dumps({'data': data}, default=json_handler)
 
 @app.route('/api/lookup/', methods=['POST', 'GET'])
@@ -46,14 +57,17 @@ def lookup():
   dbname = request.form.get('db', 'intel')
   tablename = request.form.get('table', 'readings')
   try:
-    nbuckets = int(request.form.get('nbuckets', 20))
+    nbuckets = int(request.form.get('nbuckets', 100))
   except:
-    nbuckets = 50
+    nbuckets = 100
 
-  from monetdb import sql as msql
-  db = dbname
-  #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
-  foo = Summary(db, tablename, nbuckets=nbuckets)
+  if (dbname, tablename) not in summaries:
+    from monetdb import sql as msql
+    db = dbname
+    #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
+    summaries[(dbname, tablename)] = Summary(db, tablename, nbuckets=nbuckets)
+
+  foo = summaries[(dbname, tablename)]
   stats = foo()
   data = []
   for col, col_stats in stats:

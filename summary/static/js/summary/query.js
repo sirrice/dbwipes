@@ -46,7 +46,11 @@ define(function(require) {
 
     ensureWhere: function() {
       var where = this.get('where');
-      if (!where) where = new Where;
+      console.log(['ensurewhere', where, 'to', where.id, where.models.length]);
+      if (!where) {
+        console.log("creating new Where");
+        where = new Where;
+      }
       this.listenTo(where, 'change:selection', function() {
         console.log("selection changed")
         console.log(where)
@@ -114,5 +118,3 @@ define(function(require) {
 
   return Query;
 });
-
-

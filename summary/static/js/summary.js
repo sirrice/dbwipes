@@ -29,13 +29,12 @@ requirejs.config({
     'handlebars': {
       exports: 'Handlebars'
     }
-
   }
 });
 
 // Start the main app logic.
-requirejs(['jquery', 'handlebars', 'summary/where', 'summary/whereview', 'summary/cstat', 'summary/cstatsview', 'summary/query', 'summary/queryview'],
-function   ($, Handlebars, Where, WhereView, CStat, CStatsView, Query, QueryView) {
+requirejs(['jquery', 'summary/where', 'summary/whereview', 'summary/cstat', 'summary/cstatsview', 'summary/query', 'summary/queryview'],
+function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
 
   $("#fm").on("submit", function() {
     var params = {
@@ -62,7 +61,7 @@ function   ($, Handlebars, Where, WhereView, CStat, CStatsView, Query, QueryView
   var csv = new CStatsView({collection: where, el: $("#rows")});
   var q = new Query();
   var qv = new QueryView({ model: q })
-  $("body").append(qv.render().$el);
+  $("#viz").append(qv.render().$el);
 
 
   var newq = {
@@ -80,15 +79,16 @@ function   ($, Handlebars, Where, WhereView, CStat, CStatsView, Query, QueryView
     })
   };
 
-  function loadQuery(newquery) {
-    where.fetch({data: { db: newquery.db, table: newquery.table}});
-    console.log(['where post fetch', where])
-    q.set(newquery);
-    console.log(['where post set', where])
-    q.fetch({data: q.toJSON()});
-    console.log(['where post qfetch', where])
-  }
-  loadQuery(newq)
+  q.set(newq);
+  console.log(['where post set', where])
+  //q.fetch({data: q.toJSON()});
+  //console.log(['where post qfetch', where])
+
+  //where.parse({data: [{col: 'hr', type: 'timestamp', stats: [{val: new Date('2004-03-1'), count: 10, range:[]}]}]})
+  console.log(['wherelen', where.models.length])
+  where.fetch({data: { db: newq.db, table: newq.table}});
+  //console.log(['where post fetch', where])
+
 
 
   window.where = where;

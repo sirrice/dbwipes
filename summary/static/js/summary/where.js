@@ -12,6 +12,7 @@ define(function(require) {
 
     initialize: function() {
       var _this = this;
+      this.id = Where.id_++;
       this.on('add', function(model) {
         this.listenTo(model, 'change:selection', function() {
           _this.trigger('change:selection');
@@ -22,24 +23,21 @@ define(function(require) {
     parse: function(resp) {
       var data = resp.data;
       var newstats = _.map(data, function(tup) { return new CStat(tup); })
-      console.log("resetting where")
-      this.reset();
-      _.each(newstats, function(m) {
-        console.log(["adding new where", m]);
-        this.add(m);
-      }, this)
+      return newstats;
     },
+
     toJSON: function() {
       return _.compact(_.invoke(this.models, 'toJSON'));
     },
+
     toSQL: function() {
-              console.log(this.models)
       return _.compact(this.map(function(m) {
         return m.toSQLWhere();
       })).join(' and ');
     }
-  })
+  });
+
+  Where.id_ = 0;
 
   return Where;
 });
-

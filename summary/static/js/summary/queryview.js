@@ -3,7 +3,8 @@ define(function(require) {
       $ = require('jquery'),
       d3 = require('d3'),
       _ = require('underscore'),
-      Where = require('summary/where');
+      Where = require('summary/where'),
+      util = require('summary/util');
 
 
   // TODO: connect to server to query and fetch data
@@ -30,8 +31,9 @@ define(function(require) {
     setupScales: function() {
       var data = this.model.get('data'),
           schema = this.model.get('schema'),
+          type = this.model.get('type'),
           xcol = this.model.get('x').col,
-          ycols = _.pluck(this.model.get('ys'), 'col')
+          ycols = _.pluck(this.model.get('ys'), 'col'),
           _this = this;
       var xs = _.pluck(data, xcol),
           yss = _.map(ycols, function(ycol) { return _.pluck(data, ycol) });
@@ -41,25 +43,29 @@ define(function(require) {
 
       this.state.cscales.domain(_.compact(_.union(this.state.cscales.domain(), ycols)));
 
-      if (this.model.get('type') == 'str') {
+      if (util.isStr(type)) {
         if (this.state.xdomain == null) this.state.xdomain = [];
         this.state.xdomain = _.union(this.state.xdomain, _.uniq(xs));
       } else {
         if (this.state.xdomain == null) this.state.xdomain = [Infinity, -Infinity];
-        this.state.xdomain[0] = Math.min(this.state.xdomain[0], d3.min(xs));
-        this.state.xdomain[1] = Math.max(this.state.xdomain[1], d3.max(xs));
+        if (xs.length) {
+          this.state.xdomain[0] = Math.min(this.state.xdomain[0], d3.min(xs));
+          this.state.xdomain[1] = Math.max(this.state.xdomain[1], d3.max(xs));
+        }
       }
 
       _.each(yss, function(ys) {
         if (this.state.ydomain == null) this.state.ydomain = [Infinity, -Infinity];
-        this.state.ydomain[0] = Math.min(this.state.ydomain[0], d3.min(ys));
-        this.state.ydomain[1] = Math.max(this.state.ydomain[1], d3.max(ys));
+        if (ys.length) {
+          this.state.ydomain[0] = Math.min(this.state.ydomain[0], d3.min(ys));
+          this.state.ydomain[1] = Math.max(this.state.ydomain[1], d3.max(ys));
+        }
       }, this);
 
       if (this.state.xscales == null) {
         var xtype = schema[xcol];
         var xscales = d3.scale.linear();
-        if (_.contains(['time', 'timestamp', 'date'], xtype)) {
+        if (util.isTime(xtype)) {
           xscales = d3.time.scale();
         }
         xscales.range([0, this.state.w]);
@@ -83,6 +89,8 @@ define(function(require) {
           .scale(this.state.xscales)
           .tickSize(0,0)
           .orient('bottom')
+        var nticks = util.estNumXTicks(this.state.xaxis, type, this.state.w);
+        util.setAxisLabels(this.state.xaxis, type, nticks);
       }
       if (!this.state.yaxis) {
         this.state.yaxis = d3.svg.axis()
@@ -180,6 +188,7 @@ define(function(require) {
       }
       console.log("data:")
       console.log(this.model.get('data')[0])
+      console.log(this.model.get('where'));
 
 
 

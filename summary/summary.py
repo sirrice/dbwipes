@@ -15,6 +15,22 @@ class Summary(object):
     self.tablename = tablename
     self.nbuckets = nbuckets
 
+    self._cache = {}
+
+  def __call__(self):
+    cols = self.get_columns()
+    stats = []
+    for col in cols:
+      print "stats for: %s" % col
+      col_stats = self.get_col_stats(col)
+      if col_stats is None:
+        print "\tgot None"
+        continue
+      print "\tgot %d" % (len(col_stats))
+      stats.append((col, col_stats))
+    return stats
+
+
 
   def query(self, q, *args):
     """
@@ -72,22 +88,6 @@ class Summary(object):
       traceback.print_exc()
       return None
 
-  def __call__(self):
-    cols = self.get_columns()
-    stats = []
-    for col in cols:
-      print "stats for: %s" % col
-      col_stats = self.get_col_stats(col)
-      if col_stats is None:
-        print "\tgot None"
-        continue
-      else:
-        print "\tgot %d" % (len(col_stats))
-      stats.append((col, col_stats))
-      break
-    return stats
-
-
 
   def get_cardinality(self, col_name):
     q = "SELECT count(distinct %s) FROM %s"
@@ -129,20 +129,56 @@ class Summary(object):
 
 
   def get_col_stats(self, col_name):
+    if col_name in self._cache:
+      return self._cache[col_name]
+
     col_type = self.get_type(col_name)
+
+    if self.dbtype == 'pg' and any([s in col_type for s in ['int', 'float', 'double', 'numeric']]):
+      stats = self.get_numeric_stats(col_name)
+      self._cache[col_name] = stats
+      return stats
 
     groupby = self.get_col_groupby(col_name, col_type)
     if groupby:
-      return self.get_group_stats(col_name, groupby)
+      stats = self.get_group_stats(col_name, groupby)
+      self._cache[col_name] = stats
+      return stats
+    self._cache[col_name] = None
     return None
 
 
 
   def get_group_stats(self, col_name, groupby):
-    q = "select %s as GRP, count(*) from %s group by GRP order by GRP limit %d"
-    q = q % (groupby, self.tablename, self.nbuckets)#groupby, groupby, self.nbuckets)
-    rows = [{ 'val': x, 'count': count, 'range':[]} for (x, count) in self.query(q)]
+    q = """select %s as GRP, min(%s), max(%s), count(*) 
+    from %s group by GRP 
+    order by GRP limit %d"""
+    q = q % (groupby, col_name, col_name, self.tablename, self.nbuckets)
+    rows = [{ 'val': x, 'count': count, 'range':[minv, maxv]} for (x, minv, maxv, count) in self.query(q)]
     return rows
+
+  def get_numeric_stats(self, c):
+    q = """
+    with bound as (
+      SELECT min(%s) as min, max(%s) as max FROM %s
+    )
+    SELECT width_bucket(%s::numeric, min, max, %d) as bucket,
+           min(%s) as min,
+           max(%s) as max,
+           count(*) as count
+    FROM %s, bound
+    GROUP BY bucket
+    """
+    q = q % (c, c, self.tablename, c, self.nbuckets, c, c, self.tablename)
+    print q
+    stats = []
+    for (val, minv, maxv, count) in self.query(q):
+      stats.append({
+        'val': (maxv+minv)/2.,
+        'count': count,
+        'range': [minv, maxv]
+      })
+    return stats
 
   def get_num_stats(self, col_name):
     q = "select min(%s), max(%s), avg(%s), var_pop(%s), count(distinct %s) from %s" 
@@ -150,11 +186,17 @@ class Summary(object):
     minv, maxv, avg, var, ndistinct = self.query(q)[0]
     if ndistinct <= self.nbuckets: return col_name
 
-    block = (min(maxv, avg+2.5*(var**.5)) - max(minv, avg-2.5*(var**.5))) / self.nbuckets 
+    maxvar = avg+2.5*(var**.5)
+    minvar = avg-2.5*(var**.5)
+    if maxvar <= maxv and minvar >= minv:
+      minv, maxv = minvar, maxvar
+
+    block = (maxv - minv) / self.nbuckets 
     if self.dbtype == 'pg':
-      groupby = "((%s-(%.3f)) / %s)::int*%.3f" % (col_name, minv, block, block)
+      groupby = "(%s / %s)::int*%s" % (col_name, block, block)
     else:
-      groupby = "cast(((%s-(%.3f)) / %s) as int)*%.3f" % (col_name, minv, block, block)
+      groupby = "cast((%s / %s) as int)*%s" % (col_name, block, block)
+    print groupby
 
     return groupby
 

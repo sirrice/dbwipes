@@ -1,8 +1,10 @@
 define(function(require) {
   var Backbone = require('backbone'),
-      d3 = require('d3');
+      d3 = require('d3'),
+      util = require('summary/util');
+
+
   require('date');
-      
 
   var CStat = Backbone.Model.extend({
     urlRoot: "/",
@@ -23,15 +25,13 @@ define(function(require) {
           stats = attrs.stats,
           _this = this;
 
-      if (_.contains(['int4', 'int', 'int8', 'float8', 'float', 'bigint'], type)) {
+      if (util.isNum(type)) {
         type = attrs.type = 'num';
       }
-      if (_.contains(['varchar', 'text'], type)) {
+      if (util.isStr(type)) {
         type = attrs.type = 'str';
       }
-
-
-      if (_.contains(['time', 'timestamp', 'date'], type)) {
+      if (util.isTime(type)){
         // ensure vals and ranges are date objects
         _.each(stats, function(el) {
           el.val = new Date(el.val);
@@ -39,8 +39,8 @@ define(function(require) {
         })
       }
 
-      var xdomain = null;
 
+      var xdomain = null;
       if (type != 'str') {
         xdomain = [
           d3.min(stats, function(el) { return el.range[0] || el.val; }),
@@ -78,34 +78,48 @@ define(function(require) {
 
 
     toJSON: function() {
-      if (_.size(this.get('selection')) == 0) {
-        return {};
+      if (this.get('selection').length == 0) {
+        return {col: this.get('col')};
       }
       return {
         col: this.get('col'),
         type: this.get('type'),
-        vals: _.keys(this.get('selection'))
+        vals: _.pluck(this.get('selection'), 'range')
       };
     },
 
     toSQLWhere: function() {
-      var sel = this.get('selection');
-      if (_.size(sel) == 0) return null;
+      var sel = this.get('selection'),
+          type = this.get('type'),
+          col = this.get('col');
+      if (sel.length == 0) return null;
 
-      var vals = _.keys(sel);
+      var vals = [];
+      _.each(sel, function(d) {
+        vals = vals.concat(d.range);
+      });
+      vals = _.compact(_.uniq(vals));
 
-      if (this.get('type') == 'str') {
-        vals = _.map(vals, function(v) { return '"'+v+'"'})
-        vals.join(',')
-        return this.get('col') + " in ("+vals+")";
+
+      if (util.isStr(type)) {
+        return col + " in ("+vals.join(',')+")";
+      }
+
+      if (util.isTime(type)) {
+        var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
+        vals = _.map(vals, function(v) { return new Date(v)});
+      } else {
+        var val2s = function(v) { return +v };
       }
 
       if (vals.length == 1) {
-        return this.get('col') + " = " + vals[0];
+        return col + " = " + val2s(vals[0]);
       }
+      console.log("cstat.toSQL")
+      console.log([d3.min(vals), d3.max(vals)])
       return [
-        d3.min(vals) + " <= " + this.get('col'),
-        this.get('col') + " <= " + d3.max(vals)
+        val2s(d3.min(vals)) + " <= " + col,
+        col + " <= " + val2s(d3.max(vals))
       ].join(' and ');
     }
 
@@ -113,7 +127,3 @@ define(function(require) {
   CStat.id_ = 0;
   return CStat;
 });
-
-
-
-
