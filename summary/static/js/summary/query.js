@@ -3,7 +3,8 @@ define(function(require) {
       $ = require('jquery'),
       d3 = require('d3'),
       _ = require('underscore'),
-      Where = require('summary/where');
+      Where = require('summary/where'),
+      util = require('summary/util');
 
 
   var Query = Backbone.Model.extend({
@@ -46,22 +47,16 @@ define(function(require) {
 
     ensureWhere: function() {
       var where = this.get('where');
-      console.log(['ensurewhere', where, 'to', where.id, where.models.length]);
       if (!where) {
-        console.log("creating new Where");
         where = new Where;
       }
       this.listenTo(where, 'change:selection', function() {
-        console.log("selection changed")
-        console.log(where)
-        console.log(where.toSQL())
         this.fetch({data:this.toJSON()});
       }, this);
       this.attributes['where'] = where;
     },
 
     onChange: function() {
-      console.log('changed')
       this.ensureX();
       this.ensureYs();
       this.ensureWhere();
@@ -70,11 +65,18 @@ define(function(require) {
 
     parse: function(resp, opts) {
       if (resp.data) {
-        // ensure vals and ranges are date objects
-        _.each(resp.data, function(el) {
-          // SUPER HACK RIGHT NOW
-          el.hr = new Date(el.hr);
-        })
+        var xcol = this.get('x'),
+            schema = this.get('schema');
+        if (util.isTime(schema[xcol.col])) {
+          // ensure vals and ranges are date objects
+          _.each(resp.data, function(el) {
+            el[xcol.alias] = new Date(el[xcol.alias]);
+          });
+
+          resp.data = _.reject(resp.data, function(d) {
+            return _.any(_.map(_.values(d), function(v){ return v == null; }))
+          });
+        }
       }
       return resp;
     },

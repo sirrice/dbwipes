@@ -1,16 +1,55 @@
 <html>
 
 <head>
-  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
   <script data-main="/static/js/summary" src="/static/js/require.js"></script>
 	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
+
+</head>
+
+<div class="row">
+  <form id="fm" action="/" method="post">
+    <input id="db" name="db" value="bt"/>
+    <input id="table" name="table" value="sample"/>
+    <input id="nbuckets" name="nbuckets" value="50" length=3 />
+    <input type="submit"/>
+  </form>
+</div>
+
+<div class="row">
+	<div class="col-md-5">
+		<div id="facets"></div>
+	</div>
+	<div class="col-md-5">
+    <div style="position: fixed">
+      <div id="viz" ></div>
+      <div id="where"></div>
+    </div>
+	</div>
+</div>
+
+<div class="row">&nbsp;</div>
+
+{%raw%}
+<script id="foo-template" type="text/x-underscore-template">
+<div class='row'>
+  <div class="col-md-2">{{col}}<span>({{type}})</span></div>
+	<div class="col-md-10">
+    <svg class=""></svg>
+	</div>
+</div>
+</script>
+{%endraw%}
+
+
+
+
+
 
 	<style>
     @import url(http://fonts.googleapis.com/css?family=Carme);
     @import url(http://fonts.googleapis.com/css?family=Open+Sans:300);
-    body { font-family: open sans; margin-left: 50px; width: 950px;
+    body { font-family: open sans; margin-left: 50px; min-width: 900px; width: 95%;
     margin-right: auto; margin-left: auto; }
-    div.container {}
     td {text-align: right;}
     table {float:left; margin-right: 20px; }
     p {font-size: 12pt; width: 700px; margin: 15px; margin-bottom: 3ex; font-family: open sans;}
@@ -18,25 +57,29 @@
     h2 { color: rgb(151, 158, 170); font-size: 13pt; }
     b {color: steelblue; font-weight: bold;}
     .footer {display: block; clear:both; text-align: center; font-size: 10pt; margin-top: 5em;}
-    .row { margin-top: 2.5em; }
+    .row { margin-top: .2em; }
     .axis path, .axis line {
       fill: none;
-      stroke: black;
+      stroke: #aeaeae;
       stroke-width: 1px;
       shape-rendering: crispEdges;
     }
-    circle {
+    .tick text {
+      fill: #aeaeae;
+      font-size: 10pt;
+    }
+    .cstat circle {
       fill: grey;
     }
-    circle.selected {
+    .cstat circle.selected {
       fill: steelblue;
       size: 10;
       stroke: steelblue
     }
-    rect{
+    .cstat rect{
       fill: grey;
     }
-    rect.selected {
+    .cstat rect.selected {
       fill: steelblue;
     }
     .mark:hover {
@@ -50,38 +93,6 @@
       shape-rendering: crispEdges;
     }
 	</style>
-</head>
 
-<div class="row">
-  <form id="fm" action="/" method="post">
-    <input id="db" name="db" value="bt"/>
-    <input id="table" name="table" value="sample"/>
-    <input id="nbuckets" name="nbuckets" value="50" length=3 />
-    <input type="submit"/>
-  </form>
-</div>
-
-<div class="row">
-	<div class="span7">
-		<div id="rows"></div>
-	</div>
-	<div class="span5">
-		<div id="where"></div>
-		<div id="viz"></div>
-	</div>
-</div>
-
-<div class="row">&nbsp;</div>
-
-{%raw%}
-<script id="foo-template" type="text/x-underscore-template">
-<h2>{{col}}</h2>
-<div class='row'>
-	<div class="span12">
-    <svg class=""></svg>
-	</div>
-</div>
-</script>
-{%endraw%}
 
 </html>

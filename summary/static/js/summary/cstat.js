@@ -46,6 +46,24 @@ define(function(require) {
           d3.min(stats, function(el) { return el.range[0] || el.val; }),
           d3.max(stats, function(el) { return el.range[1] || el.val; })
         ]
+        if (xdomain[0] == xdomain[1]) {
+          if (util.isNum(type)) {
+            xdomain[0] -= .5;
+            xdomain[1] += .5;
+          } else {
+            xdomain[0] -= 1000*60*60*24;
+            xdomain[1] += 1000*60*60*24;
+          }
+        } else {
+          var diff = (xdomain[1] - xdomain[0]) * 0.05;
+          if (util.isNum(type)) {
+            xdomain[0] -= diff;
+            xdomain[1] += diff;
+          } else {
+            xdomain[0] = new Date(xdomain[0] - diff);
+            xdomain[1] = new Date(xdomain[1] + diff);
+          }
+        }
       } else {
         xdomain = {};
         _.each(stats, function(el) {
@@ -78,9 +96,6 @@ define(function(require) {
 
 
     toJSON: function() {
-      if (this.get('selection').length == 0) {
-        return {col: this.get('col')};
-      }
       return {
         col: this.get('col'),
         type: this.get('type'),
@@ -101,26 +116,27 @@ define(function(require) {
       vals = _.compact(_.uniq(vals));
 
 
+      var SQL = null;
       if (util.isStr(type)) {
-        return col + " in ("+vals.join(',')+")";
-      }
-
-      if (util.isTime(type)) {
-        var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
-        vals = _.map(vals, function(v) { return new Date(v)});
+         SQL = col + " in ("+vals.join(',')+")";
       } else {
-        var val2s = function(v) { return +v };
-      }
+        if (util.isTime(type)) {
+          var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
+          vals = _.map(vals, function(v) { return new Date(v)});
+        } else {
+          var val2s = function(v) { return +v };
+        }
 
-      if (vals.length == 1) {
-        return col + " = " + val2s(vals[0]);
+        if (vals.length == 1) {
+          SQL = col + " = " + val2s(vals[0]);
+        } else {
+          SQL = [
+            val2s(d3.min(vals)) + " <= " + col,
+            col + " <= " + val2s(d3.max(vals))
+          ].join(' and ');
+        }
       }
-      console.log("cstat.toSQL")
-      console.log([d3.min(vals), d3.max(vals)])
-      return [
-        val2s(d3.min(vals)) + " <= " + col,
-        col + " <= " + val2s(d3.max(vals))
-      ].join(' and ');
+      return "not("+SQL+")";
     }
 
   });

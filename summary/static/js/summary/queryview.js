@@ -33,13 +33,12 @@ define(function(require) {
           schema = this.model.get('schema'),
           type = this.model.get('type'),
           xcol = this.model.get('x').col,
-          ycols = _.pluck(this.model.get('ys'), 'col'),
+          ycols = _.pluck(this.model.get('ys'), 'alias'),
           _this = this;
       var xs = _.pluck(data, xcol),
           yss = _.map(ycols, function(ycol) { return _.pluck(data, ycol) });
+      console.log(yss)
 
-      console.log("setup scales")
-      console.log(this.state.xdomain)
 
       this.state.cscales.domain(_.compact(_.union(this.state.cscales.domain(), ycols)));
 
@@ -56,6 +55,7 @@ define(function(require) {
 
       _.each(yss, function(ys) {
         if (this.state.ydomain == null) this.state.ydomain = [Infinity, -Infinity];
+        ys = _.filter(ys, _.isFinite);
         if (ys.length) {
           this.state.ydomain[0] = Math.min(this.state.ydomain[0], d3.min(ys));
           this.state.ydomain[1] = Math.max(this.state.ydomain[1], d3.max(ys));
@@ -99,19 +99,16 @@ define(function(require) {
           .orient('left');
       }
 
-
-      console.log(this.state.xdomain)
-
     },
 
     renderAxes: function(el) {
       el.append('g')
-        .attr('class', 'axis x')
+        .attr('class', 'axis x xaxis')
         .attr('transform', "translate(0,"+this.state.h+")")
         .call(this.state.xaxis)
 
       el.append('g')
-        .attr('class', 'axis y')
+        .attr('class', 'axis y yaxis')
         .call(this.state.yaxis)
     },
 
@@ -122,30 +119,30 @@ define(function(require) {
           y: d[ycol]
         }
       });
-      console.log(this.model.get('schema')['hr']);
-      console.log(this.state.xscales.domain())
-      console.log(this.state.xscales.range())
+
       var _this = this;
       var dc = el.append('g')
         .attr('class', 'data-container')
-      dc.selectAll('circle')
-          .data(data)
-        .enter().append('circle')
-          .attr({
-            class: 'mark',
-            cx: function(d) { return _this.state.xscales(d.x)},
-            cy: function(d) { return _this.state.yscales(d.y)},
-            r: 2,
-            fill: this.state.cscales(ycol),
-            stroke: this.state.cscales(ycol),
-          })
+      if (this.state.marktype == 'circle') {
+        dc.selectAll('circle')
+            .data(data)
+          .enter().append('circle')
+            .attr({
+              class: 'mark',
+              cx: function(d) { return _this.state.xscales(d.x)},
+              cy: function(d) { return _this.state.yscales(d.y)},
+              r: 2,
+              fill: this.state.cscales(ycol),
+              stroke: this.state.cscales(ycol),
+            })
+      }
     },
 
     renderBrush: function(el) {
       var type = this.model.get('type');
       var brushf = function(p) {
         var e = brush.extent()
-        var selected = {};
+        var selected = [];
         el.selectAll('.mark')
           .classed('selected', function(d){
             if (type == 'str') {
@@ -155,13 +152,11 @@ define(function(require) {
             }
             b = b && (e[0][1] <= d.y && e[1][1] > d.y);
 
-            if (b) {
-              selected[d.x] = d;
-            }
+            if (b) selected.push(d)
             return b;
           })
         if (d3.event.type == 'brushend') {
-          console.log(selected)
+          console.log(['selected', selected]);
         }
       }
 
@@ -180,16 +175,26 @@ define(function(require) {
 
     },
 
+    renderZoom: function(el) {
+      var _this = this;
+      function zoomed() {
+        el.select('.xaxis').call(_this.state.xaxis);
+      };
+      var zoom = d3.behavior.zoom()
+        .x(this.state.xscales)
+        .y(this.state.yscales)
+        .scaleExtent([1, 5])
+        .on('zoom', zoomed);
+
+      zoom(el);
+    },
+
 
     render: function() {
       if (!this.model.get('data'))  {
         console.log("no data, queryview not rendering");
         return this;
       }
-      console.log("data:")
-      console.log(this.model.get('data')[0])
-      console.log(this.model.get('where'));
-
 
 
       this.$el.empty();
@@ -199,13 +204,22 @@ define(function(require) {
           .attr('height', this.state.h + 20);
       var c = svg.append('g')
           .attr('transform', "translate(40, 0)");
+      
+      c.append('rect')
+        .attr('width', this.state.w)
+        .attr('height', this.state.h)
+        .attr('fill', 'none')
+        .attr('stroke', 'none')
+        .style('pointer-events', 'all')
 
       this.setupScales()
       this.renderAxes(c)
       _.each(this.model.get('ys'), function(ycol) {
-        this.renderData(c, this.model.get('x').col, ycol.col);
+        console.log(['renderData','ycol',ycol])
+        this.renderData(c, this.model.get('x').col, ycol.alias);
       }, this)
       this.renderBrush(c)
+      //this.renderZoom(c)
       return this;
 
     }

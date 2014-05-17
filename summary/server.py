@@ -48,26 +48,29 @@ def query():
     cur.close()
     conn.close()
     db.dispose()
+    print data[:3]
   except Exception as e:
     print e
   return json.dumps({'data': data}, default=json_handler)
 
 @app.route('/api/lookup/', methods=['POST', 'GET'])
 def lookup():
-  dbname = request.form.get('db', 'intel')
-  tablename = request.form.get('table', 'readings')
+  dbname = request.args.get('db', 'intel')
+  tablename = request.args.get('table', 'readings')
   try:
-    nbuckets = int(request.form.get('nbuckets', 100))
-  except:
+    nbuckets = int(request.args.get('nbuckets', 100))
+  except Exception as e:
+    print e
     nbuckets = 100
 
-  if (dbname, tablename) not in summaries:
+  key = (dbname, tablename, nbuckets)
+  if key not in summaries:
     from monetdb import sql as msql
     db = dbname
     #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
-    summaries[(dbname, tablename)] = Summary(db, tablename, nbuckets=nbuckets)
+    summaries[key] = Summary(db, tablename, nbuckets=nbuckets)
 
-  foo = summaries[(dbname, tablename)]
+  foo = summaries[key]
   stats = foo()
   data = []
   for col, col_stats in stats:

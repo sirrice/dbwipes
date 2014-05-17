@@ -160,16 +160,16 @@ class Summary(object):
   def get_numeric_stats(self, c):
     q = """
     with bound as (
-      SELECT min(%s) as min, max(%s) as max FROM %s
+      SELECT min(%s) as min, max(%s) as max, avg(%s) as avg, stddev(%s) as std FROM %s
     )
-    SELECT width_bucket(%s::numeric, min, max, %d) as bucket,
+    SELECT width_bucket(%s::numeric, (avg-2.5*std), (avg+2.5*std), %d) as bucket,
            min(%s) as min,
            max(%s) as max,
            count(*) as count
     FROM %s, bound
     GROUP BY bucket
     """
-    q = q % (c, c, self.tablename, c, self.nbuckets, c, c, self.tablename)
+    q = q % (c, c, c, c, self.tablename, c, self.nbuckets, c, c, self.tablename)
     print q
     stats = []
     for (val, minv, maxv, count) in self.query(q):

@@ -45,7 +45,7 @@ function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
 
     $.post('/json/lookup/', params, function(resp){
       var data = resp.data;
-      var rows = $("#rows").empty();
+      var rows = $("#facets").empty();
       _.each(data, function(tup){
         var cs = new CStat(tup);
         where.add(cs);
@@ -58,7 +58,7 @@ function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
 
   var where = new Where;
   var whereview = new WhereView({collection: where, el: $("#where")});
-  var csv = new CStatsView({collection: where, el: $("#rows")});
+  var csv = new CStatsView({collection: where, el: $("#facets")});
   var q = new Query();
   var qv = new QueryView({ model: q })
   $("#viz").append(qv.render().$el);
@@ -66,7 +66,10 @@ function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
 
   var newq = {
     x: 'hr',
-    ys: [{col: 'temp', expr: "avg(temp)", alias: 'temp'}],
+    ys: [
+      {col: 'temp', expr: "avg(temp)", alias: 'avg'},
+      {col: 'temp', expr: "stddev(temp)", alias: 'std'}
+    ],
     schema: {
       hr: 'timestamp',
       temp: 'num'
@@ -75,22 +78,22 @@ function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
     table: 'readings' ,
     db: 'intel',
     data: _.times(10, function(i) {
-      return { hr: new Date('2004-03-'+i), temp: i, y2: i/2};
+      return { hr: new Date('2004-03-'+i), std: i, avg: i/2};
     })
   };
 
   q.set(newq);
-  console.log(['where post set', where])
   //q.fetch({data: q.toJSON()});
   //console.log(['where post qfetch', where])
 
   //where.parse({data: [{col: 'hr', type: 'timestamp', stats: [{val: new Date('2004-03-1'), count: 10, range:[]}]}]})
-  console.log(['wherelen', where.models.length])
-  where.fetch({data: { db: newq.db, table: newq.table}});
+  where.fetch({data: { db: newq.db, table: newq.table, nbuckets:500}});
   //console.log(['where post fetch', where])
 
 
 
+  window.q = q;
+  window.qv = qv;
   window.where = where;
 
 
