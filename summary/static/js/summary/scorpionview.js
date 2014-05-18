@@ -23,10 +23,10 @@ define(function(require) {
     },
 
     render: function() {
-      console.log("render walkthroug")
       var _this = this,
           model = this.model;
 
+      this.$el.attr("id", "walkthrough-container");
       this.$el.empty().html(this.template(this.model.toJSON()));
 
       this.$('.close').click(function() {_this.$el.hide(); });
@@ -47,7 +47,9 @@ define(function(require) {
             e.checked = false;
           });
       });
-      this.$('submit').click(function(){});
+      this.$('#scorpion_submit').click(function(){
+        model.fetch({data: model.toJSON()});
+      });
 
 
       return this;

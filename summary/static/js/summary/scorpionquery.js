@@ -5,11 +5,12 @@ define(function(require) {
       _ = require('underscore'),
       Where = require('summary/where'),
       util = require('summary/util'),
-      ScorpionResult = require('summary/scorpionresult')
+      ScorpionResult = require('summary/scorpionresult'),
+      ScorpionResults = require('summary/scorpionresults')
 
 
   var ScorpionQuery = Backbone.Model.extend({
-    url: '/api/scorpion',
+    url: '/api/scorpion/',
 
     defaults: function() {
       return {
@@ -17,7 +18,7 @@ define(function(require) {
         goodselection: {},
         selection: {},
         query: null,
-        results: new ScorpionResult()
+        results: new ScorpionResults()
       }
     },
 
@@ -52,15 +53,15 @@ define(function(require) {
 
     parse: function(resp) {
       if (resp.results) {
+        var q = this.get('query'),
+            results = this.get('results');
 
-        var results = this.get('results'),
-            q = this.get('query');
-        results.reset();
-
-        _.each(resp.results, function(r) {
+        var newresults = _.map(resp.results, function(r) {
           r.query = q;
-          results.add(new ScorpionResult(r));
+          return new ScorpionResult(r);
         });
+
+        results.reset(newresults);
         resp.results = results;
       }
       return resp;

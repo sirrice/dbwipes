@@ -2,30 +2,44 @@
 
 <head>
   <script data-main="/static/js/summary" src="/static/js/require.js"></script>
-	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
 
 </head>
 
-
 <div class="row">
-	<div class="col-md-5">
-		<div id="facets"></div>
-	</div>
-	<div class="col-md-5">
-    <div class="row" style="position: fixed">
-      <div class="col-md-12" id="right">
-        <div id="where"></div>
-        <div style="clear:both"></div>
-      </div>
-    </div>
-	</div>
-  <div style="clear:both"></div>
-</div>
-<div class="row">
-  <div class="col-md-12" id="scorpion-container">
+  <div class="col-md-12">
+    <h1>Scorpion</h1>
   </div>
 </div>
 
+<div class="row">
+  <div class="col-md-6 col-md-offset-6">
+    <span id="q-toggle">toggle plot</span>
+  </div>
+</div>
+
+
+
+<div class="row">
+	<div class="col-md-6">
+		<div id="facets"></div>
+    <div class='row'>
+      <div class="col-md-10 col-md-offset-2" id='where'></div>
+    </div>
+	</div>
+
+
+	<div class="col-md-6">
+
+    <div class="row" style="position: fixed">
+      <div class="col-md-12" id="right">
+        <div style="clear:both"></div>
+        <div id="scorpion-container"></div>
+      </div>
+    </div>
+
+	</div>
+  <div style="clear:both"></div>
+</div>
 <div class="row">&nbsp;</div>
 
 {%raw%}
@@ -93,20 +107,23 @@
 <div class='row'>
   <div class="col-md-12 scorpion-result">
     <ul class="filter-clause">
-      <span class="score">{{score}}</span>
-      <span class="crange">{{c_range[0]}} - {{c_range[1]}}</span>
+      <span class="info">
+        <span class="score">{{score}}</span>
+        <span class="crange">{{c_range}}</span>
+      </span>
       {{#each clauses}}
         <li class='clause-part'>{{this}}</li>
       {{/each}}
-    <ul>
+    </ul>
     {{#if alt_clauses}}
-    <div class="equiv-show">expand</div>
-    <div style="display:none;">
-      <ul class="equiv-clauses">
+    <div class="equiv-toggle-container">
+      <div class="equiv-toggle">expand</div>
+    </div>
+    <div class="equiv-clauses" style="display:none;">
+      <ul class="equiv-clause">
         {{#each alt_clauses}}
         <li class="clause-part">{{this}}</li>
         {{/each}}
-        <li class="equiv-hide">Hide clauses</li>
       </ul>
     </div>
     {{/if}}
@@ -124,7 +141,7 @@
 </script>
 
 <script id="scorpion-template" type="text/x-underscore-template">
-<div id="walkthrough-popover" class="row" >
+<div class="walkthrough" class="row" >
 	<div class="col-md-12">
     <h4><button class="close" style="">x</button></h4>
     <fieldset>
@@ -167,7 +184,7 @@
 
       <div class="form-group">
         <div class="controls col-sm-9 col-sm-offset-3">
-          <input type="submit" id="errbox_submit" class="form-control btn btn-primary" value="Debug Highlighted Points!"></input>
+          <input type="submit" id="scorpion_submit" class="form-control btn btn-primary" value="Debug Highlighted Points!"></input>
         </div>
       </div>
 
@@ -184,6 +201,7 @@
 
 
 
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
 	<link rel="stylesheet" type="text/css" href="/static/css/base.css"/>
 
 

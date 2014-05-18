@@ -1,8 +1,8 @@
-@import url(http://fonts.googleapis.com/css?family=Carme);
+@import url(/static/fonts/carme.css);
 
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:300);
+@import url(/static/fonts/opensans-light.css);
 body {
-  font-family: open sans;
+  font-family: open sans, "Gill Sans";
   min-width: 900px;
   width: 95%;
   margin-right: auto;
@@ -13,6 +13,9 @@ body .row {
 }
 body h4 {
   min-height: .5em;
+}
+body #where {
+  margin-top: 2em;
 }
 .axis path,
 .axis line {
@@ -26,10 +29,12 @@ body h4 {
   font-size: 10pt;
 }
 .cstat circle {
-  fill: grey;
+  fill: #aeaeae;
+  stroke: none;
 }
 .cstat rect {
-  fill: grey;
+  fill: #aeaeae;
+  stroke: none;
 }
 .mark:hover {
   fill: steelblue;
@@ -61,15 +66,21 @@ rect.extent {
   border: none;
   color: white;
 }
-.scorpion-result .filter-clause {
+.scorpion-results {
+  padding: 0px;
+  /* /.scorpion-result */
+
+}
+.scorpion-results .scorpion-result .filter-clause {
   font-family: "Gill Sans";
-  font-size: 14pt;
-  line-height: 17pt;
+  font-size: 12pt;
+  line-height: 15pt;
   color: white;
   clear: both;
   background: steelblue;
   width: 100%;
-  padding: 1em;
+  padding: .5em;
+  padding-left: 1em;
   list-style-type: none;
   border-radius: 2px;
   cursor: pointer;
@@ -77,66 +88,75 @@ rect.extent {
   margin: 0;
   margin-top: 1.5em;
 }
-.scorpion-result .filter-clause .load-text {
+.scorpion-results .scorpion-result .filter-clause .load-text {
   display: none;
   color: black;
 }
-.scorpion-result .filter-clause .score {
-  right: .25em;
-  top: .25em;
-  position: absolute;
-  font-weight: 100;
-  font-size: 10pt;
-  display: none;
-}
-.scorpion-result .filter-clause .crange {
+.scorpion-results .scorpion-result .filter-clause .info {
   right: .25em;
   top: .25em;
   position: absolute;
   font-weight: 100;
   font-size: 10pt;
 }
-.scorpion-result .filter-clause:hover {
-  background: #359fdb;
+.scorpion-results .scorpion-result .filter-clause .info .score,
+.scorpion-results .scorpion-result .filter-clause .info .crange {
+  margin-left: 2em;
 }
-.scorpion-result .equiv-clauses {
+.scorpion-results .scorpion-result .equiv-clauses {
   margin-left: 1em;
 }
-.scorpion-result .equiv-clause,
-.scorpion-result .equiv-show,
-.scorpion-result .equiv-hide {
+.scorpion-results .scorpion-result .equiv-toggle-container {
+  padding-left: 1em;
+}
+.scorpion-results .scorpion-result .equiv-clause,
+.scorpion-results .scorpion-result .equiv-toggle {
   font-family: "Gill Sans";
-  font-size: 12pt;
-  line-height: 15pt;
-  color: white;
-  clear: both;
-  background: #3c4f5f;
+  font-size: 11pt;
+  line-height: 13pt;
   width: 100%;
   padding: .75em;
-  list-style-type: none;
-  border-radius: 2px;
-  cursor: pointer;
   position: relative;
   margin: 0;
   margin-bottom: 5px;
+  list-style-type: none;
+  color: white;
+  background: #3c4f5f;
+  border-radius: 2px;
+  clear: both;
 }
-.scorpion-result .equiv-show,
-.scorpion-result .equiv-hide {
-  margin-left: 1em;
+.scorpion-results .scorpion-result .equiv-toggle {
+  cursor: pointer;
 }
-/* /.scorpion-result */
-#walkthrough-popover {
+.scorpion-results .scorpion-result .filter-clause:hover,
+.scorpion-results .scorpion-result .equiv-toggle:hover {
+  background: #359fdb;
+}
+#walkthrough-container {
+  position: absolute;
+  top: 8em;
+  left: 0px;
+}
+#walkthrough-container .walkthrough {
   width: 40%;
   background: white;
-  border: 5px solid whitesmoke;
+  border: 10px solid #dddddd;
   padding: 1em;
   position: fixed;
-  left: 0px;
+  left: -10px;
   padding-top: 0px;
+  box-shadow: 4px 4px 7px 0px #929292;
 }
-#walkthrough-popover span.btn {
+#walkthrough-container .walkthrough fieldset {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+#walkthrough-container .walkthrough span.btn {
   margin-bottom: .25em;
 }
-#walkthrough-popover span.btn-danger span.btn-success {
+#walkthrough-container .walkthrough span.btn-danger span.btn-success {
   border: none;
+}
+#walkthrough-container .walkthrough label {
+  text-align: right;
 }

@@ -95,6 +95,46 @@ def lookup():
   return json.dumps(context, default=json_handler)
 
 
+
+@app.route('/api/scorpion/', methods=['POST', 'GET'])
+def scorpion():
+  ret = {}
+  results = []
+
+  result = {
+    'score': 0.2,
+    'c_range': [0, 1],
+    'clauses': [
+      {'col': 'light', 'type': 'num', 'vals': [500, 1000]},
+      {'col': 'sensor', 'type': 'str', 'vals': [16, 17, 18, 19, 20]}
+    ],
+    'alt_clauses': [
+      {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]}
+    ]
+  }
+  results.append(result)
+
+
+  result = {
+    'score': 0.2,
+    'c_range': [0, 1],
+    'clauses': [
+      {'col': 'voltage', 'type': 'num', 'vals': [0, 1.5]},
+      {'col': 'humidity', 'type': 'num', 'vals': [-5000, .1]}
+    ],
+    'alt_clauses': [
+    ]
+  }
+  results.append(result)
+
+
+
+  if results:
+    ret['results'] = results
+
+  return json.dumps(ret, default=json_handler)
+
+
 if __name__ == "__main__":
   import psycopg2
   DEC2FLOAT = psycopg2.extensions.new_type(

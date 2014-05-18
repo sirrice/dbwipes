@@ -56,18 +56,15 @@ define(function(require) {
       this.$q.css("padding-left", this.state.lp);
 
 
-      this.$toggle = $("<div></div>");
-      this.$el.prepend(this.$toggle);
-      this.$toggle
-      var btn = $("<span>toggle</span>")
+      this.$toggle = $("#q-toggle")
         .addClass("btn btn-primary")
+        .css("margin-left", this.state.lp)
         .click((function() {
           this.renderUnready('');
+          this.$('.legend').toggle();
           this.$svg.toggle();
           this.$q.toggle();
-        }).bind(this))
-        .css("margin-left", this.state.lp)
-        .appendTo(this.$toggle);
+        }).bind(this));
           
 
       //this.listenTo(this.model, 'change:db', this.onChange);

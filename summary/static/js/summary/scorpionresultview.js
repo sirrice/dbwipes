@@ -16,24 +16,27 @@ define(function(require) {
     },
 
     render: function() {
-      var _this = this;
-      this.$el.html(this.template(this.model.toJSON()));
-      var show = this.$(".equiv-show"),
-          hide = this.$(".equiv-hide"),
+      var _this = this,
+          json = this.model.toJSON();
+      console.log(['scorpionresultview.render', json]);
+
+      this.$el.html(this.template(json));
+      var toggle = this.$(".equiv-toggle"),
           equiv = this.$(".equiv-clauses");
 
-      show.click(function() {
-        show.hide();
-        equiv.show();
-      });
-      hide.click(function() {
-        equiv.hide();
-        show.show();
+      toggle.click(function() {
+        if (toggle.text() == 'expand') {
+          toggle.text('hide');
+          equiv.show();
+        } else {
+          toggle.text('expand');
+          equiv.hide();
+        }
       });
 
       this.$('.filter-clause').hover(
-        function() { _this.trigger('selected'); },
-        function() { _this.trigger('unselected'); }
+        function() { _this.trigger('selected', _this.model); },
+        function() { _this.trigger('unselected', _this.model); }
       );
 
       return this;

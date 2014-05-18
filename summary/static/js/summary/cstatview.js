@@ -18,7 +18,7 @@ define(function(require) {
         xaxis: null,
         yaxis: null,
         series: null,
-        w: 400,
+        w: 350,
         h: 30,
         lp: 70,
         marktype: 'rect'
@@ -26,9 +26,9 @@ define(function(require) {
     },
 
     render: function() {
-      console.log(this.model.toJSON());
       this.$el.html(this.template(this.model.toJSON()));
       this.renderPlot(this.$('svg'));
+      this.listenTo(this.model, 'setSelection', this.setSelection)
       return this;
     },
 
@@ -113,7 +113,7 @@ define(function(require) {
           width = d3.min(intervals)
         if (!width)
           width = 10;
-        width = Math.max(1, width)
+        width = Math.max(2, width)
 
 
         el.selectAll('rect')
@@ -143,6 +143,34 @@ define(function(require) {
 
     },
 
+    setSelection: function(clause) {
+      function withinClause(clause, val) {
+        if (clause == null) return false;
+        if (util.isStr(clause.type)) {
+          return _.contains(clause.vals, val);
+        } else {
+          return clause.vals[0] <= val && val <= clause.vals[1];
+        }
+      };
+      this.d3brush.extent([]);
+      this.d3svg.selectAll('.mark')
+        .classed('selected', function(d) {
+          return withinClause(clause, d.val);
+        })
+
+      this.d3brush.clear();
+      if (clause) {
+        if (!util.isStr(clause.type)) {
+          console.log(['setextent to', clause.col, clause.vals]);
+          var extent = [
+            Math.max(clause.vals[0], this.state.xscales.domain()[0]),
+            Math.min(clause.vals[1], this.state.xscales.domain()[1])
+          ];
+          this.d3brush.extent(extent);
+        }
+      }
+      this.d3brush(this.d3gbrush);
+    },
 
 
     renderBrushes: function(el) {
@@ -179,6 +207,10 @@ define(function(require) {
           .call(brush)
       gbrush.selectAll('rect')
           .attr('height', h)
+
+      this.d3brush = brush;
+      this.d3gbrush = gbrush;
+
     },
 
     renderZoom: function(el) {
@@ -217,7 +249,8 @@ define(function(require) {
 
     renderPlot: function(svg) {
       svg.empty();
-      var c = d3.select(svg.get()[0])
+      this.d3svg = d3.select(svg.get()[0]);
+      var c = this.d3svg
           .attr('class', 'cstat-container')
           .attr('width', this.state.w+this.state.lp)
           .attr('height', this.state.h+15)

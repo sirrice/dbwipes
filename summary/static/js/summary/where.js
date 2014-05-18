@@ -20,6 +20,22 @@ define(function(require) {
       });
     },
 
+
+    // Sets each cstat to the corresponding selection clause
+    // @param clauses list of { col:, type:, vals: } objects
+    setSelection: function(clauses) {
+      var col2clause = {};
+      _.each(clauses, function(clause) {
+        col2clause[clause.col] = clause;
+      });
+
+      this.each(function(model) {
+        var col = model.get('col');
+        //model.setSelection(col2clause[col]);
+        model.trigger('setSelection', col2clause[col]);
+      });
+    },
+
     parse: function(resp) {
       var data = resp.data;
       var newstats = _.map(data, function(tup) { return new CStat(tup); })

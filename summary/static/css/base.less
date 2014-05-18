@@ -1,7 +1,5 @@
-@import url(http://fonts.googleapis.com/css?family=Carme);
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:300);
 body { 
-  font-family: open sans; 
+  font-family: open sans, "Gill Sans";
   min-width: 900px; 
   width: 95%;
   margin-right: auto; 
@@ -13,6 +11,10 @@ body {
 
   h4 {
     min-height: .5em;
+  }
+
+  #where {
+    margin-top: 2em;
   }
   
 }
@@ -32,10 +34,12 @@ body {
 
 .cstat {
   circle {
-    fill: grey;
+    fill: #aeaeae;
+    stroke: none;
   }
   rect{
-    fill: grey;
+    fill: #aeaeae;
+    stroke: none;
   }
 }
 
@@ -76,94 +80,122 @@ rect.extent {
 
 
 
-.scorpion-result {
-  .filter-clause {
-    font-family: "Gill Sans";
-    font-size: 14pt;
-    line-height: 17pt;
-    color: white;
-    clear: both;
-    background: steelblue;
-    width: 100%;
-    padding: 1em;
-    list-style-type: none;
-    border-radius: 2px;
-    cursor: pointer;
-    position: relative;
-    margin: 0;
-    margin-top: 1.5em;
+.scorpion-results {
+  padding: 0px;
+
+  .scorpion-result {
+    .filter-clause {
+      font-family: "Gill Sans";
+      font-size: 12pt;
+      line-height: 15pt;
+      color: white;
+      clear: both;
+      background: steelblue;
+      width: 100%;
+      padding: .5em;
+      padding-left: 1em;
+      list-style-type: none;
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+      margin: 0;
+      margin-top: 1.5em;
 
 
-    .load-text {
-      display: none;
-      color: black;
+      .load-text {
+        display: none;
+        color: black;
+      }
+
+      .info {
+        right: .25em;
+        top: .25em;
+        position: absolute;
+        font-weight: 100;
+        font-size: 10pt;
+        
+        .score, .crange {
+          margin-left: 2em;
+        }
+
+
+
+      }
+
     }
 
-    .score {
-      right: .25em;
-      top: .25em;
-      position: absolute;
-      font-weight: 100;
-      font-size: 10pt;
-      display: none;
+
+    .equiv-clauses {
+      margin-left: 1em;
     }
 
-    .crange {
-      right: .25em;
-      top: .25em;
-      position: absolute;
-      font-weight: 100;
-      font-size: 10pt;
+    .equiv-toggle-container {
+      padding-left: 1em;
+    }
+    .equiv-clause, .equiv-toggle {
+      font-family: "Gill Sans";
+      font-size: 11pt;
+      line-height: 13pt;
+      width: 100%;
+      padding: .75em;
+      position: relative;
+      margin: 0;
+      margin-bottom: 5px;
+      list-style-type: none;
+      color: white;
+      background: rgb(60, 79, 95);
+      border-radius: 2px;
+      clear: both;
     }
 
-  }
+    .equiv-toggle {
+      cursor: pointer;
+    }
 
-  .filter-clause:hover {
-    background: rgb(53, 159, 219);
-  }
+    .filter-clause:hover, .equiv-toggle:hover {
+      background: rgb(53, 159, 219);
+    }
 
 
-  .equiv-clauses {
-    margin-left: 1em;
-  }
-
-  .equiv-clause, .equiv-show, .equiv-hide {
-    font-family: "Gill Sans";
-    font-size: 12pt;
-    line-height: 15pt;
-    color: white;
-    clear: both;
-    background: rgb(60, 79, 95);
-    width: 100%;
-    padding: .75em;
-    list-style-type: none;
-    border-radius: 2px;
-    cursor: pointer;
-    position: relative;
-    margin: 0;
-    margin-bottom: 5px;
-  }
-
-  .equiv-show, .equiv-hide {
-    margin-left: 1em;
-  }
-} /* /.scorpion-result */
+  } /* /.scorpion-result */
+}
 
 
 
-#walkthrough-popover {
-  width: 40%;
-  background: white;
-  border: 5px solid whitesmoke;
-  padding: 1em;
-  position: fixed;
+#walkthrough-container {
+  position: absolute;
+  top: 8em;
   left: 0px;
-  padding-top: 0px;
 
-  span.btn {
-    margin-bottom: .25em;
-  }
-  span.btn-danger span.btn-success {
-    border: none;
+  .walkthrough {
+    width: 40%;
+    background: white;
+    border: 10px solid rgb(221, 221, 221);
+    padding: 1em;
+    position: fixed;
+    left: -10px;
+    padding-top: 0px;
+    box-shadow: 4px 4px 10px -4px rgb(146, 146, 146);
+
+    fieldset {
+      margin-top: 2em;
+      margin-bottom: 2em;
+    }
+
+    span.btn {
+      margin-bottom: .25em;
+    }
+    span.btn-danger span.btn-success {
+      border: none;
+    }
+
+    label {
+      text-align: right;
+    }
   }
 }
+
+
+@import url(/static/fonts/carme.css);
+@import url(/static/fonts/opensans-light.css);
+

@@ -90,16 +90,16 @@ function   (
 
 
 
-  var sq = new ScorpionQuery({query: q});
-  var sqv = new ScorpionQueryView({model: sq});
   var srs = new ScorpionResults()
   var srv = new ScorpionResultsView({
     collection: srs, 
     where: where, 
     query: q
   });
+  var sq = new ScorpionQuery({query: q, results: srs});
+  var sqv = new ScorpionQueryView({model: sq});
   $("#scorpion-container").append(srv.render().el);
-  $("body").append(sqv.render().$el.hide());
+  $("body").append(sqv.render().$el);//.hide());
 
   qv.on('change:selection', function(selection) {
     sq.set('selection', selection);
