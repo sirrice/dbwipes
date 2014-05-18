@@ -33,8 +33,16 @@ requirejs.config({
 });
 
 // Start the main app logic.
-requirejs(['jquery', 'summary/where', 'summary/whereview', 'summary/cstat', 'summary/cstatsview', 'summary/query', 'summary/queryview'],
-function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
+requirejs([
+    'jquery', 'summary/where', 'summary/whereview', 
+    'summary/cstat', 'summary/cstatsview', 
+    'summary/query', 'summary/queryview',
+    'summary/scorpionquery', 'summary/scorpionview',
+    'summary/scorpionresults', 'summary/scorpionresultsview'],
+function   (
+  $, Where, WhereView, 
+  CStat, CStatsView, Query, QueryView, 
+  ScorpionQuery, ScorpionQueryView, ScorpionResults, ScorpionResultsView) {
 
   $("#fm").on("submit", function() {
     var params = {
@@ -56,12 +64,48 @@ function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
 
   });
 
+
+  var q = new Query();
+  var qv = new QueryView({ model: q })
+  $("#right").prepend(qv.render().$el);
+
+
   var where = new Where;
   var whereview = new WhereView({collection: where, el: $("#where")});
   var csv = new CStatsView({collection: where, el: $("#facets")});
-  var q = new Query();
-  var qv = new QueryView({ model: q })
-  $("#viz").append(qv.render().$el);
+  q.on('change:db change:table', function() {
+    where.reset()
+    where.fetch({
+      data: {
+        db: q.get('db'),
+        table: q.get('table'),
+        nbuckets: 500
+      },
+      reset: true
+    });
+  })
+  where.on('change:selection', function() {
+    q.set('where', where.toSQL());
+  });
+
+
+
+  var sq = new ScorpionQuery({query: q});
+  var sqv = new ScorpionQueryView({model: sq});
+  var srs = new ScorpionResults()
+  var srv = new ScorpionResultsView({
+    collection: srs, 
+    where: where, 
+    query: q
+  });
+  $("#scorpion-container").append(srv.render().el);
+  $("body").append(sqv.render().$el.hide());
+
+  qv.on('change:selection', function(selection) {
+    sq.set('selection', selection);
+  })
+
+
 
 
   var newq = {
@@ -74,21 +118,12 @@ function   ($, Where, WhereView, CStat, CStatsView, Query, QueryView) {
       hr: 'timestamp',
       temp: 'num'
     },
-    where: where,
+    where: '',
     table: 'readings' ,
-    db: 'intel',
-    data: _.times(10, function(i) {
-      return { hr: new Date('2004-03-'+i), std: i, avg: i/2};
-    })
+    db: 'intel'
   };
 
   q.set(newq);
-  //q.fetch({data: q.toJSON()});
-  //console.log(['where post qfetch', where])
-
-  //where.parse({data: [{col: 'hr', type: 'timestamp', stats: [{val: new Date('2004-03-1'), count: 10, range:[]}]}]})
-  where.fetch({data: { db: newq.db, table: newq.table, nbuckets:500}});
-  //console.log(['where post fetch', where])
 
 
 

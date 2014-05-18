@@ -1,0 +1,169 @@
+@import url(http://fonts.googleapis.com/css?family=Carme);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300);
+body { 
+  font-family: open sans; 
+  min-width: 900px; 
+  width: 95%;
+  margin-right: auto; 
+  margin-left: auto; 
+  
+  .row { 
+    margin-top: .2em; 
+  }
+
+  h4 {
+    min-height: .5em;
+  }
+  
+}
+
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #aeaeae;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+.tick text {
+  fill: #aeaeae;
+  font-size: 10pt;
+}
+
+
+.cstat {
+  circle {
+    fill: grey;
+  }
+  rect{
+    fill: grey;
+  }
+}
+
+.mark:hover {
+  fill:steelblue;
+}
+
+circle.selected {
+  fill: black;
+  size: 10;
+  stroke: black;
+}
+rect.selected {
+  fill: black;
+}
+
+rect.extent {
+  fill: grey;
+  fill-opacity: 0.2;
+  stroke-width: 1px;
+  stroke: none;
+  shape-rendering: crispEdges;
+}
+.legend {
+  margin-top: 10px;
+
+  span {
+    padding: 3px;
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-right: 1em;
+    border-radius: 3px;
+    border: none;
+    color: white;
+  }
+}
+
+
+
+
+.scorpion-result {
+  .filter-clause {
+    font-family: "Gill Sans";
+    font-size: 14pt;
+    line-height: 17pt;
+    color: white;
+    clear: both;
+    background: steelblue;
+    width: 100%;
+    padding: 1em;
+    list-style-type: none;
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    margin-top: 1.5em;
+
+
+    .load-text {
+      display: none;
+      color: black;
+    }
+
+    .score {
+      right: .25em;
+      top: .25em;
+      position: absolute;
+      font-weight: 100;
+      font-size: 10pt;
+      display: none;
+    }
+
+    .crange {
+      right: .25em;
+      top: .25em;
+      position: absolute;
+      font-weight: 100;
+      font-size: 10pt;
+    }
+
+  }
+
+  .filter-clause:hover {
+    background: rgb(53, 159, 219);
+  }
+
+
+  .equiv-clauses {
+    margin-left: 1em;
+  }
+
+  .equiv-clause, .equiv-show, .equiv-hide {
+    font-family: "Gill Sans";
+    font-size: 12pt;
+    line-height: 15pt;
+    color: white;
+    clear: both;
+    background: rgb(60, 79, 95);
+    width: 100%;
+    padding: .75em;
+    list-style-type: none;
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    margin-bottom: 5px;
+  }
+
+  .equiv-show, .equiv-hide {
+    margin-left: 1em;
+  }
+} /* /.scorpion-result */
+
+
+
+#walkthrough-popover {
+  width: 40%;
+  background: white;
+  border: 5px solid whitesmoke;
+  padding: 1em;
+  position: fixed;
+  left: 0px;
+  padding-top: 0px;
+
+  span.btn {
+    margin-bottom: .25em;
+  }
+  span.btn-danger span.btn-success {
+    border: none;
+  }
+}

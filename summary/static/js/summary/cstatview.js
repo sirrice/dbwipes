@@ -21,7 +21,7 @@ define(function(require) {
         w: 400,
         h: 30,
         lp: 70,
-        marktype: 'circle'
+        marktype: 'rect'
       }
     },
 

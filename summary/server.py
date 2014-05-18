@@ -14,6 +14,7 @@ app = Flask(__name__)
 summaries = {}
 
 
+
 def json_handler(o):
   if hasattr(o, 'isoformat'):
     return o.isoformat()
@@ -37,21 +38,30 @@ def query():
     return json.dumps({})
 
   print query
-  data = []
+  ret = {'data': []}
 
   try:
     db = create_engine('postgresql://localhost/%s' % dbname)
     conn = db.connect()
+
     cur = conn.execute(query)
     rows = cur.fetchall()
     data = [dict(zip(cur.keys(), vals)) for vals in rows]
+    ret['data'] = data
+
+    summary = Summary(db, table)
+    cols = summary.get_columns()
+    types = map(summary.get_type, cols)
+    schema = dict(zip(cols, types))
+    ret['schema'] = schema
+
     cur.close()
     conn.close()
     db.dispose()
     print data[:3]
   except Exception as e:
     print e
-  return json.dumps({'data': data}, default=json_handler)
+  return json.dumps(ret, default=json_handler)
 
 @app.route('/api/lookup/', methods=['POST', 'GET'])
 def lookup():

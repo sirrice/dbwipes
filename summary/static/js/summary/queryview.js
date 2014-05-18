@@ -1,5 +1,6 @@
 define(function(require) {
   var Backbone = require('backbone'),
+      Handlebars = require('handlebars'),
       $ = require('jquery'),
       d3 = require('d3'),
       _ = require('underscore'),
@@ -10,6 +11,8 @@ define(function(require) {
   // TODO: connect to server to query and fetch data
   //       connect with Where object
   var QueryView = Backbone.View.extend({
+    errtemplate: Handlebars.compile($("#q-err-template").html()),
+
     initialize: function() {
       this.state = {
         xdomain: null,
@@ -22,10 +25,65 @@ define(function(require) {
         series: null,
         w: 500,
         h: 400,
+        lp: 40,
+        tp: 20,
         marktype: 'circle'
       };
 
-      this.listenTo(this.model, 'change', this.render);
+
+
+      this.$svg = $("<svg id='viz'></svg>").prependTo(this.$el);
+      this.svg = this.$svg.get()[0];
+      this.d3svg = d3.select(this.svg);
+      this.d3svg
+        .attr('class', 'viz-container')
+        .attr('width', this.state.w + this.state.lp)
+        .attr('height', this.state.h + this.state.tp);
+      this.c = this.d3svg.append('g')
+          .attr('transform', "translate("+this.state.lp+", 0)");
+      this.c.append('rect')
+        .attr('width', this.state.w)
+        .attr('height', this.state.h)
+        .attr('fill', 'none')
+        .attr('stroke', 'none')
+        .style('pointer-events', 'all')
+
+
+
+      this.$q = $("<div id='q'></div>").prependTo(this.$el);
+      this.q = this.$q.get()[0];
+      this.d3q = d3.select(this.q);
+      this.$q.css("padding-left", this.state.lp);
+
+
+      this.$toggle = $("<div></div>");
+      this.$el.prepend(this.$toggle);
+      this.$toggle
+      var btn = $("<span>toggle</span>")
+        .addClass("btn btn-primary")
+        .click((function() {
+          this.renderUnready('');
+          this.$svg.toggle();
+          this.$q.toggle();
+        }).bind(this))
+        .css("margin-left", this.state.lp)
+        .appendTo(this.$toggle);
+          
+
+      //this.listenTo(this.model, 'change:db', this.onChange);
+      //this.listenTo(this.model, 'change:table', this.onChange);
+      this.listenTo(this.model, 'change:data', this.render);
+    },
+
+    onChange: function() {
+      return;
+      this.model.get('where').fetch({
+        data: {
+          db: this.model.get('db'),
+          table: this.model.get('table'),
+          nbuckets: 500
+        }
+      });
     },
 
     setupScales: function() {
@@ -134,15 +192,17 @@ define(function(require) {
               r: 2,
               fill: this.state.cscales(ycol),
               stroke: this.state.cscales(ycol),
+              ycol: ycol
             })
       }
     },
 
     renderBrush: function(el) {
-      var type = this.model.get('type');
+      var type = this.model.get('type'),
+          _this = this;
       var brushf = function(p) {
         var e = brush.extent()
-        var selected = [];
+        var selected = {};
         el.selectAll('.mark')
           .classed('selected', function(d){
             if (type == 'str') {
@@ -152,11 +212,15 @@ define(function(require) {
             }
             b = b && (e[0][1] <= d.y && e[1][1] > d.y);
 
-            if (b) selected.push(d)
+            if (b) {
+              var ycol = d3.select(this).attr('ycol')
+              if (!selected[ycol]) selected[ycol] = [];
+              selected[ycol].push(d);
+            }
             return b;
           })
         if (d3.event.type == 'brushend') {
-          console.log(['selected', selected]);
+          _this.trigger('change:selection', selected);
         }
       }
 
@@ -190,38 +254,114 @@ define(function(require) {
     },
 
 
+    renderUnready: function(errText) {
+      var json = this.model.toJSON(),
+          _this = this;
+      json['error'] = errText;
+
+
+      this.$q.html(this.errtemplate(json));
+
+      this.$('.q-add').click((function(){
+        this.$(".input-ys-expr").append(
+          $("<div><input class='form-control' name='q-y-expr' placeholder='expression'/></div>")
+        );
+        this.$(".input-ys-col").append(
+          $("<div><input class='form-control' name='q-y-col' placeholder='attribute'/></div>")
+        );
+      }).bind(this));
+
+
+      this.$('.q-submit').click((function(){
+        var db = this.$('input[name=q-db]').val(),
+            table = this.$('input[name=q-table]').val();
+        
+        var xexpr = this.$('input[name=q-x-expr]').val(),
+            xcol = this.$('input[name=q-x-col]').val(),
+            xalias = xcol;
+        if (xexpr.indexOf(' as ')) {
+          var pair = xexpr.split(' as ');
+          xexpr = pair[0];
+          xalias = pair[1];
+        }
+
+        
+        var yexprs = this.$("input[name=q-y-expr]").map(function(idx, el) {
+          return $(el).val()
+        }).get();
+        var ycols = this.$("input[name=q-y-col]").map(function(idx, el) {
+          return $(el).val()
+        }).get();
+        var ys = _.zip(yexprs, ycols);
+        ys = _.compact(_.map(ys, function(pair) {
+          if (pair[0] == '' || pair[1] == '') return null;
+          var yexpr = pair[0],
+              yalias = pair[1];
+          if (pair[0].indexOf(' as ')) {
+            var aspair = pair[0].split(' as '),
+                yexpr = aspair[0],
+                yalias = aspair[1];
+          }
+          return {
+            col: pair[1],
+            alias: yalias,
+            expr: yexpr
+          };
+        }));
+
+        var q = {
+          db: db,
+          table: table,
+          x: { col: xcol, alias: xalias, expr: xexpr},
+          ys: ys,
+          where: this.model.get('where'),
+          schema: this.model.get('schema')
+        };
+        this.model.set(q);
+
+
+      }).bind(this));
+
+    },
+
+    renderLabels: function() {
+      var ys = this.model.get('ys'),
+          cscales = this.state.cscales;
+
+      this.$('.legend').remove();
+      d3.select(this.el).append("div")
+          .attr('class', 'legend')
+          .style("margin-left", this.state.lp)
+        .selectAll("span")
+          .data(ys)
+        .enter().append("span")
+          .text(function(d) { console.log("yo"); return d.alias; })
+          .style("background", function(d) { return cscales(d.alias); });
+    },
+
+
     render: function() {
-      if (!this.model.get('data'))  {
-        console.log("no data, queryview not rendering");
+      if (!this.model.isValid()) {
+        this.renderUnready(this.model.validationError);
+        this.$q.show();
+        this.$svg.hide();
         return this;
       }
+      this.$svg.show();
+      this.$q.hide();
 
 
-      this.$el.empty();
-      var svg = d3.select(this.el).append("svg")
-          .attr('class', 'container')
-          .attr('width', this.state.w + 40)
-          .attr('height', this.state.h + 20);
-      var c = svg.append('g')
-          .attr('transform', "translate(40, 0)");
-      
-      c.append('rect')
-        .attr('width', this.state.w)
-        .attr('height', this.state.h)
-        .attr('fill', 'none')
-        .attr('stroke', 'none')
-        .style('pointer-events', 'all')
+      $(this.c[0]).empty()
 
       this.setupScales()
-      this.renderAxes(c)
+      this.renderAxes(this.c)
       _.each(this.model.get('ys'), function(ycol) {
-        console.log(['renderData','ycol',ycol])
-        this.renderData(c, this.model.get('x').col, ycol.alias);
-      }, this)
-      this.renderBrush(c)
-      //this.renderZoom(c)
-      return this;
+        this.renderData(this.c, this.model.get('x').col, ycol.alias);
+      }, this);
+      this.renderBrush(this.c);
+      this.renderLabels(this.c);
 
+      return this;
     }
 
   });

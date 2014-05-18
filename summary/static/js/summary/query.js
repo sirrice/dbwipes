@@ -13,7 +13,7 @@ define(function(require) {
         x: null,        // { col:, expr:}
         ys: null,
         schema: null,   // { col -> type }
-        where: null,    // Where object
+        where: null,    // string
         table: null,
         db: null,
         data: null
@@ -45,6 +45,7 @@ define(function(require) {
       this.attributes['ys'] = ys;
     },
 
+    // @deprecated
     ensureWhere: function() {
       var where = this.get('where');
       if (!where) {
@@ -59,51 +60,58 @@ define(function(require) {
     onChange: function() {
       this.ensureX();
       this.ensureYs();
-      this.ensureWhere();
+      //this.ensureWhere();
       this.fetch({data:this.toJSON()});
     },
 
     parse: function(resp, opts) {
-      if (resp.data) {
-        var xcol = this.get('x'),
-            schema = this.get('schema');
-        if (util.isTime(schema[xcol.col])) {
-          // ensure vals and ranges are date objects
-          _.each(resp.data, function(el) {
-            el[xcol.alias] = new Date(el[xcol.alias]);
-          });
-
-          resp.data = _.reject(resp.data, function(d) {
-            return _.any(_.map(_.values(d), function(v){ return v == null; }))
-          });
-        }
-      }
-      return resp;
+      return util.parseQueryResponse.bind(this)(resp, opts);
     },
 
+
+    validate: function() {
+      var errs = [];
+      if (!this.get('db')) 
+        errs.push("need database");
+      if (!this.get('table')) 
+        errs.push("need table name");
+      if (!this.get('x')) 
+        errs.push("need grouping attribute (x)");
+      if (!this.get('ys')) 
+        errs.push("need aggregations (y)");
+      if (!this.get('data'))
+        errs.push("need data!");
+      if (errs.length) 
+        return errs.join('\n');
+    },
+
+
     toJSON: function() {
-      return {
+      var ret = {
         x: this.get('x'),
         ys: this.get('ys'),
-        where: this.get('where').toJSON(),
         table: this.get('table'),
         db: this.get('db'),
         query: this.toSQL()
+      };
+      if (this.get('where')) {
+        ret.where = this.get('where');
       }
+      return ret;
     },
 
     toSQL: function() {
       function col2str(d) {
         return d.expr + " as " + d.alias;
       }
+      if (!this.get('x')) return '';
       var select = [col2str(this.get('x'))];
       select = select.concat(_.map(this.get('ys'), col2str));
       select = "SELECT " + select.join(', ');
 
       var from = 'FROM ' + this.get('table');
       var where = this.get('where');
-      where = (where)? where.toSQL() : '';
-      where = (where != '')? 'WHERE ' + where : null;
+      where = (where && where != '')? 'WHERE ' + where : null;
       var groupby = 'GROUP BY ' + this.get('x').expr;
       var orderby = 'ORDER BY ' + this.get('x').expr;
 

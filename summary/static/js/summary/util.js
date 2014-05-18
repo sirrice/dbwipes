@@ -55,12 +55,62 @@ define(function(require) {
 
   }
 
+
+  function toWhereClause(col, type, vals) {
+    if (!vals || vals.length == 0) return null;
+    var SQL = null;
+    if (isStr(type)) {
+        SQL = col + " in ("+vals.join(',')+")";
+    } else {
+      if (isTime(type)) {
+        var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
+        vals = _.map(vals, function(v) { return new Date(v)});
+      } else {
+        var val2s = function(v) { return +v };
+      }
+
+      if (vals.length == 1) {
+        SQL = col + " = " + val2s(vals[0]);
+      } else {
+        SQL = [
+          val2s(d3.min(vals)) + " <= " + col,
+          col + " <= " + val2s(d3.max(vals))
+        ].join(' and ');
+      }
+    }
+    return SQL;
+
+  }
+
+
+  // parse /api/query/ results
+  function parseQueryResponse(resp, opts) {
+    if (resp.data) {
+      var xcol = this.get('x'),
+          schema = this.get('schema');
+      if (isTime(schema[xcol.col])) {
+        // ensure vals and ranges are date objects
+        _.each(resp.data, function(el) {
+          el[xcol.alias] = new Date(el[xcol.alias]);
+        });
+
+        resp.data = _.reject(resp.data, function(d) {
+          return _.any(_.map(_.values(d), function(v){ return v == null; }))
+        });
+      }
+    }
+    return resp;
+
+  }
+
   return {
     isTime: isTime,
     isNum: isNum,
     isStr: isStr,
     estNumXTicks: estNumXTicks,
-    setAxisLabels: setAxisLabels
+    setAxisLabels: setAxisLabels,
+    toWhereClause: toWhereClause,
+    parseQueryResponse: parseQueryResponse
   }
 })
 

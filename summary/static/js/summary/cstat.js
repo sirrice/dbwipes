@@ -43,15 +43,17 @@ define(function(require) {
       var xdomain = null;
       if (type != 'str') {
         xdomain = [
-          d3.min(stats, function(el) { return el.range[0] || el.val; }),
-          d3.max(stats, function(el) { return el.range[1] || el.val; })
+          d3.min(stats, function(d) { return d.range[0] || d.val; }),
+          d3.max(stats, function(d) { return d.range[1] || d.val; })
         ]
+
+        // expand the domain a bit
         if (xdomain[0] == xdomain[1]) {
           if (util.isNum(type)) {
             xdomain[0] -= .5;
             xdomain[1] += .5;
           } else {
-            xdomain[0] -= 1000*60*60*24;
+            xdomain[0] -= 1000*60*60*24; // 1 day
             xdomain[1] += 1000*60*60*24;
           }
         } else {
@@ -104,9 +106,7 @@ define(function(require) {
     },
 
     toSQLWhere: function() {
-      var sel = this.get('selection'),
-          type = this.get('type'),
-          col = this.get('col');
+      var sel = this.get('selection');
       if (sel.length == 0) return null;
 
       var vals = [];
@@ -114,28 +114,11 @@ define(function(require) {
         vals = vals.concat(d.range);
       });
       vals = _.compact(_.uniq(vals));
-
-
-      var SQL = null;
-      if (util.isStr(type)) {
-         SQL = col + " in ("+vals.join(',')+")";
-      } else {
-        if (util.isTime(type)) {
-          var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
-          vals = _.map(vals, function(v) { return new Date(v)});
-        } else {
-          var val2s = function(v) { return +v };
-        }
-
-        if (vals.length == 1) {
-          SQL = col + " = " + val2s(vals[0]);
-        } else {
-          SQL = [
-            val2s(d3.min(vals)) + " <= " + col,
-            col + " <= " + val2s(d3.max(vals))
-          ].join(' and ');
-        }
-      }
+      var SQL = util.toWhereClause(
+        this.get('col'), 
+        this.get('type'),
+        vals
+      );
       return "not("+SQL+")";
     }
 

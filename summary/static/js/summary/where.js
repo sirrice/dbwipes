@@ -15,7 +15,7 @@ define(function(require) {
       this.id = Where.id_++;
       this.on('add', function(model) {
         this.listenTo(model, 'change:selection', function() {
-          _this.trigger('change:selection');
+          _this.trigger('change:selection', _this);
         })
       });
     },

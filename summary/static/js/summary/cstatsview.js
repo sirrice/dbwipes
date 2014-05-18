@@ -11,6 +11,7 @@ define(function(require) {
     },
 
     onReset: function() {
+      this.$el.empty();
       this.collection.each(this.addOne.bind(this));
     },
 
