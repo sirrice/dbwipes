@@ -48,7 +48,17 @@ define(function(require) {
           });
       });
       this.$('#scorpion_submit').click(function(){
-        model.fetch({data: model.toJSON()});
+        if (model.isValid()) {
+          model.fetch({
+            data: {
+              json: JSON.stringify(model.toJSON()) ,
+              db: model.get('query').get('db')
+            }, 
+            type: 'POST'
+          });
+        } else {
+          _this.$("#errmsg").html(model.validationError);
+        }
       });
 
 

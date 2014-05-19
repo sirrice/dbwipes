@@ -13,8 +13,8 @@ define(function(require) {
   var QueryView = Backbone.View.extend({
     errtemplate: Handlebars.compile($("#q-err-template").html()),
 
-    initialize: function() {
-      this.state = {
+    defaults: function() {
+      return {
         xdomain: null,
         ydomain: null,
         xscales: null,
@@ -27,9 +27,15 @@ define(function(require) {
         h: 400,
         lp: 40,
         tp: 20,
+        bp: 15,
         marktype: 'circle'
       };
+    },
 
+
+
+    initialize: function() {
+      this.state = this.defaults();
 
 
       this.$svg = $("<svg id='viz'></svg>").prependTo(this.$el);
@@ -38,7 +44,7 @@ define(function(require) {
       this.d3svg
         .attr('class', 'viz-container')
         .attr('width', this.state.w + this.state.lp)
-        .attr('height', this.state.h + this.state.tp);
+        .attr('height', this.state.h + this.state.tp + this.state.bp);
       this.c = this.d3svg.append('g')
           .attr('transform', "translate("+this.state.lp+", 0)");
       this.c.append('rect')
@@ -67,9 +73,13 @@ define(function(require) {
         }).bind(this));
           
 
-      //this.listenTo(this.model, 'change:db', this.onChange);
-      //this.listenTo(this.model, 'change:table', this.onChange);
+      this.listenTo(this.model, 'change:db', this.resetState);
+      this.listenTo(this.model, 'change:table', this.resetState);
       this.listenTo(this.model, 'change:data', this.render);
+    },
+
+    resetState: function() {
+      this.state = this.defaults();
     },
 
     onChange: function() {
@@ -101,10 +111,12 @@ define(function(require) {
         if (this.state.xdomain == null) this.state.xdomain = [];
         this.state.xdomain = _.union(this.state.xdomain, _.uniq(xs));
       } else {
-        if (this.state.xdomain == null) this.state.xdomain = [Infinity, -Infinity];
+        if (this.state.xdomain == null) 
+          this.state.xdomain = [Infinity, -Infinity];
+
         if (xs.length) {
-          this.state.xdomain[0] = Math.min(this.state.xdomain[0], d3.min(xs));
-          this.state.xdomain[1] = Math.max(this.state.xdomain[1], d3.max(xs));
+          this.state.xdomain[0] = d3.min([this.state.xdomain[0], d3.min(xs)]);
+          this.state.xdomain[1] = d3.max([this.state.xdomain[1], d3.max(xs)]);
         }
       }
 
@@ -165,14 +177,23 @@ define(function(require) {
       el.append('g')
         .attr('class', 'axis y yaxis')
         .call(this.state.yaxis)
+
+      el.append('g')
+        .attr('transform', 'translate('+(this.state.w/2)+','+(this.state.h+25)+')')
+        .append('text')
+        .data([1])
+        .text(this.model.get('x')['expr'])
     },
 
-    renderData: function(el, xcol, ycol) {
+    renderData: function(el, xcol, yalias) {
       var data = _.map(this.model.get('data'), function(d) {
-        return {
+        var ret = {
           x: d[xcol],
-          y: d[ycol]
-        }
+          y: d[yalias],
+        };
+        ret[xcol] = d[xcol];
+        ret[yalias] = d[yalias];
+        return ret
       });
 
       var _this = this;
@@ -187,9 +208,9 @@ define(function(require) {
               cx: function(d) { return _this.state.xscales(d.x)},
               cy: function(d) { return _this.state.yscales(d.y)},
               r: 2,
-              fill: this.state.cscales(ycol),
-              stroke: this.state.cscales(ycol),
-              ycol: ycol
+              fill: this.state.cscales(yalias),
+              stroke: this.state.cscales(yalias),
+              yalias: yalias
             })
       }
     },
@@ -210,9 +231,9 @@ define(function(require) {
             b = b && (e[0][1] <= d.y && e[1][1] > d.y);
 
             if (b) {
-              var ycol = d3.select(this).attr('ycol')
-              if (!selected[ycol]) selected[ycol] = [];
-              selected[ycol].push(d);
+              var yalias = d3.select(this).attr('yalias')
+              if (!selected[yalias]) selected[yalias] = [];
+              selected[yalias].push(d);
             }
             return b;
           })
@@ -314,6 +335,7 @@ define(function(require) {
           where: this.model.get('where'),
           schema: this.model.get('schema')
         };
+        this.resetState();
         this.model.set(q);
 
 

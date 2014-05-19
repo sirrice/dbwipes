@@ -17,6 +17,7 @@ define(function(require) {
         badselection: {},   // y -> []
         goodselection: {},
         selection: {},
+        errtypes: {},
         query: null,
         results: new ScorpionResults()
       }
@@ -27,31 +28,59 @@ define(function(require) {
     },
 
     merge: function(key, selection) {
+      //
+      // TODO: remove from other selection values in new selection
+      //
       if (selection == null || _.size(selection) == 0) return;
-      var cursel = this.get(key) || {};
-      _.each(selection, function(ds, col) {
-        if (!cursel[col]) cursel[col] = [];
-        cursel[col] = _.union(cursel[col], ds);
+      var curSel = this.get(key) || {};
+      _.each(selection, function(ds, yalias) {
+        if (!curSel[yalias]) 
+          curSel[yalias] = [];
+        curSel[yalias] = _.union(curSel[yalias], ds);
       }, this)
-      this.set(key, cursel);
+      this.set(key, curSel);
       this.trigger('change')
     },
 
     count: function(key) {
-     return d3.sum(
-      _.values(this.get(key))
-        .map(function(ds) { return ds.length; })
+      return d3.sum(
+        _.values(this.get(key))
+          .map(function(ds) { return ds.length; })
       );
     },
 
+    mean: function(key, yalias) {
+      var selected = this.get(key)[yalias];
+      if (!selected) return null;
+
+      return d3.mean(selected.map(function(d) {
+        return d[yalias];
+      }));
+    },
 
     validate: function() {
       var errs = [];
+
+      this.set('errtypes', {});
+
+      _.each(this.get('badselection'), function(selected, yalias) {
+        var badmean = this.mean('badselection', yalias),
+            goodmean = this.mean('goodselection', yalias);
+        if (!badmean) return;
+        if (badmean && goodmean == null) 
+          errs.push(["<div>select good examples for <strong>"+yalias+"</strong></div>"]);
+        else
+          this.get('errtypes')[yalias] = (goodmean > badmean)? 3 : 2;
+      }, this) 
+
       if (errs.length) 
         return errs.join('\n');
     },
 
     parse: function(resp) {
+      //
+      // [ { score:, c_range:, clauses:, alt_clauses:, } ]
+      //
       if (resp.results) {
         var q = this.get('query'),
             results = this.get('results');
@@ -70,9 +99,13 @@ define(function(require) {
 
     toJSON: function() {
       var json = {
-        cols: _.keys(this.get('query').get('schema')),
+        schema: this.get('query').get('schema'),
         nbad: this.count('badselection'),
-        ngood: this.count('goodselection')
+        ngood: this.count('goodselection'),
+        badselection: this.get('badselection'),
+        goodselection: this.get('goodselection'),
+        errtypes: this.get('errtypes'),
+        query: this.get('query').toJSON()
       };
       return json;
     },

@@ -10,6 +10,7 @@ define(function(require) {
     defaults: function() {
       return {
         query: null,        // Query object
+        yalias: null,
         score: 0,
         c_range: [],     // [minc, maxc]
         clauses: [],    // { col:, type:, vals: }
@@ -31,15 +32,19 @@ define(function(require) {
         alt_clauses: _.map(this.get('alt_clauses'), function(c) {
           return util.toWhereClause(c.col, c.type, c.vals);//.substr(0, 20);
         }),
-        c_range: this.get('c_range').join(' - ')
+        c_range: this.get('c_range').join(' - '),
+        yalias: this.get('yalias')
       };
       return json;
     },
 
     toSQL: function() {
-      return _.map(this.get('clauses'), function(clause) {
+      var SQL = _.map(this.get('clauses'), function(clause) {
         return util.toWhereClause(clause.col, clause.type, clause.vals); 
-      });
+      }).join(' and ');
+      if (SQL.length > 0)
+        return "not("+SQL+")";
+      return null;
     }
   });
   ScorpionResult._id = 0;

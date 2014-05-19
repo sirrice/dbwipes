@@ -152,12 +152,8 @@ define(function(require) {
           return clause.vals[0] <= val && val <= clause.vals[1];
         }
       };
-      this.d3brush.extent([]);
-      this.d3svg.selectAll('.mark')
-        .classed('selected', function(d) {
-          return withinClause(clause, d.val);
-        })
 
+      this.d3brush.extent([]);
       this.d3brush.clear();
       if (clause) {
         if (!util.isStr(clause.type)) {
@@ -170,6 +166,23 @@ define(function(require) {
         }
       }
       this.d3brush(this.d3gbrush);
+
+      if (clause) {
+        this.d3svg.selectAll('.mark')
+          .classed('selected', false)
+          .classed('highlighted', function(d) {
+            return withinClause(clause, d.val);
+          })
+          .classed('faded', function(d) {
+            return !withinClause(clause, d.val);
+          })
+      } else {
+        this.d3svg.selectAll('.mark')
+          .classed('selected', false)
+          .classed('highlighted', false)
+          .classed('faded', false)
+      }
+
     },
 
 
@@ -183,6 +196,7 @@ define(function(require) {
         var e = brush.extent()
         var selected = [];
         el.selectAll('.mark')
+          .classed('highlighted', false)
           .classed('selected', function(d){
             if (type == 'str') {
               var b = e[0] <= xscales(d.val) && e[1] >= xscales(d.val);
@@ -214,6 +228,10 @@ define(function(require) {
     },
 
     renderZoom: function(el) {
+      if (util.isStr(this.model.get('type'))) {
+        // sorry, don't support discrete zooming...
+        return;
+      }
       var _this = this,
           xscales = this.state.xscales,
           xaxis = this.state.xaxis;

@@ -99,7 +99,7 @@ function   (
   var sq = new ScorpionQuery({query: q, results: srs});
   var sqv = new ScorpionQueryView({model: sq});
   $("#scorpion-container").append(srv.render().el);
-  $("body").append(sqv.render().$el);//.hide());
+  $("body").append(sqv.render().$el.hide());
 
   qv.on('change:selection', function(selection) {
     sq.set('selection', selection);
@@ -121,6 +121,17 @@ function   (
     where: '',
     table: 'readings' ,
     db: 'intel'
+  };
+
+  newq = {
+    x: 'week_start_date',
+    ys: [ { col: 'job_count', expr: 'sum(job_count)'} ],
+    schema: {
+      week_start_date: 'timestamp',
+      job_count: 'num'
+    },
+    table: 'sample',
+    db: 'bt'
   };
 
   q.set(newq);

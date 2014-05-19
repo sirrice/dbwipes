@@ -30,7 +30,7 @@
 
 	<div class="col-md-6">
 
-    <div class="row" style="position: fixed">
+    <div class="row"> 
       <div class="col-md-12" id="right">
         <div style="clear:both"></div>
         <div id="scorpion-container"></div>
@@ -45,8 +45,11 @@
 {%raw%}
 <script id="foo-template" type="text/x-underscore-template">
 <div class='row'>
-  <div class="col-md-2">{{col}}<span>({{type}})</span></div>
-	<div class="col-md-10">
+  <div class="col-md-2 cstat-label">
+    {{col}}
+    <div class="type">{{type}}</div>
+  </div>
+	<div class="col-md-10 cstat-plot">
     <svg class=""></svg>
 	</div>
 </div>
@@ -184,7 +187,8 @@
 
       <div class="form-group">
         <div class="controls col-sm-9 col-sm-offset-3">
-          <input type="submit" id="scorpion_submit" class="form-control btn btn-primary" value="Debug Highlighted Points!"></input>
+          <div><input type="submit" id="scorpion_submit" class="form-control btn btn-primary" value="Debug Highlighted Points!"></input></div>
+          <p id="errmsg" class="text-danger"></p>
         </div>
       </div>
 

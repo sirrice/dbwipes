@@ -113,13 +113,14 @@ define(function(require) {
       _.each(sel, function(d) {
         vals = vals.concat(d.range);
       });
-      vals = _.compact(_.uniq(vals));
+      vals = _.uniq(vals);
       var SQL = util.toWhereClause(
         this.get('col'), 
         this.get('type'),
         vals
       );
-      return "not("+SQL+")";
+      if (SQL == '' || SQL == null) return null;
+      return SQL;
     }
 
   });

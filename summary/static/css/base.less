@@ -16,6 +16,17 @@ body {
   #where {
     margin-top: 2em;
   }
+
+
+  .cstat-label {
+    overflow: hidden;
+    text-align: right;
+
+    .type {
+      font-size: smaller;
+      color: grey;
+    }
+  }
   
 }
 
@@ -55,12 +66,18 @@ circle.selected {
 rect.selected {
   fill: black;
 }
+rect.faded {
+  fill: whitesmoke;
+}
+rect.highlighted {
+  fill: black;
+}
 
 rect.extent {
   fill: grey;
   fill-opacity: 0.2;
   stroke-width: 1px;
-  stroke: none;
+  stroke: white;
   shape-rendering: crispEdges;
 }
 .legend {
@@ -170,7 +187,7 @@ rect.extent {
   .walkthrough {
     width: 40%;
     background: white;
-    border: 10px solid rgb(221, 221, 221);
+    border: 10px solid rgb(100, 124, 160);
     padding: 1em;
     position: fixed;
     left: -10px;

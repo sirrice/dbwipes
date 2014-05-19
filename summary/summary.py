@@ -1,5 +1,13 @@
+import bsddb
+import json
 import pdb
 from sqlalchemy import create_engine
+
+
+def json_handler(o):
+  if hasattr(o, 'isoformat'):
+    return o.isoformat()
+
 
 class Summary(object):
 
@@ -15,7 +23,7 @@ class Summary(object):
     self.tablename = tablename
     self.nbuckets = nbuckets
 
-    self._cache = {}
+    self._cache = bsddb.hashopen(".summary.cache")
 
   def __call__(self):
     cols = self.get_columns()
@@ -66,7 +74,7 @@ class Summary(object):
       q = "select columns.name from columns, tables where tables.name = %s and tables.id = columns.table_id;"
     ret = []
     for (attr,) in self.query(q, self.tablename):
-      ret.append(attr)
+      ret.append(str(attr))
     return ret
 
 
@@ -129,22 +137,26 @@ class Summary(object):
 
 
   def get_col_stats(self, col_name):
+    print col_name, type(col_name)
     if col_name in self._cache:
-      return self._cache[col_name]
+      return json.loads(self._cache[col_name])
 
     col_type = self.get_type(col_name)
 
     if self.dbtype == 'pg' and any([s in col_type for s in ['int', 'float', 'double', 'numeric']]):
       stats = self.get_numeric_stats(col_name)
-      self._cache[col_name] = stats
+      self._cache[col_name] = json.dumps(stats, default=json_handler)
+      self._cache.sync()
       return stats
 
     groupby = self.get_col_groupby(col_name, col_type)
     if groupby:
       stats = self.get_group_stats(col_name, groupby)
-      self._cache[col_name] = stats
+      self._cache[col_name] = json.dumps(stats, default=json_handler)
+      self._cache.sync()
       return stats
-    self._cache[col_name] = None
+    self._cache[col_name] = json.dumps(None)
+    self._cache.sync()
     return None
 
 

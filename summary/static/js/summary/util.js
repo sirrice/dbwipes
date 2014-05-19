@@ -59,8 +59,29 @@ define(function(require) {
   function toWhereClause(col, type, vals) {
     if (!vals || vals.length == 0) return null;
     var SQL = null;
+    var re = new RegExp("'", "gi");
     if (isStr(type)) {
-        SQL = col + " in ("+vals.join(',')+")";
+        SQL = [];
+        if (_.contains(vals, null)) {
+          SQL.push(col + " is null");
+        }
+
+        var nonnulls = _.compact(vals);
+        if (nonnulls.length == 1) {
+          var v = nonnulls[0];
+          if (_.isString(v)) 
+            v = "'" + v.replace(re, "\\'") + "'";
+          SQL.push(col + " = " + v);
+        } else if (nonnulls.length > 1) {
+          vals = _.map(nonnulls, function(v) {
+            if (_.isString(v)) 
+              return "'" + v.replace(re, "\\'") + "'";
+            return v;
+          });
+          SQL.push(col + " in ("+vals.join(',')+")");
+        }
+
+        SQL = (SQL.length)? SQL.join(' and ') : null;
     } else {
       if (isTime(type)) {
         var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }

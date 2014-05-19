@@ -17,6 +17,14 @@ body h4 {
 body #where {
   margin-top: 2em;
 }
+body .cstat-label {
+  overflow: hidden;
+  text-align: right;
+}
+body .cstat-label .type {
+  font-size: smaller;
+  color: grey;
+}
 .axis path,
 .axis line {
   fill: none;
@@ -47,11 +55,17 @@ circle.selected {
 rect.selected {
   fill: black;
 }
+rect.faded {
+  fill: whitesmoke;
+}
+rect.highlighted {
+  fill: red;
+}
 rect.extent {
   fill: grey;
   fill-opacity: 0.2;
   stroke-width: 1px;
-  stroke: none;
+  stroke: white;
   shape-rendering: crispEdges;
 }
 .legend {
@@ -140,12 +154,12 @@ rect.extent {
 #walkthrough-container .walkthrough {
   width: 40%;
   background: white;
-  border: 10px solid #dddddd;
+  border: 10px solid #647ca0;
   padding: 1em;
   position: fixed;
   left: -10px;
   padding-top: 0px;
-  box-shadow: 4px 4px 7px 0px #929292;
+  box-shadow: 4px 4px 10px -4px #929292;
 }
 #walkthrough-container .walkthrough fieldset {
   margin-top: 2em;

@@ -31,7 +31,7 @@ define(function(require) {
 
       this.each(function(model) {
         var col = model.get('col');
-        //model.setSelection(col2clause[col]);
+        model.set('selection', []);
         model.trigger('setSelection', col2clause[col]);
       });
     },
@@ -47,9 +47,12 @@ define(function(require) {
     },
 
     toSQL: function() {
-      return _.compact(this.map(function(m) {
+      var SQL = _.compact(this.map(function(m) {
         return m.toSQLWhere();
       })).join(' and ');
+      if (SQL.length)
+        return "not("+SQL+")";
+      return null;
     }
   });
 
