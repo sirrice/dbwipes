@@ -149,24 +149,35 @@
     <h4><button class="close" style="">x</button></h4>
     <fieldset>
 
-      <div class="form-group">
-        <label class="col-sm-3 control-label">
-            Selected outputs are
-        </label>
-        <div class="col-sm-9">
+      <div class="form-group row">
+        <div class="col-sm-8">
           <span id="addbad" class="form-control btn btn-danger" >
             bad outputs ({{nbad}})
           </span>
           <span id="addgood" class="form-control btn btn-success" >
             good outputs ({{ngood}})
           </span>
+        </div>
+        <div class="col-sm-4">
+          <div><span id="clearbad" class="btn" >
+            clear
+          </span></div>
+          <div><span id="cleargood" class="btn" >
+            clear
+          </span></div>
+        </div>
+      </div>			
+
+      <div class="row">
+        <div class="col-sm-12">
           <span id="draw" class="form-control btn btn-default" >
             click to draw
           </span>
         </div>
-      </div>			
+      </div>
 
-      <div class="form-group" id="walkthrough-schema" >
+      <!--
+      <div class="form-group row" id="walkthrough-schema" >
         <label class="col-sm-3 control-label">
           <span class='link' id='toggle-schema'>cols</span>
         </label>
@@ -183,11 +194,12 @@
           {{/each}}
         </div>
       </div>
+      -->
 
 
-      <div class="form-group">
-        <div class="controls col-sm-9 col-sm-offset-3">
-          <div><input type="submit" id="scorpion_submit" class="form-control btn btn-primary" value="Debug Highlighted Points!"></input></div>
+      <div class="form-group row">
+        <div class="controls col-sm-12">
+          <div><span id="scorpion_submit" class="form-control btn btn-primary">Debug Highlighted Points!</span></div>
           <p id="errmsg" class="text-danger"></p>
         </div>
       </div>
