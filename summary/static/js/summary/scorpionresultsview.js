@@ -23,6 +23,8 @@ define(function(require) {
 
       this.listenTo(this.collection, 'add', this.addTo);
       this.listenTo(this.collection, 'reset', this.reset);
+      this.listenTo(this.state.query, 'change:db', this.clear);
+      this.listenTo(this.state.query, 'change:table', this.clear);
     },
 
     render: function() {
@@ -44,10 +46,15 @@ define(function(require) {
       this.state.active = model;
     },
 
+    clear: function() {
+      this.collection.reset();
+    },
+
     reset: function() {
       this.$list.empty();
       this.collection.each(this.addTo.bind(this));
     },
+
 
     addTo: function(model) {
       console.log(['srv.add', model])
