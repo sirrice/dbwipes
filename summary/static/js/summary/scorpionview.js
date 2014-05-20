@@ -43,7 +43,9 @@ define(function(require) {
       this.$('#cleargood').click(function(){
         model.set('goodselection', {});
       });
-      this.$('#draw').click(function(){});
+      this.$('#draw').click(function(){
+        window.qv.toggleBrushDrawing();
+      });
       this.$('#toggle-schema').click(function() {
         _this.$('#schema').toggle()
       });

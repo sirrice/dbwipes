@@ -5,11 +5,13 @@ define(function(require) {
       d3 = require('d3'),
       _ = require('underscore'),
       Where = require('summary/where'),
-      util = require('summary/util');
+      util = require('summary/util'),
+      DrawingView = require('summary/drawingview');
 
 
-  // TODO: connect to server to query and fetch data
-  //       connect with Where object
+
+
+
   var QueryView = Backbone.View.extend({
     errtemplate: Handlebars.compile($("#q-err-template").html()),
 
@@ -46,6 +48,7 @@ define(function(require) {
         .attr('width', this.state.w + this.state.lp)
         .attr('height', this.state.h + this.state.tp + this.state.bp);
       this.c = this.d3svg.append('g')
+          .classed("plot-container", true)
           .attr('transform', "translate("+this.state.lp+", 0)");
       this.c.append('rect')
         .attr('width', this.state.w)
@@ -248,14 +251,22 @@ define(function(require) {
           .on('brush', brushf)
           .on('brushend', brushf)
           .on('brushstart', brushf)
-      var gbrush = el.append('g')
+      var gbrush = this.gbrush = el.append('g')
           .attr('class', 'brush')
           .call(brush)
       gbrush.selectAll('rect')
           .attr('height', this.state.h)
-
-
     },
+
+    disableBrush: function() {
+      if (this.gbrush)
+        this.gbrush.style("pointer-events", null);
+    },
+    enableBrush: function() {
+      if (this.gbrush)
+        this.gbrush.style("pointer-events", 'all');
+    },
+
 
     renderZoom: function(el) {
       var _this = this;
@@ -358,6 +369,21 @@ define(function(require) {
           .style("background", function(d) { return cscales(d.alias); });
     },
 
+    toggleBrushDrawing: function() {
+      if (!this.dv) {
+        this.enableBrush();
+        return;
+      }
+
+      if (this.dv.status() == 'all') {
+        this.dv.disable();
+        this.enableBrush();
+      } else {
+        this.dv.enable();
+        this.disableBrush();
+      }
+    },
+
 
     render: function() {
       if (!this.model.isValid()) {
@@ -379,6 +405,12 @@ define(function(require) {
       }, this);
       this.renderBrush(this.c);
       this.renderLabels(this.c);
+
+      this.dv = new DrawingView({state: this.state});
+      $(this.c[0]).append(this.dv.render().$("g"));
+      this.dv.disable();
+      this.enableBrush();
+
 
       return this;
     }

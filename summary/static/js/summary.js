@@ -34,15 +34,20 @@ requirejs.config({
 
 // Start the main app logic.
 requirejs([
-    'jquery', 'summary/where', 'summary/whereview', 
+    'jquery', 'd3',
+    'summary/where', 'summary/whereview', 
     'summary/cstat', 'summary/cstatsview', 
     'summary/query', 'summary/queryview',
     'summary/scorpionquery', 'summary/scorpionview',
-    'summary/scorpionresults', 'summary/scorpionresultsview'],
-function   (
-  $, Where, WhereView, 
+    'summary/scorpionresults', 'summary/scorpionresultsview',
+    'summary/drawingview'],
+function (
+  $, d3,
+  Where, WhereView, 
   CStat, CStatsView, Query, QueryView, 
-  ScorpionQuery, ScorpionQueryView, ScorpionResults, ScorpionResultsView) {
+  ScorpionQuery, ScorpionQueryView, 
+  ScorpionResults, ScorpionResultsView,
+  DrawingView) {
 
   $("#fm").on("submit", function() {
     var params = {

@@ -31,7 +31,7 @@ def before_request():
     g.db = None
 
     if dbname:
-      g.engine = create_engine('postgresql:///%s' % dbname)
+      g.engine = create_engine('postgresql://localhost/%s' % dbname)
       g.db = g.engine.connect()
   except:
     traceback.print_exc()

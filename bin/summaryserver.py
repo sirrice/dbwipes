@@ -1,3 +1,4 @@
+import sys
 import psycopg2
 from summary.server import app
 
@@ -11,6 +12,10 @@ psycopg2.extensions.register_type(DEC2FLOAT)
 
 PORT = 8111
 HOST = '128.52.160.140'
+
+if len(sys.argv) > 1:
+  HOST = sys.argv[1]
+
 
 try:
   from gevent.wsgi import WSGIServer

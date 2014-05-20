@@ -19,7 +19,7 @@ class Summary(object):
     elif 'Engine' in str(dbname):
       self.db = dbname
     else:
-      self.db = create_engine("postgresql:///%s" % dbname)
+      self.db = create_engine("postgresql://localhost/%s" % dbname)
     self.tablename = tablename
     self.nbuckets = nbuckets
 
