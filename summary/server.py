@@ -1,17 +1,17 @@
-#from gevent.pywsgi import WSGIServer # must be pywsgi to support websocket
-#from geventwebsocket.handler import WebSocketHandler
 from flask import Flask, request, render_template, g, redirect
+import os
 import re
 import time
 import json
 import md5
+import pdb
+import psycopg2
 import traceback
 from collections import *
 from datetime import datetime
 
 from sqlalchemy import *
-from summary import *
-import pdb
+from summary import Summary
 app = Flask(__name__)
 
 summaries = {}
@@ -31,7 +31,7 @@ def before_request():
     g.db = None
 
     if dbname:
-      g.engine = create_engine('postgresql://localhost/%s' % dbname)
+      g.engine = create_engine('postgresql:///%s' % dbname)
       g.db = g.engine.connect()
   except:
     traceback.print_exc()
@@ -57,6 +57,7 @@ def json_handler(o):
 
 @app.route('/', methods=["POST", "GET"])
 def index():
+  print os.path.abspath('.')
   return render_template("index.html")
 
 
@@ -108,7 +109,7 @@ def lookup():
 
   key = (dbname, tablename, nbuckets)
   if key not in summaries:
-    from monetdb import sql as msql
+    #from monetdb import sql as msql
     #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
     summaries[key] = Summary(dbname, tablename, nbuckets=nbuckets)
 
@@ -210,7 +211,7 @@ def scorpion_run(qjson, badsel, goodsel, errtypes):
   import scorpion
   from scorpion.aggerror import AggErr
   from scorpion.db import db_type
-  from scorpion.sql import *
+  from scorpion.sql import Select, SelectExpr, SelectAgg, Query
   from scorpion.arch import SharedObj, extract_agg_vals
   from scorpion.parallel import parallel_debug
 
@@ -341,14 +342,3 @@ def create_scorpion_results(obj):
   return results
 
 
-
-
-if __name__ == "__main__":
-  import psycopg2
-  DEC2FLOAT = psycopg2.extensions.new_type(
-    psycopg2.extensions.DECIMAL.values,
-    'DEC2FLOAT',
-    lambda value, curs: float(value) if value is not None else None)
-  psycopg2.extensions.register_type(DEC2FLOAT)
-  app.debug = True
-  app.run(port=8111)
