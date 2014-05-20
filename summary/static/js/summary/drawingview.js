@@ -14,6 +14,38 @@ define(function(require) {
         isDrawing: false,
         path: []
       };
+    },
+
+    interpolate: function(xs) {
+      var xys = this.get('path');
+      xys.sort(function(a,b) { return a[0] - b[0]; });
+
+      if (xys.length == 0) 
+        return null;
+      if (xys[0][0] > xs[0] || xys[xys.length-1][0] < xs[xs.length-1])
+        return null;
+
+      var idx = -1,
+          xyidx = 0,
+          xy = xys[0],
+          xyn = xys[1],
+          ys = [],
+          x = null;
+      while (++idx < xs.length ){
+        x = xs[idx];
+        while (x >= xyn[0] && ++xyidx < xys.length) {
+          xy = xyn;
+          xyn = xys[xyidx]
+        }
+        if (xyidx >= xys.length) break;
+        var ratio = (x-xy[0]) / (xyn[0]-xy[0]);
+        ys.push(ratio * (xyn[1]-xy[1]) + xy[1])
+      }
+      return ys;
+    },
+
+    inverty: function(y) {
+      return this.get('state').yscales.invert(y);
     }
   });
 
@@ -22,8 +54,8 @@ define(function(require) {
 
     // expect state
     initialize: function(attrs) {
-      this.model = new Drawing()
       this.state = attrs.state || {w: 500, h: 500};
+      this.model = new Drawing({state: attrs.state})
     },
 
 
@@ -104,6 +136,7 @@ define(function(require) {
       if (this.model.get("path").length <= 1) 
         this.model.get("path", [])
       this.model.set("isDrawing", false);
+      this.trigger("change:drawing");
     },
 
 

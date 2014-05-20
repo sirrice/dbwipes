@@ -18,7 +18,9 @@ define(function(require) {
         goodselection: {},
         selection: {},
         errtypes: {},
+        erreqs: {},
         query: null,
+        drawing: null,
         results: new ScorpionResults()
       }
     },
@@ -59,19 +61,42 @@ define(function(require) {
     },
 
     validate: function() {
-      var errs = [];
+      var errs = [],
+          yaliases = _.keys(this.get('badselection')),
+          drawing = this.get('drawing');
 
       this.set('errtypes', {});
 
-      _.each(this.get('badselection'), function(selected, yalias) {
-        var badmean = this.mean('badselection', yalias),
-            goodmean = this.mean('goodselection', yalias);
-        if (!badmean) return;
-        if (badmean && goodmean == null) 
-          errs.push(["<div>select good examples for <strong>"+yalias+"</strong></div>"]);
-        else
-          this.get('errtypes')[yalias] = (goodmean > badmean)? 3 : 2;
-      }, this) 
+
+      // verify errtype is eq if a line is drawn
+      if (drawing && drawing.get('path') && drawing.get('path').length) {
+        _.each(yaliases, function(yalias) {
+          var ds = this.get('badselection')[yalias];
+          ds.sort(function(a,b) { return a.px - b.px; });
+
+          var ys = drawing.interpolate(_.pluck(ds, 'px'));
+
+          if (ys == null) {
+            errs.push("<div>drawn path doesn't cover selected points</div>");
+          } else {
+            ys = _.map(ys, drawing.inverty.bind(drawing));
+            this.get('errtypes')[yalias] = 1;
+            this.get('erreqs')[yalias] = ys;
+          }
+
+        }, this);
+      } else {
+        _.each(yaliases, function(yalias) {
+          var badmean = this.mean('badselection', yalias),
+              goodmean = this.mean('goodselection', yalias);
+          if (!badmean) return;
+          if (badmean && goodmean == null) 
+            errs.push("<div>select good examples for <strong>"+yalias+"</strong></div>");
+          else
+            this.get('errtypes')[yalias] = (goodmean > badmean)? 3 : 2;
+        }, this) 
+      }
+
 
       if (errs.length) 
         return errs.join('\n');
@@ -100,11 +125,13 @@ define(function(require) {
     toJSON: function() {
       var json = {
         schema: this.get('query').get('schema'),
+        nselected: this.count('selection'),
         nbad: this.count('badselection'),
         ngood: this.count('goodselection'),
         badselection: this.get('badselection'),
         goodselection: this.get('goodselection'),
         errtypes: this.get('errtypes'),
+        erreqs: this.get('erreqs'),
         query: this.get('query').toJSON()
       };
       return json;

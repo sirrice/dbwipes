@@ -101,14 +101,18 @@ function (
     where: where, 
     query: q
   });
+
   var sq = new ScorpionQuery({query: q, results: srs});
-  var sqv = new ScorpionQueryView({model: sq});
+  var sqv = new ScorpionQueryView({model: sq, queryview: qv});
   $("#scorpion-container").append(srv.render().el);
   $("body").append(sqv.render().$el.hide());
 
   qv.on('change:selection', function(selection) {
     sq.set('selection', selection);
   })
+  qv.on('change:drawing', function(drawingmodel) {
+    sq.set('drawing', drawingmodel);
+  });
 
 
 

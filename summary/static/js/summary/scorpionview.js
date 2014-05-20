@@ -13,6 +13,7 @@ define(function(require) {
     template: Handlebars.compile($("#scorpion-template").html()),
 
     initialize: function(attrs) {
+      this.queryview = attrs.queryview;
       this.listenTo(this.model, 'change', this.onChange);
     },
 
@@ -43,9 +44,6 @@ define(function(require) {
       this.$('#cleargood').click(function(){
         model.set('goodselection', {});
       });
-      this.$('#draw').click(function(){
-        window.qv.toggleBrushDrawing();
-      });
       this.$('#toggle-schema').click(function() {
         _this.$('#schema').toggle()
       });
@@ -55,14 +53,45 @@ define(function(require) {
             e.checked = false;
           });
       });
+
+      var draw = this.$("#draw");
+      var qv = this.queryview;
+      draw.text((qv.brushStatus() == 'all')? "click to draw" : "click when done drawing")
+      draw.click(function(){
+        if (qv.brushStatus() == 'all') {
+          qv.disableBrush();
+          qv.dv.enable();
+          draw.addClass("drawing");
+          draw.text("click when done drawing");
+        } else {
+          qv.enableBrush();
+          qv.dv.disable();
+          draw.removeClass("drawing");
+          draw.text("click to draw");
+        }
+      });
+
+
       this.$('#scorpion_submit').click(function(){
         if (model.isValid()) {
+          console.log(_this.model.get('erreqs'));
+          console.log(_this.model.get('badselection'));
+          var wait = $("#scorpion-wait").show();
           model.fetch({
             data: {
               json: JSON.stringify(model.toJSON()) ,
               db: model.get('query').get('db')
             }, 
-            type: 'POST'
+            type: 'POST',
+            success: function() { 
+              wait.hide(); 
+              _this.$el.fadeOut(); 
+              _this.$("#errmsg").text(resp.errormsg || '');
+            },
+            error: function(resp) { 
+              wait.hide(); 
+              _this.$("#errmsg").text(resp.errormsg || '');
+            }
           });
         } else {
           _this.$("#errmsg").html(model.validationError);

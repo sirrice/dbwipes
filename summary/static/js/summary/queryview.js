@@ -189,17 +189,19 @@ define(function(require) {
     },
 
     renderData: function(el, xcol, yalias) {
+      var _this = this;
       var data = _.map(this.model.get('data'), function(d) {
         var ret = {
           x: d[xcol],
           y: d[yalias],
+          px: _this.state.xscales(d[xcol]),
+          py: _this.state.yscales(d[yalias])
         };
         ret[xcol] = d[xcol];
         ret[yalias] = d[yalias];
         return ret
       });
 
-      var _this = this;
       var dc = el.append('g')
         .attr('class', 'data-container')
       if (this.state.marktype == 'circle') {
@@ -208,8 +210,8 @@ define(function(require) {
           .enter().append('circle')
             .attr({
               class: 'mark',
-              cx: function(d) { return _this.state.xscales(d.x)},
-              cy: function(d) { return _this.state.yscales(d.y)},
+              cx: function(d) { return d.px },
+              cy: function(d) { return d.py },
               r: 2,
               fill: this.state.cscales(yalias),
               stroke: this.state.cscales(yalias),
@@ -265,6 +267,11 @@ define(function(require) {
     enableBrush: function() {
       if (this.gbrush)
         this.gbrush.style("pointer-events", 'all');
+    },
+
+    brushStatus: function() {
+      if (this.gbrush)
+        return this.gbrush.style("pointer-events");
     },
 
 
@@ -407,6 +414,9 @@ define(function(require) {
       this.renderLabels(this.c);
 
       this.dv = new DrawingView({state: this.state});
+      this.listenTo(this.dv, "change:drawing", (function() {
+        this.trigger('change:drawing', this.dv.model);
+      }).bind(this))
       $(this.c[0]).append(this.dv.render().$("g"));
       this.dv.disable();
       this.enableBrush();
