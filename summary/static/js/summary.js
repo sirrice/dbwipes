@@ -108,7 +108,7 @@ function   (
 
 
 
-  var newq = {
+  var intelq = {
     x: 'hr',
     ys: [
       {col: 'temp', expr: "avg(temp)", alias: 'avg'},
@@ -123,7 +123,7 @@ function   (
     db: 'intel'
   };
 
-  newq = {
+  btq = {
     x: 'week_start_date',
     ys: [ { col: 'job_count', expr: 'sum(job_count)'} ],
     schema: {
@@ -134,7 +134,15 @@ function   (
     db: 'bt'
   };
 
-  q.set(newq);
+  q.set(intelq);
+
+  $("#q-load-bt").click(function() { 
+    q.set(btq);
+  });
+  $("#q-load-intel").click(function() { 
+    q.set(intelq);
+  });
+
 
 
 
