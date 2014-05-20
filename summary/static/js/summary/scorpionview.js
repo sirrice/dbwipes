@@ -37,6 +37,12 @@ define(function(require) {
       this.$('#addgood').click(function(){
         model.merge('goodselection', model.get('selection'));
       });
+      this.$('#clearbad').click(function(){
+        model.set('badselection', {});
+      });
+      this.$('#cleargood').click(function(){
+        model.set('goodselection', {});
+      });
       this.$('#draw').click(function(){});
       this.$('#toggle-schema').click(function() {
         _this.$('#schema').toggle()
