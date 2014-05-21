@@ -61,8 +61,8 @@ define(function(require) {
             xdomain[0] -= .5;
             xdomain[1] += .5;
           } else {
-            xdomain[0] -= 1000*60*60*24; // 1 day
-            xdomain[1] += 1000*60*60*24;
+            xdomain[0] = new Date(+xdomain[0] - 1000*60*60*24); // 1 day
+            xdomain[1] = new Date(+xdomain[1] + 1000*60*60*24);
           }
         } else {
           var diff = (xdomain[1] - xdomain[0]) * 0.05;
