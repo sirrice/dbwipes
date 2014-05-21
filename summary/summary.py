@@ -11,19 +11,19 @@ def json_handler(o):
 
 class Summary(object):
 
-  def __init__(self, dbname, tablename, nbuckets=50):
+  def __init__(self, dbname, tablename, nbuckets=50, CACHELOC='.summary.cache'):
     self.dbtype = 'pg'
     if 'monetdb' in str(dbname):
       self.db = dbname
       self.dbtype = 'monet'
-    elif 'Engine' in str(dbname):
+    elif 'engine' in str(dbname).lower():
       self.db = dbname
     else:
       self.db = create_engine("postgresql://localhost/%s" % dbname)
     self.tablename = tablename
     self.nbuckets = nbuckets
 
-    self._cache = bsddb.hashopen(".summary.cache")
+    self._cache = bsddb.hashopen(CACHELOC)
 
   def __call__(self):
     cols = self.get_columns()
@@ -37,7 +37,6 @@ class Summary(object):
       print "\tgot %d" % (len(col_stats))
       stats.append((col, col_stats))
     return stats
-
 
 
   def query(self, q, *args):
@@ -63,13 +62,12 @@ class Summary(object):
       finally:
         cur.close()
 
-
   def get_columns(self):
     """
     engine specific way to get table columns
     """
     if self.dbtype == 'pg':
-      q = "select attname from pg_class, pg_attribute where relname = %s and attrelid = pg_class.oid and attnum > 0;"
+      q = "select attname from pg_class, pg_attribute where relname = %s and attrelid = pg_class.oid and attnum > 0 and attisdropped = false;"
     else:
       q = "select columns.name from columns, tables where tables.name = %s and tables.id = columns.table_id;"
     ret = []
@@ -121,15 +119,19 @@ class Summary(object):
 
     if 'int' in col_type or 'float' in col_type or 'double' in col_type:
       if self.dbtype == 'pg':
-        q = "select count(distinct %s)::float / count(*), count(*) from %s"
+        q = "select count(distinct %s), count(*) from %s"
       else:
-        q = "select cast(count(distinct %s) as float) / count(*), count(*) from %s"
+        q = "select cast(count(distinct %s) as float), count(*) from %s"
 
       q = q % (col_name, self.tablename)
-      perc, count = self.query(q)[0]
+      distincts, count = self.query(q)[0]
 
-      if count > 1000 and perc > .7:
+      if count > 1000 and distincts > .7 * count:
         return None
+      if count == 0:
+        return None
+      if distincts == 1:
+        return col_name
 
       groupby = self.get_num_stats(col_name)
 
@@ -137,25 +139,26 @@ class Summary(object):
 
 
   def get_col_stats(self, col_name):
-    print col_name, type(col_name)
-    if col_name in self._cache:
+    print col_name, self.get_type(col_name)
+    key = str((self.tablename, col_name, self.nbuckets))
+    if key in self._cache:
       return json.loads(self._cache[col_name])
 
     col_type = self.get_type(col_name)
 
-    if self.dbtype == 'pg' and any([s in col_type for s in ['int', 'float', 'double', 'numeric']]):
+    if self.dbtype == 'pg' and any([('_' not in col_type) and (s in col_type) for s in ['int', 'float', 'double', 'numeric']]):
       stats = self.get_numeric_stats(col_name)
-      self._cache[col_name] = json.dumps(stats, default=json_handler)
+      self._cache[key] = json.dumps(stats, default=json_handler)
       self._cache.sync()
       return stats
 
     groupby = self.get_col_groupby(col_name, col_type)
     if groupby:
       stats = self.get_group_stats(col_name, groupby)
-      self._cache[col_name] = json.dumps(stats, default=json_handler)
+      self._cache[key] = json.dumps(stats, default=json_handler)
       self._cache.sync()
       return stats
-    self._cache[col_name] = json.dumps(None)
+    self._cache[key] = json.dumps(None)
     self._cache.sync()
     return None
 
@@ -170,6 +173,11 @@ class Summary(object):
     return rows
 
   def get_numeric_stats(self, c):
+    q = "SELECT count(distinct %s) from %s" % (c, self.tablename)
+    if self.query(q)[0][0] <= 1:
+      return []
+
+
     q = """
     with bound as (
       SELECT min(%s) as min, max(%s) as max, avg(%s) as avg, stddev(%s) as std FROM %s
@@ -185,11 +193,19 @@ class Summary(object):
     print q
     stats = []
     for (val, minv, maxv, count) in self.query(q):
-      stats.append({
-        'val': (maxv+minv)/2.,
-        'count': count,
-        'range': [minv, maxv]
-      })
+      if val is None:
+        stats.append({
+          'val': None,
+          'count': count,
+          'range': [minv, maxv]
+        })
+      else:
+        stats.append({
+          'val': (maxv+minv)/2.,
+          'count': count,
+          'range': [minv, maxv]
+        })
+
     return stats
 
   def get_num_stats(self, col_name):
@@ -234,6 +250,10 @@ class Summary(object):
         from %s"""
     q = q % (col_name, col_name, col_name, col_name,  self.tablename)
     (maxv, minv, nminutes) = self.query(q)[0]
+    if maxv is None or minv is None or nminutes is None:
+      return None
+
+
     ndays = nminutes / 60 / 24
 
     if self.dbtype == 'pg':

@@ -34,6 +34,11 @@ define(function(require) {
       if (util.isTime(type)){
         // ensure vals and ranges are date objects
         _.each(stats, function(el) {
+          if (attrs.col == 'time')  {
+            el.val = '2000-01-01T' + el.val;
+            el.range = _.map(el.range, function(v) { return '2000-01-01T'+v});
+          }
+          console.log([type, el.val])
           el.val = new Date(el.val);
           el.range = _.map(el.range, function(v) {return new Date(v);})
         })

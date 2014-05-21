@@ -83,6 +83,7 @@ define(function(require) {
 
     resetState: function() {
       this.state = this.defaults();
+      this.trigger("resetState");
     },
 
     onChange: function() {

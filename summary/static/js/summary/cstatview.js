@@ -104,8 +104,11 @@ define(function(require) {
             })
       } else {
         var xs =_.pluck(stats, 'val');
-        xs.push.apply(xs, xscales.range());
+
+        //if (xs.length == 0) return;
+
         xs = _.uniq(_.map(xs, xscales));
+        xs.push.apply(xs, xscales.range());
         xs.sort();
         var intervals = _.times(xs.length-1, function(idx) { return xs[idx+1] - xs[idx]});
         var width = null;
@@ -114,6 +117,14 @@ define(function(require) {
         if (!width)
           width = 10;
         width = Math.max(2, width)
+        var minv = xscales.invert(d3.min(xs) - width),
+            maxv = xscales.invert(d3.max(xs) + width);
+        xscales.domain([minv, maxv]);
+
+        if (_.isNaN(minv)) 
+          console.log([this.model, stats, xs]);
+        
+        console.log([this.model.get('col'), xscales.domain()])
 
 
         el.selectAll('rect')
@@ -126,18 +137,6 @@ define(function(require) {
               x: function(d) {return xscales(d.val) - width/2},
               y: function(d) { return h-yscales(d.count)}
             })
-
-        /*
-        el.selectAll("circle")
-            .data(stats)
-          .enter().append('circle')
-            .attr({
-              class: 'mark',
-              cx: function(d) {return xscales(d.val);},
-              cy: function(d) {return yscales(d.count);},
-              r: 2
-            })
-            */
       } 
 
 

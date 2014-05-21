@@ -107,9 +107,13 @@ function (
   $("#scorpion-container").append(srv.render().el);
   $("body").append(sqv.render().$el.hide());
 
+  q.on('change:db change:table', function() {
+    sq.set('badselection', {});
+    sq.set('goodselection', {});
+  });
   qv.on('change:selection', function(selection) {
     sq.set('selection', selection);
-  })
+  });
   qv.on('change:drawing', function(drawingmodel) {
     sq.set('drawing', drawingmodel);
   });
@@ -132,7 +136,7 @@ function (
     db: 'intel'
   };
 
-  btq = {
+  var btq = {
     x: 'week_start_date',
     ys: [ { col: 'job_count', expr: 'sum(job_count)'} ],
     schema: {
@@ -142,6 +146,19 @@ function (
     table: 'sample',
     db: 'bt'
   };
+
+  var ppq = {
+    x: 'provider',
+    ys: [ { col: 'pmt_amt', expr: 'sum(pmt_amt)'} ],
+    schema: {
+      x: 'str',
+      'pmt_amt': 'num'
+    },
+    table: 'inp',
+    db: 'penispros'
+  };
+
+
 
   q.set(intelq);
 

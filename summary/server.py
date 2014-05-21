@@ -16,9 +16,8 @@ from summary import Summary
 import scorpionutil
 
 app = Flask(__name__)
-
+SUMMARYCACHE = '.summary.cache'
 summaries = {}
-
 
 @app.before_request
 def before_request():
@@ -87,7 +86,7 @@ def query():
     data = [dict(zip(cur.keys(), vals)) for vals in rows]
     ret['data'] = data
 
-    summary = Summary(g.engine, table)
+    summary = Summary(g.engine, table, CACHELOC=SUMMARYCACHE)
     cols = summary.get_columns()
     types = map(summary.get_type, cols)
     schema = dict(zip(cols, types))
@@ -114,7 +113,7 @@ def lookup():
   if key not in summaries:
     #from monetdb import sql as msql
     #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
-    summaries[key] = Summary(dbname, tablename, nbuckets=nbuckets)
+    summaries[key] = Summary(dbname, tablename, nbuckets=nbuckets, CACHELOC=SUMMARYCACHE)
 
   foo = summaries[key]
   stats = foo()
@@ -135,7 +134,6 @@ def lookup():
 @app.route('/api/scorpion/', methods=['POST', 'GET'])
 def scorpion():
   data =  json.loads(str(request.form['json']))
-  schema = data.get('schema', {})
   results = scorpionutil.scorpion_run(g.db, data)
   return json.dumps(results, default=json_handler)
 

@@ -6,32 +6,36 @@
 </head>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-6">
     <h1>Scorpion</h1>
-  </div>
-</div>
 
-<div class="row">
-  <div class="col-md-6 col-md-offset-6">
-    <span id="q-toggle">toggle plot</span>
-    <span id="q-load-bt" class="btn">load bt</span>
-    <span id="q-load-intel" class='btn'>load intel</span>
-  </div>
-</div>
-
-
-
-<div class="row">
-	<div class="col-md-6">
-		<div id="facets"></div>
-    <div class='row'>
-      <div class="col-md-10 col-md-offset-2" id='where'></div>
+    <div class="row">
+      <div class="col-md-12">
+        <span class="btn"></span>
+      </div>
     </div>
-	</div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div id="facets"></div>
+        <div class='row'>
+          <div class="col-md-10 col-md-offset-2" id='where'></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
-	<div class="col-md-6">
 
+  <div class="col-md-6" style="position:fixed; margin-left: 50%">
+    <h1>&nbsp;</h1>
+    <div class="row">
+      <div class="col-md-12">
+        <span id="q-toggle">toggle plot</span>
+        <span id="q-load-bt" class="btn">load bt</span>
+        <span id="q-load-intel" class='btn'>load intel</span>
+      </div>
+    </div>
     <div class="row"> 
       <div class="col-md-12" id="right">
         <div style="clear:both"></div>
@@ -39,10 +43,12 @@
       </div>
     </div>
 
-	</div>
-  <div style="clear:both"></div>
+  </div>
 </div>
-<div class="row">&nbsp;</div>
+
+
+
+
 
 {%raw%}
 <script id="foo-template" type="text/x-underscore-template">
@@ -168,8 +174,8 @@
             Add good examples ({{ngood}} selected)
           </span>
         </div>
-        <div class="col-sm-2">
-          <div><span id="clearbad" class="btn" >
+        <div class="col-sm-2" style="padding-left: 0px">
+          <div><span id="clearbad" class="btn">
             clear
           </span></div>
           <div><span id="cleargood" class="btn" >

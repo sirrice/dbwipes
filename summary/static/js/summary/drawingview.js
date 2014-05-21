@@ -111,15 +111,65 @@ define(function(require) {
       var xy = d3.mouse(this.d3g[0][0]),
           path = this.model.get("path");
 
-      if (path.length > 1) {
-        var diff = path[path.length-1][0] - path[path.length-2][0];
-        if ((xy[0] - path[path.length-1][0])*diff > 0) {
-          path.push(xy);
+      function find_and_insert(path, x, y) {
+        var prev = null;
+        var insertidx = null;
+        var dir = (path.length == 1)? null : ((path[0][0] < path[path.length-1][0])? 'inc' : 'dec');
+        for (var idx = 0; idx < path.length; idx++) {
+          var cur = path[idx][0];
+          if (prev != null) {
+            if (dir == 'inc' && prev < x && x < cur) {
+                insertidx = idx-1;
+            } else if (dir == 'dec' && cur < x && x < prev)  {
+                insertidx = idx;
+            }
+          }
+          prev = cur;
+        }
+
+        if (insertidx != null) {
+          var minidx = maxidx = insertidx;
+          while(minidx > 0) {
+            if (Math.abs(path[minidx-1][0]-path[insertidx][0]) > 10)
+              break;
+            minidx--;
+          }
+          while(maxidx < path.length-1) {
+            if (Math.abs(path[maxidx+1][0]-path[insertidx][0]) > 10)
+              break;
+            maxidx++;
+          }
+          path.splice(minidx, (maxidx-minidx)+1, [path[insertidx][0], y]);
+        } else {
+          if (dir == 'inc') {
+            if (x < path[0][0]) 
+              path.unshift(xy);
+            else if (x > path[path.length-1][0])
+              path.push(xy);
+          } else if (dir == 'dec') {
+            if (x > path[0][0]) 
+              path.unshift(xy);
+            if (x < path[path.length-1][0])
+              path.push(xy);
+          } else {
+            if (path.length <= 1)
+              path.push(xy);
+            else
+              return null;
+          }
+          return 1;
+        }
+        return insertidx;
+      }
+
+
+      if (path.length >= 1) {
+        var insertidx = find_and_insert(path, xy[0], xy[1]);
+        if (insertidx != null) {
           this.renderPath();
         }
       } else if (path.length == 1) {
-        var diff = xy[0] - path[path.length-1][0];
-        if (diff != 0) {
+        if (xy[0] != path[path.length-1][0]) {
           path.push(xy);
           this.renderPath();
         }

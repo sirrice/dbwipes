@@ -17,7 +17,10 @@ setup(name="summary",
       include_package_data = True,      
       packages = find_packages(),
       package_dir = {'summary' : 'summary'},
-      scripts = ['bin/summaryserver.py'],
+      scripts = [
+        'bin/summaryserver.py',
+        'bin/summarizedb.py'
+      ],
       #zip_safe = False,
       install_requires = ['flask', 'psycopg2', 'sqlalchemy'],
       keywords= "")
