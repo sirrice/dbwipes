@@ -34,14 +34,14 @@ define(function(require) {
       if (util.isTime(type)){
         // ensure vals and ranges are date objects
         _.each(stats, function(el) {
-          if (attrs.col == 'time')  {
+          if (type == 'time')  {
             el.val = '2000-01-01T' + el.val;
             el.range = _.map(el.range, function(v) { return '2000-01-01T'+v});
           }
-          console.log([type, el.val])
           el.val = new Date(el.val);
           el.range = _.map(el.range, function(v) {return new Date(v);})
         })
+        console.log([attrs.col, type, stats[0].val]);
       }
 
 
@@ -51,6 +51,9 @@ define(function(require) {
           d3.min(stats, function(d) { return d.range[0] || d.val; }),
           d3.max(stats, function(d) { return d.range[1] || d.val; })
         ]
+
+        console.log([attrs.col, type, xdomain[0], xdomain[1]])
+
 
         // expand the domain a bit
         if (xdomain[0] == xdomain[1]) {
@@ -67,8 +70,8 @@ define(function(require) {
             xdomain[0] -= diff;
             xdomain[1] += diff;
           } else {
-            xdomain[0] = new Date(xdomain[0] - diff);
-            xdomain[1] = new Date(xdomain[1] + diff);
+            xdomain[0] = new Date(+xdomain[0] - diff);
+            xdomain[1] = new Date(+xdomain[1] + diff);
           }
         }
       } else {
