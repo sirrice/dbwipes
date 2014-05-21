@@ -83,7 +83,7 @@ define(function(require) {
               db: model.get('query').get('db')
             }, 
             type: 'POST',
-            success: function() { 
+            success: function(resp) { 
               wait.hide(); 
               _this.$el.fadeOut(); 
               _this.$("#errmsg").text(resp.errormsg || '');

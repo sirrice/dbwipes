@@ -6,7 +6,8 @@ define(function(require) {
       _ = require('underscore'),
       Where = require('summary/where'),
       util = require('summary/util'),
-      DrawingView = require('summary/drawingview');
+      DrawingView = require('summary/drawingview'),
+      QueryForm = require('summary/queryform');
 
 
 
@@ -59,20 +60,18 @@ define(function(require) {
 
 
 
-      this.$q = $("<div id='q'></div>").prependTo(this.$el);
-      this.q = this.$q.get()[0];
-      this.d3q = d3.select(this.q);
-      this.$q.css("padding-left", this.state.lp);
+      this.queryform = new QueryForm({model: this.model});
+      this.listenTo(this.queryform, 'submit', this.resetState.bind(this));
+      this.$el.append(this.queryform.render().el)
 
 
       this.$toggle = $("#q-toggle")
         .addClass("btn btn-primary")
         .css("margin-left", this.state.lp)
         .click((function() {
-          this.renderUnready('');
+          this.queryform.render().$el.toggle();
           this.$('.legend').toggle();
           this.$svg.toggle();
-          this.$q.toggle();
         }).bind(this));
           
 
@@ -289,78 +288,6 @@ define(function(require) {
       zoom(el);
     },
 
-
-    renderUnready: function(errText) {
-      var json = this.model.toJSON(),
-          _this = this;
-      json['error'] = errText;
-
-
-      this.$q.html(this.errtemplate(json));
-
-      this.$('.q-add').click((function(){
-        this.$(".input-ys-expr").append(
-          $("<div><input class='form-control' name='q-y-expr' placeholder='expression'/></div>")
-        );
-        this.$(".input-ys-col").append(
-          $("<div><input class='form-control' name='q-y-col' placeholder='attribute'/></div>")
-        );
-      }).bind(this));
-
-
-      this.$('.q-submit').click((function(){
-        var db = this.$('input[name=q-db]').val(),
-            table = this.$('input[name=q-table]').val();
-        
-        var xexpr = this.$('input[name=q-x-expr]').val(),
-            xcol = this.$('input[name=q-x-col]').val(),
-            xalias = xcol;
-        if (xexpr.indexOf(' as ')) {
-          var pair = xexpr.split(' as ');
-          xexpr = pair[0];
-          xalias = pair[1];
-        }
-
-        
-        var yexprs = this.$("input[name=q-y-expr]").map(function(idx, el) {
-          return $(el).val()
-        }).get();
-        var ycols = this.$("input[name=q-y-col]").map(function(idx, el) {
-          return $(el).val()
-        }).get();
-        var ys = _.zip(yexprs, ycols);
-        ys = _.compact(_.map(ys, function(pair) {
-          if (pair[0] == '' || pair[1] == '') return null;
-          var yexpr = pair[0],
-              yalias = pair[1];
-          if (pair[0].indexOf(' as ')) {
-            var aspair = pair[0].split(' as '),
-                yexpr = aspair[0],
-                yalias = aspair[1];
-          }
-          return {
-            col: pair[1],
-            alias: yalias,
-            expr: yexpr
-          };
-        }));
-
-        var q = {
-          db: db,
-          table: table,
-          x: { col: xcol, alias: xalias, expr: xexpr},
-          ys: ys,
-          where: this.model.get('where'),
-          schema: this.model.get('schema')
-        };
-        this.resetState();
-        this.model.set(q);
-
-
-      }).bind(this));
-
-    },
-
     renderLabels: function() {
       var ys = this.model.get('ys'),
           cscales = this.state.cscales;
@@ -394,13 +321,12 @@ define(function(require) {
 
     render: function() {
       if (!this.model.isValid()) {
-        this.renderUnready(this.model.validationError);
-        this.$q.show();
+        this.queryform.render().$el.show()
         this.$svg.hide();
         return this;
       }
       this.$svg.show();
-      this.$q.hide();
+      this.queryform.$el.hide();
 
 
       $(this.c[0]).empty()

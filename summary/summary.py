@@ -189,6 +189,7 @@ class Summary(object):
 
   def get_col_stats(self, col_name):
     key = str(tuple(map(str, (self.tablename, col_name, self.nbuckets))))
+    print key
     if key in self._cache:
       try:
         return json.loads(self._cache[key])
