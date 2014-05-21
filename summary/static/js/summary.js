@@ -34,40 +34,21 @@ requirejs.config({
 
 // Start the main app logic.
 requirejs([
-    'jquery', 'd3',
-    'summary/where', 'summary/whereview', 
-    'summary/cstat', 'summary/cstatsview', 
-    'summary/query', 'summary/queryview',
-    'summary/scorpionquery', 'summary/scorpionview',
-    'summary/scorpionresults', 'summary/scorpionresultsview',
-    'summary/drawingview'],
-function (
+  'jquery', 'd3',
+  'summary/where', 'summary/whereview', 
+  'summary/cstat', 'summary/cstatsview', 
+  'summary/query', 'summary/queryview',
+  'summary/scorpionquery', 'summary/scorpionview',
+  'summary/scorpionresults', 'summary/scorpionresultsview',
+  'summary/drawingview'
+  ], function (
   $, d3,
   Where, WhereView, 
-  CStat, CStatsView, Query, QueryView, 
+  CStat, CStatsView, 
+  Query, QueryView, 
   ScorpionQuery, ScorpionQueryView, 
   ScorpionResults, ScorpionResultsView,
   DrawingView) {
-
-  $("#fm").on("submit", function() {
-    var params = {
-      db: $("#db").val(),
-      table: $("#table").val(),
-      nbuckets: $("#nbuckets").val()
-    }
-
-    $.post('/json/lookup/', params, function(resp){
-      var data = resp.data;
-      var rows = $("#facets").empty();
-      _.each(data, function(tup){
-        var cs = new CStat(tup);
-        where.add(cs);
-      })
-
-    }, 'json')
-    return false;
-
-  });
 
 
   var q = new Query();
@@ -148,7 +129,8 @@ function (
   };
 
   var ppq = {
-    x: 'provider',
+    //x: 'provider',
+    x: 'hcpscd1',
     ys: [ { col: 'pmt_amt', expr: 'sum(pmt_amt)'} ],
     schema: {
       x: 'str',
@@ -160,14 +142,17 @@ function (
 
 
 
-  q.set(intelq);
-
   $("#q-load-bt").click(function() { 
     q.set(btq);
   });
   $("#q-load-intel").click(function() { 
     q.set(intelq);
   });
+  $("#q-load-pp").click(function() { 
+    q.set(ppq);
+  });
+
+  q.set(intelq);
 
 
 

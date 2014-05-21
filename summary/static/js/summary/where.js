@@ -8,7 +8,7 @@ define(function(require) {
 
   var Where = Backbone.Collection.extend({
     model: CStat,
-    url: '/api/lookup/',
+    url: '/api/column_distributions/',
 
     initialize: function() {
       var _this = this;
@@ -35,6 +35,7 @@ define(function(require) {
         model.trigger('setSelection', col2clause[col]);
       });
     },
+
 
     parse: function(resp) {
       var data = resp.data;

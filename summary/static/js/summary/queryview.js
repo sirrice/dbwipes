@@ -27,7 +27,7 @@ define(function(require) {
         series: null,
         w: 500,
         h: 400,
-        lp: 40,
+        lp: 60,
         tp: 20,
         bp: 15,
         marktype: 'circle'
@@ -100,9 +100,9 @@ define(function(require) {
     setupScales: function() {
       var data = this.model.get('data'),
           schema = this.model.get('schema'),
-          type = this.model.get('type'),
-          xcol = this.model.get('x').col,
+          xcol = this.model.get('x').alias,
           ycols = _.pluck(this.model.get('ys'), 'alias'),
+          type = schema[xcol],
           _this = this;
       var xs = _.pluck(data, xcol),
           yss = _.map(ycols, function(ycol) { return _.pluck(data, ycol) });
@@ -134,14 +134,13 @@ define(function(require) {
       }, this);
 
       if (this.state.xscales == null) {
-        var xtype = schema[xcol];
         var xscales = d3.scale.linear();
-        if (util.isTime(xtype)) {
+        if (util.isTime(type)) {
           xscales = d3.time.scale();
         }
         xscales.range([0, this.state.w]);
 
-        if (xtype == 'str') {
+        if (util.isStr(type)) {
           xscales = d3.scale.ordinal();
           xscales.rangeRoundBands([0, this.state.w], 0.1);
         }
@@ -189,16 +188,16 @@ define(function(require) {
         .text(this.model.get('x')['expr'])
     },
 
-    renderData: function(el, xcol, yalias) {
+    renderData: function(el, xalias, yalias) {
       var _this = this;
       var data = _.map(this.model.get('data'), function(d) {
         var ret = {
-          x: d[xcol],
+          x: d[xalias],
           y: d[yalias],
-          px: _this.state.xscales(d[xcol]),
+          px: _this.state.xscales(d[xalias]),
           py: _this.state.yscales(d[yalias])
         };
-        ret[xcol] = d[xcol];
+        ret[xalias] = d[xalias];
         ret[yalias] = d[yalias];
         return ret
       });
@@ -409,7 +408,7 @@ define(function(require) {
       this.setupScales()
       this.renderAxes(this.c)
       _.each(this.model.get('ys'), function(ycol) {
-        this.renderData(this.c, this.model.get('x').col, ycol.alias);
+        this.renderData(this.c, this.model.get('x').alias, ycol.alias);
       }, this);
       this.renderBrush(this.c);
       this.renderLabels(this.c);

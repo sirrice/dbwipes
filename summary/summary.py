@@ -1,7 +1,7 @@
 import bsddb
 import json
 import pdb
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, engine
 
 
 def json_handler(o):
@@ -14,35 +14,59 @@ class Summary(object):
   def __init__(self, dbname, tablename, nbuckets=50, CACHELOC='.summary.cache'):
     self.dbtype = 'pg'
     if 'monetdb' in str(dbname):
+      self.engine = None
       self.db = dbname
       self.dbtype = 'monet'
-    elif 'engine' in str(dbname).lower():
+    elif isinstance(dbname, engine.base.Engine):
+      self.engine = dbname
+      self.db = dbname.connect()
+    elif isinstance(dbname, engine.base.Connection):
+      self.engine = dbname.engine
       self.db = dbname
     else:
-      self.db = create_engine("postgresql://localhost/%s" % dbname)
+      self.engine = create_engine("postgresql://localhost/%s" % dbname)
+      self.db = self.engine.connect()
+
     self.tablename = tablename
     self.nbuckets = nbuckets
 
     self._cache = bsddb.hashopen(CACHELOC)
 
   def __call__(self):
-    cols = self.get_columns()
     stats = []
-    for col in cols:
-      print "stats for: %s" % col
+    for col, typ in self.get_columns_and_types():
+      print "stats for: %s\t%s" % (col, typ)
       col_stats = self.get_col_stats(col)
       if col_stats is None:
         print "\tgot None"
         continue
       print "\tgot %d" % (len(col_stats))
-      stats.append((col, col_stats))
+      stats.append((col, typ, col_stats))
     return stats
+
+
+  def close(self):
+    try:
+      self.db.close()
+    except:
+      pass
+
+    try:
+      self.engine.dispose()
+    except:
+      pass
+
+    try:
+      self._cache.close()
+    except:
+      pass
 
 
   def query(self, q, *args):
     """
     Summaries using other engines only need to override this method
     """
+
     if self.dbtype == 'pg':
       return self.db.execute(q, *args).fetchall()
     else:
@@ -61,6 +85,31 @@ class Summary(object):
         raise
       finally:
         cur.close()
+
+
+  def get_columns_and_types(self):
+    if self.dbtype == 'pg':
+      q = """
+      SELECT attname, pg_type.typname 
+      FROM pg_class, pg_attribute, pg_type
+      WHERE relname = %s and 
+            pg_attribute.attrelid = pg_class.oid and 
+            pg_type.oid = atttypid and
+            attnum > 0 and 
+            attisdropped = false;
+      """
+    else:
+      q = """
+      SELECT columns.name , columns.type
+      FROM columns, tables 
+      WHERE tables.name = %s and 
+            tables.id = columns.table_id;
+      """
+    ret = []
+    for (col, typ) in self.query(q, self.tablename):
+      ret.append((str(col), str(typ)))
+    return ret
+
 
   def get_columns(self):
     """
@@ -139,10 +188,14 @@ class Summary(object):
 
 
   def get_col_stats(self, col_name):
-    print col_name, self.get_type(col_name)
-    key = str((self.tablename, col_name, self.nbuckets))
+    key = str(tuple(map(str, (self.tablename, col_name, self.nbuckets))))
     if key in self._cache:
-      return json.loads(self._cache[col_name])
+      try:
+        return json.loads(self._cache[key])
+      except Exception as e:
+        print "couldn't load %s from cache.  re-populating" % str(key)
+        del self._cache[key]
+
 
     col_type = self.get_type(col_name)
 
@@ -173,10 +226,13 @@ class Summary(object):
     return rows
 
   def get_numeric_stats(self, c):
-    q = "SELECT count(distinct %s) from %s" % (c, self.tablename)
-    if self.query(q)[0][0] <= 1:
+    q = "SELECT count(distinct %s), count(*) from %s" % (c, self.tablename)
+    ndistinct, ncount = tuple(self.query(q)[0])
+    if ndistinct == 0:
       return []
-
+    if ndistinct == 1:
+      val = self.query("SELECT %s from %s where %s is not null" % (c, self.tablename, c))[0][0]
+      return [{'val': val, 'count': ncount, 'range': [val, val]}]
 
     q = """
     with bound as (

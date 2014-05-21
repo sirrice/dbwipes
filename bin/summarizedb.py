@@ -4,7 +4,7 @@ from summary.summary import Summary
 
 
 def get_tables(db):
-  q = "select tablename from pg_tables where schemaname = 'public'";
+  q = "select tablename from pg_tables where schemaname = 'public'"
   for (table,) in db.execute(q).fetchall():
     yield table
 

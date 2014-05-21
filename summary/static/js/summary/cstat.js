@@ -7,8 +7,6 @@ define(function(require) {
   require('date');
 
   var CStat = Backbone.Model.extend({
-    urlRoot: "/",
-
     defaults: function() {
       return {
         col: null,
@@ -33,62 +31,66 @@ define(function(require) {
       }
       if (util.isTime(type)){
         // ensure vals and ranges are date objects
-        _.each(stats, function(el) {
+        _.each(stats, function(d) {
           if (type == 'time')  {
-            el.val = '2000-01-01T' + el.val;
-            el.range = _.map(el.range, function(v) { return '2000-01-01T'+v});
+            d.val = '2000-01-01T' + d.val;
+            d.range = _.map(d.range, function(v) { return '2000-01-01T'+v; });
           }
-          el.val = new Date(el.val);
-          el.range = _.map(el.range, function(v) {return new Date(v);})
+          d.val = new Date(d.val);
+          d.range = _.map(d.range, function(v) {return new Date(v);})
         })
-        console.log([attrs.col, type, stats[0].val]);
       }
 
 
       var xdomain = null;
-      if (type != 'str') {
-        xdomain = [
-          d3.min(stats, function(d) { return d.range[0] || d.val; }),
-          d3.max(stats, function(d) { return d.range[1] || d.val; })
-        ]
-
-        console.log([attrs.col, type, xdomain[0], xdomain[1]])
-
+      if (util.isNum(type)) {
+        var xvals = [];
+        _.each(stats, function(d) {
+          xvals.push.apply(xvals, d.range);
+          xvals.push(d.val);
+        });
+        xvals = _.reject(xvals, _.isNull);
+        xvals = _.filter(xvals, _.isFinite);
+        xdomain = [ d3.min(xvals), d3.max(xvals) ];
 
         // expand the domain a bit
-        if (xdomain[0] == xdomain[1]) {
-          if (util.isNum(type)) {
-            xdomain[0] -= .5;
-            xdomain[1] += .5;
-          } else {
-            xdomain[0] = new Date(+xdomain[0] - 1000*60*60*24); // 1 day
-            xdomain[1] = new Date(+xdomain[1] + 1000*60*60*24);
-          }
-        } else {
-          var diff = (xdomain[1] - xdomain[0]) * 0.05;
-          if (util.isNum(type)) {
-            xdomain[0] -= diff;
-            xdomain[1] += diff;
-          } else {
-            xdomain[0] = new Date(+xdomain[0] - diff);
-            xdomain[1] = new Date(+xdomain[1] + diff);
-          }
-        }
+        var diff = 1;
+        if (xdomain[0] != xdomain[1])
+          diff = (xdomain[1] - xdomain[0]) * 0.05;
+        xdomain[0] -= diff;
+        xdomain[1] += diff;
+        console.log([attrs.col, type, 'diff', diff, 'domain', xdomain[0], xdomain[1]])
+      } else if (util.isTime(type)) {
+        var xvals = [];
+        _.each(stats, function(d) {
+          xvals.push.apply(xvals, d.range);
+          xvals.push(d.val);
+        });
+        xvals = _.reject(xvals, _.isNull);
+        xdomain = [ d3.min(xvals), d3.max(xvals) ];
+
+        // expand the domain a bit
+        var diff = 1000*60*60*24; // 1 day
+        if (xdomain[0] != xdomain[1]) 
+          diff = (xdomain[1] - xdomain[0]) * 0.05;
+
+        xdomain[0] = new Date(+xdomain[0] - diff);
+        xdomain[1] = new Date(+xdomain[1] + diff);
       } else {
         xdomain = {};
-        _.each(stats, function(el) {
-          _.each(el.range, function(o) {
+        _.each(stats, function(d) {
+          _.each(d.range, function(o) {
             xdomain[o] = 1;
           });
-          xdomain[el.val] = 1  ;
+          xdomain[d.val] = 1  ;
         });
         xdomain = _.keys(xdomain);
       }
 
 
       var ydomain = [
-        d3.min(stats, function(el) { return el.count }),
-        d3.max(stats, function(el) { return el.count })
+        d3.min(stats, function(d) { return d.count }),
+        d3.max(stats, function(d) { return d.count })
       ];
 
       this.set('type', type);

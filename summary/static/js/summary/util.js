@@ -5,7 +5,7 @@ define(function(require) {
     return _.contains(['time', 'timestamp', 'date'], type);
   }
   function isNum(type) {
-    return _.contains(['int4', 'int', 'int8', 'float8', 'float', 'bigint'], type);
+    return _.contains(['num', 'int4', 'int', 'int8', 'float8', 'float', 'bigint'], type);
   }
   function isStr(type) {
     return _.contains(['varchar', 'text', 'str'], type);
@@ -104,34 +104,13 @@ define(function(require) {
   }
 
 
-  // parse /api/query/ results
-  function parseQueryResponse(resp, opts) {
-    if (resp.data) {
-      var xcol = this.get('x'),
-          schema = this.get('schema');
-      if (isTime(schema[xcol.col])) {
-        // ensure vals and ranges are date objects
-        _.each(resp.data, function(el) {
-          el[xcol.alias] = new Date(el[xcol.alias]);
-        });
-
-        resp.data = _.reject(resp.data, function(d) {
-          return _.any(_.map(_.values(d), function(v){ return v == null; }))
-        });
-      }
-    }
-    return resp;
-
-  }
-
   return {
     isTime: isTime,
     isNum: isNum,
     isStr: isStr,
     estNumXTicks: estNumXTicks,
     setAxisLabels: setAxisLabels,
-    toWhereClause: toWhereClause,
-    parseQueryResponse: parseQueryResponse
+    toWhereClause: toWhereClause
   }
 })
 

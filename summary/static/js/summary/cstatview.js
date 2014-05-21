@@ -19,7 +19,7 @@ define(function(require) {
         yaxis: null,
         series: null,
         w: 350,
-        h: 30,
+        h: 40,
         lp: 70,
         marktype: 'rect'
       }
@@ -36,8 +36,8 @@ define(function(require) {
       var xdomain = this.model.get('xdomain'),
           ydomain = this.model.get('ydomain'),
           type = this.model.get('type');
-      this.state.xscales = this.makeScales(xdomain, [0, this.state.w], type);
-      this.state.yscales = this.makeScales(ydomain, [this.state.h, 5], 'num');
+      this.state.xscales = this.makeScales('x', xdomain, [0, this.state.w], type);
+      this.state.yscales = this.makeScales('y', ydomain, [this.state.h, 5], 'num');
 
 
       // create axes
@@ -55,15 +55,21 @@ define(function(require) {
       );
       util.setAxisLabels(this.state.xaxis, this.model.get('type'), nticks);
       this.state.yaxis.ticks(2).tickSize(0,0);
-
     },
 
-    makeScales: function(domain, range, type) {
+    makeScales: function(scaletype, domain, range, type) {
       var scales = d3.scale.linear();
       if (util.isTime(type)) 
         scales = d3.time.scale();
       else if (util.isStr(type)) 
         scales = d3.scale.ordinal();
+      
+      if (scaletype == 'y' && util.isNum(type)) {
+        if (domain[1] > Math.max(1,domain[0]) * 100)  {
+          scales = d3.scale.log()
+          domain[0] = Math.max(domain[0], 1);
+        }
+      }
 
       scales.domain(domain).range(range);
       if (util.isStr(type))
@@ -85,7 +91,8 @@ define(function(require) {
 
 
     renderData: function(el) {
-      var type = this.model.get('type'),
+      var col = this.model.get('col'),
+          type = this.model.get('type'),
           stats = this.model.get('stats'),
           xscales = this.state.xscales,
           yscales = this.state.yscales,
@@ -117,14 +124,22 @@ define(function(require) {
         if (!width)
           width = 10;
         width = Math.max(2, width)
-        var minv = xscales.invert(d3.min(xs) - width),
-            maxv = xscales.invert(d3.max(xs) + width);
+        var minv = xscales.invert(d3.min(xs) - Math.max(5, width)),
+            maxv = xscales.invert(d3.max(xs) + Math.max(5, width));
         xscales.domain([minv, maxv]);
 
-        if (_.isNaN(minv)) 
-          console.log([this.model, stats, xs]);
-        
-        console.log([this.model.get('col'), xscales.domain()])
+        if (!_.isNaN(xscales.domain()[0]) && col == 'light'){
+          var args = [this.model.get('col'), type,  stats.length, stats[0]];
+          args.push('xscale')
+          args.push.apply(args, xscales.domain());
+          args.push('->')
+          args.push.apply(args, xscales.range());
+          args.push('yscale')
+          args.push.apply(args, yscales.domain());
+          args.push('->')
+          args.push.apply(args, yscales.range());
+          console.log(args);
+        }
 
 
         el.selectAll('rect')
@@ -133,9 +148,9 @@ define(function(require) {
             .attr({
               class: 'mark',
               width: width,
-              height: function(d) {return yscales(d.count)},
+              height: function(d) {return h-yscales(d.count)},
               x: function(d) {return xscales(d.val) - width/2},
-              y: function(d) { return h-yscales(d.count)}
+              y: function(d) { return yscales(d.count)}
             })
       } 
 
@@ -236,6 +251,7 @@ define(function(require) {
           xaxis = this.state.xaxis;
 
       var zoomf = function() {
+        el.select('.axis.x').call(xaxis);
         el.selectAll('.mark') 
           .attr('x', function(d) {
             return xscales(d.val);
@@ -246,7 +262,6 @@ define(function(require) {
             return (within)? null : 'none';
           });
         
-        el.select('.axis.x').call(xaxis);
       }
       var nullf = function(){}
 

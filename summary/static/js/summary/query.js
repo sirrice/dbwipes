@@ -8,6 +8,8 @@ define(function(require) {
 
 
   var Query = Backbone.Model.extend({
+    url: '/api/query',
+
     defaults: function() {
       return {
         x: null,        // { col:, expr:}
@@ -20,8 +22,6 @@ define(function(require) {
       }
     },
 
-
-    url: '/api/query',
 
     initialize: function() {
       this.on('change', this.onChange);
@@ -64,9 +64,36 @@ define(function(require) {
       this.fetch({data:this.toJSON()});
     },
 
+
+    // parse /api/query/ results
     parse: function(resp, opts) {
-      return util.parseQueryResponse.bind(this)(resp, opts);
+      var xcol = this.get('x'),
+          schema = resp.schema || this.get('schema');
+
+      if (resp.data) {
+        var type = schema[xcol.col];
+
+        if (util.isTime(type)) {
+          if (type == 'time') {
+            _.each(resp.data, function(d) {
+              d[xcol.alias] = "2000-01-01T" + d[xcol.alias];
+            });
+          }
+          // ensure vals and ranges are date objects
+          _.each(resp.data, function(d) {
+            d[xcol.alias] = new Date(d[xcol.alias]);
+          });
+
+          resp.data = _.reject(resp.data, function(d) {
+            var vals = _.values(d);
+            return _.any(_.map(vals, _.isNull));
+          });
+        }
+      }
+      return resp;
+
     },
+
 
 
     validate: function() {
