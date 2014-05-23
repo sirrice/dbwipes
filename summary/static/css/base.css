@@ -49,44 +49,44 @@ body .cstat rect {
 body .mark:hover {
   fill: steelblue;
 }
+body .axis path,
+body .axis line {
+  fill: none;
+  stroke: #aeaeae;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+body .tick text {
+  fill: #aeaeae;
+  font-size: 10pt;
+}
+body circle.selected {
+  fill: black;
+  size: 10;
+  stroke: black;
+}
+body rect.selected {
+  fill: black;
+}
+body rect.faded {
+  fill: whitesmoke;
+}
+body rect.highlighted {
+  fill: red;
+}
+body rect.extent {
+  fill: grey;
+  fill-opacity: 0.2;
+  stroke-width: 1px;
+  stroke: white;
+  shape-rendering: crispEdges;
+}
 #query-container {
   position: fixed;
   top: 0px;
   margin-left: 50%;
   background: white;
   padding-bottom: 2em;
-}
-#query-container .axis path,
-#query-container .axis line {
-  fill: none;
-  stroke: #aeaeae;
-  stroke-width: 1px;
-  shape-rendering: crispEdges;
-}
-#query-container .tick text {
-  fill: #aeaeae;
-  font-size: 10pt;
-}
-#query-container circle.selected {
-  fill: black;
-  size: 10;
-  stroke: black;
-}
-#query-container rect.selected {
-  fill: black;
-}
-#query-container rect.faded {
-  fill: whitesmoke;
-}
-#query-container rect.highlighted {
-  fill: red;
-}
-#query-container rect.extent {
-  fill: grey;
-  fill-opacity: 0.2;
-  stroke-width: 1px;
-  stroke: white;
-  shape-rendering: crispEdges;
 }
 #query-container .legend {
   margin-top: 10px;

@@ -96,11 +96,12 @@ define(function(require) {
       if (isStr(type)) {
         var nchars = d3.sum(_.times(
           Math.min(xticks, xscales.domain().length),
-          function(idx){return (""+xscales.domain()[idx]).length+1.5})
+          function(idx){return (""+xscales.domain()[idx]).length+.8})
         )
       } else {
         var fmt = xscales.tickFormat();
-        var nchars = d3.sum(xscales.ticks(xticks), function(s) {return fmt(s).length+1.5;});
+        var fmtlen = function(s) {return fmt(s).length+.8;};
+        var nchars = d3.sum(xscales.ticks(xticks), fmtlen);
       }
       if (ex*nchars < w) break;
       xticks--;
