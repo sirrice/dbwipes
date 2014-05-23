@@ -306,7 +306,7 @@ define(function(require) {
         .selectAll("span")
           .data(ys)
         .enter().append("span")
-          .text(function(d) { console.log("yo"); return d.alias; })
+          .text(function(d) { return d.alias; })
           .style("background", function(d) { return cscales(d.alias); });
     },
 

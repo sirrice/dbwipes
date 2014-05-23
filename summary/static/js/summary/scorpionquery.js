@@ -19,6 +19,7 @@ define(function(require) {
         selection: {},
         errtypes: {},
         erreqs: {},
+        ignore_cols: [],
         query: null,
         drawing: null,
         results: new ScorpionResults()
@@ -44,6 +45,7 @@ define(function(require) {
       this.trigger('change')
     },
 
+    // number of selections for {key}selection
     count: function(key) {
       return d3.sum(
         _.values(this.get(key))
@@ -51,6 +53,7 @@ define(function(require) {
       );
     },
 
+    // mean of y vals for {key}selection
     mean: function(key, yalias) {
       var selected = this.get(key)[yalias];
       if (!selected) return null;
@@ -130,6 +133,7 @@ define(function(require) {
         ngood: this.count('goodselection'),
         badselection: this.get('badselection'),
         goodselection: this.get('goodselection'),
+        ignore_cols: this.get('ignore_cols'),
         errtypes: this.get('errtypes'),
         erreqs: this.get('erreqs'),
         query: this.get('query').toJSON()

@@ -110,6 +110,7 @@ def scorpion_run(db, requestdata):
     goodsel = requestdata.get('goodselection', {})
     errtypes = requestdata.get('errtypes', {})
     erreqs = requestdata.get('erreqs', {})
+    ignore_attrs = request.get('ignore_attrs', [])
     dbname = qjson['db']
     x = qjson['x']
     ys = qjson['ys']
@@ -117,7 +118,7 @@ def scorpion_run(db, requestdata):
     obj = SharedObj(db, '', dbname=dbname, parsed=parsed)
     obj.dbname = dbname
     obj.C = 0.2
-    obj.ignore_attrs = []
+    obj.ignore_attrs = ignore_attrs 
 
     # fix aliases in select
     for nonagg in obj.parsed.select.nonaggs:

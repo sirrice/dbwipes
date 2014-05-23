@@ -18,8 +18,6 @@ define(function(require) {
       "click #addgood":          "onAddGood",
       "click #clearbad":         "onClearBad",
       "click #cleargood":        "onClearGood",
-      "click #schema":           "onToggleSchema",
-      "click #uncheck-schema":   "onUncheckSchema",
       "click #draw":             "onDrawToggle"
 
     },
@@ -56,6 +54,13 @@ define(function(require) {
       console.log(this.model.get('erreqs'));
       console.log(this.model.get('badselection'));
 
+      var ignore_cols = $("input.errcol")
+        .map(function(idx, el) { 
+          if (!el.checked) return el.value;
+        });
+      ignore_cols = _.compact(ignore_cols);
+      this.model.set('ignore_cols', ignore_cols);
+
       var wait = $("#scorpion-wait").show();
       this.model.fetch({
         data: {
@@ -82,15 +87,6 @@ define(function(require) {
     },
     onClearGood: function() {
       this.model.set('goodselection', {});
-    },
-    onToggleSchema: function() {
-      this.$('#schema').toggle()
-    },
-    onUncheckSchema: function() {
-      this.$('.errcol')
-        .get().forEach(function(e){
-          e.checked = false;
-        });
     },
     onDrawToggle: function() {
       var draw = this.$("#draw")

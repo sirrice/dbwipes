@@ -71,7 +71,9 @@ requirejs([
     });
   })
   where.on('change:selection', function() {
-    q.set('where', util.negateClause(where.toSQL()));
+    var newWhere = util.negateClause(where.toSQL());
+    if (q.get('where') != newWhere)
+      q.set('where', newWhere);
   });
 
 
