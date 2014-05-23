@@ -1,8 +1,41 @@
+from functools import wraps
 import bsddb
 import json
 import pdb
 from sqlalchemy import create_engine, engine
 
+
+def get_bdb(fname, new=False, fsync=False, recover=False):
+  eng = create_engine('postgresql://localhost/cache')
+  db = eng.connect()
+
+  try:
+    db.execute("create table cache(key varchar, val text)")
+  except:
+    pass
+
+  return eng, db
+
+def make_cache(f):
+  @wraps(f)
+  def _f(self, *args, **kwargs):
+    try:
+      key = str(map(str, (f.__name__, self.engine, self.tablename, self.nbuckets, map(str, args))))
+      print key
+      vals = self._cache.execute('select val from cache where key = %s', key).fetchall()
+      if len(vals):
+        return json.loads(vals[0][0])
+    except Exception as e:
+      print e
+      pdb.set_trace()
+
+    with self._cache.begin() as txn:
+      res = f(self, *args, **kwargs)
+      if key:
+        self._cache.execute('insert into cache values(%s, %s)', key, json.dumps(res, default=json_handler))
+      return res
+    return None
+  return _f
 
 def json_handler(o):
   if hasattr(o, 'isoformat'):
@@ -30,13 +63,15 @@ class Summary(object):
     self.tablename = tablename
     self.nbuckets = nbuckets
 
-    self._cache = bsddb.hashopen(CACHELOC)
+    self._engine, self._cache = get_bdb(CACHELOC)
 
   def __call__(self):
     stats = []
-    for col, typ in self.get_columns_and_types():
+    self.nrows = self.get_num_rows()
+    self.col_types = self.get_columns_and_types()
+    for col, typ in self.col_types:
       print "stats for: %s\t%s" % (col, typ)
-      col_stats = self.get_col_stats(col)
+      col_stats = self.get_col_stats(col, typ)
       if col_stats is None:
         print "\tgot None"
         continue
@@ -48,18 +83,29 @@ class Summary(object):
   def close(self):
     try:
       self.db.close()
-    except:
+    except Exception as e:
+      print e
       pass
 
     try:
       self.engine.dispose()
-    except:
+    except Exception as e:
+      print e
       pass
 
     try:
       self._cache.close()
-    except:
+    except Exception as e:
+      print e
       pass
+
+    try:
+      self._engine.dispose()
+    except Exception as e:
+      print e
+      pass
+
+    print self._cache.closed, self.db.closed
 
 
   def query(self, q, *args):
@@ -68,6 +114,7 @@ class Summary(object):
     """
 
     if self.dbtype == 'pg':
+      print q
       return self.db.execute(q, *args).fetchall()
     else:
       cur = self.db.cursor()
@@ -87,6 +134,28 @@ class Summary(object):
         cur.close()
 
 
+  @make_cache
+  def get_num_rows(self):
+    q = "SELECT count(*) from %s" % self.tablename
+    return self.query(q)[0][0]
+
+  @make_cache
+  def get_distinct_count(self, col):
+    q = "SELECT count(distinct %s) FROM %s" % (col, self.tablename)
+    return self.query(q)[0][0]
+
+  @make_cache
+  def get_column_counts(self, cols):
+    q = """SELECT %s FROM %s"""
+    select = ["count(distinct %s)" % col for col in cols]
+    select = ", ".join(select)
+    q = q % (select, self.tablename)
+    counts = tuple(self.query(q)[0])
+    return dict(zip(cols, counts))
+
+
+
+  @make_cache
   def get_columns_and_types(self):
     if self.dbtype == 'pg':
       q = """
@@ -111,6 +180,7 @@ class Summary(object):
     return ret
 
 
+  @make_cache
   def get_columns(self):
     """
     engine specific way to get table columns
@@ -125,6 +195,7 @@ class Summary(object):
     return ret
 
 
+  @make_cache
   def get_type(self, col_name):
     if self.dbtype == 'pg':
       q = """SELECT pg_type.typname FROM pg_attribute, pg_class, pg_type where 
@@ -144,16 +215,8 @@ class Summary(object):
       return None
 
 
-  def get_cardinality(self, col_name):
-    q = "SELECT count(distinct %s) FROM %s"
-    q = q % (col_name, self.tablename)
-    return self.query(q)[0][0]
-
   def get_col_groupby(self, col_name, col_type):
     if col_type == None:
-      return None
-
-    if col_name == 'id':
       return None
 
     groupby = None
@@ -166,54 +229,24 @@ class Summary(object):
     if 'date' in col_type or 'timestamp' in col_type:
       groupby = self.get_date_stats(col_name)
 
-    if 'int' in col_type or 'float' in col_type or 'double' in col_type:
-      if self.dbtype == 'pg':
-        q = "select count(distinct %s), count(*) from %s"
-      else:
-        q = "select cast(count(distinct %s) as float), count(*) from %s"
-
-      q = q % (col_name, self.tablename)
-      distincts, count = self.query(q)[0]
-
-      if count > 1000 and distincts > .7 * count:
-        return None
-      if count == 0:
-        return None
-      if distincts == 1:
-        return col_name
-
-      groupby = self.get_num_stats(col_name)
-
     return groupby
 
 
-  def get_col_stats(self, col_name):
-    key = str(tuple(map(str, (self.tablename, col_name, self.nbuckets))))
-    print key
-    if key in self._cache:
-      try:
-        return json.loads(self._cache[key])
-      except Exception as e:
-        print "couldn't load %s from cache.  re-populating" % str(key)
-        del self._cache[key]
+  @make_cache
+  def get_col_stats(self, col_name, col_type):
+    if col_type.startswith('_'):
+      return None
 
-
-    col_type = self.get_type(col_name)
-
-    if self.dbtype == 'pg' and any([('_' not in col_type) and (s in col_type) for s in ['int', 'float', 'double', 'numeric']]):
+    numerics = ['int', 'float', 'double', 'numeric']
+    is_numeric = any([s in col_type for s in numerics])
+    if self.dbtype == 'pg' and is_numeric:
       stats = self.get_numeric_stats(col_name)
-      self._cache[key] = json.dumps(stats, default=json_handler)
-      self._cache.sync()
       return stats
 
     groupby = self.get_col_groupby(col_name, col_type)
     if groupby:
       stats = self.get_group_stats(col_name, groupby)
-      self._cache[key] = json.dumps(stats, default=json_handler)
-      self._cache.sync()
       return stats
-    self._cache[key] = json.dumps(None)
-    self._cache.sync()
     return None
 
 
@@ -227,13 +260,12 @@ class Summary(object):
     return rows
 
   def get_numeric_stats(self, c):
-    q = "SELECT count(distinct %s), count(*) from %s" % (c, self.tablename)
-    ndistinct, ncount = tuple(self.query(q)[0])
+    ndistinct = self.get_distinct_count(c)
     if ndistinct == 0:
       return []
     if ndistinct == 1:
       val = self.query("SELECT %s from %s where %s is not null" % (c, self.tablename, c))[0][0]
-      return [{'val': val, 'count': ncount, 'range': [val, val]}]
+      return [{'val': val, 'count': self.nrows, 'range': [val, val]}]
 
     q = """
     with bound as (
@@ -247,7 +279,6 @@ class Summary(object):
     GROUP BY bucket
     """
     q = q % (c, c, c, c, self.tablename, c, self.nbuckets, c, c, self.tablename)
-    print q
     stats = []
     for (val, minv, maxv, count) in self.query(q):
       if val is None:
@@ -265,25 +296,6 @@ class Summary(object):
 
     return stats
 
-  def get_num_stats(self, col_name):
-    q = "select min(%s), max(%s), avg(%s), var_pop(%s), count(distinct %s) from %s" 
-    q = q % (col_name, col_name, col_name, col_name, col_name, self.tablename)
-    minv, maxv, avg, var, ndistinct = self.query(q)[0]
-    if ndistinct <= self.nbuckets: return col_name
-
-    maxvar = avg+2.5*(var**.5)
-    minvar = avg-2.5*(var**.5)
-    if maxvar <= maxv and minvar >= minv:
-      minv, maxv = minvar, maxvar
-
-    block = (maxv - minv) / self.nbuckets 
-    if self.dbtype == 'pg':
-      groupby = "(%s / %s)::int*%s" % (col_name, block, block)
-    else:
-      groupby = "cast((%s / %s) as int)*%s" % (col_name, block, block)
-    print groupby
-
-    return groupby
 
   def get_char_stats(self, col_name):
     groupby = col_name

@@ -12,6 +12,82 @@ define(function(require) {
   }
 
 
+  function negateClause(SQL) {
+    if (!SQL) return null;
+    return "not(" + SQL + ")";
+  }
+
+
+  // assume getx(point) and point.range contain x values
+  function getXDomain(points, type, getx) {
+    var xdomain = null;
+
+    if (isStr(type)) {
+      xdomain = {};
+      _.each(points, function(d) {
+        if (d.range) {
+          _.each(d.range, function(o) {
+            xdomain[o] = 1;
+          });
+        }
+        xdomain[getx(d)] = 1  ;
+      });
+      xdomain = _.keys(xdomain);
+      return xdomain;
+    }
+
+
+    var diff = 1;
+    var xvals = [];
+    _.each(points, function(d) {
+      if (d.range) xvals.push.apply(xvals, d.range);
+      xvals.push(getx(d));
+    });
+    xvals = _.reject(xvals, _.isNull);
+
+    if (isNum(type)) {
+      xvals = _.filter(xvals, _.isFinite);
+      xdomain = [ d3.min(xvals), d3.max(xvals) ];
+
+      diff = 1;
+      if (xdomain[0] != xdomain[1])
+        diff = (xdomain[1] - xdomain[0]) * 0.05;
+      xdomain[0] -= diff;
+      xdomain[1] += diff;
+    } else if (isTime(type)) {
+      xdomain = [ d3.min(xvals), d3.max(xvals) ];
+
+      diff = 1000*60*60*24; // 1 day
+      if (xdomain[0] != xdomain[1]) 
+        diff = (xdomain[1] - xdomain[0]) * 0.05;
+
+      xdomain[0] = new Date(+xdomain[0] - diff);
+      xdomain[1] = new Date(+xdomain[1] + diff);
+    } 
+
+    console.log([type, 'diff', diff, 'domain', JSON.stringify(xdomain)]);
+    return xdomain;
+  }
+
+
+  function mergeDomain(oldd, newd, type) {
+    var defaultd = [Infinity, -Infinity];
+    if (isStr(type)) defaultd = [];
+
+    if (oldd == null) 
+      return newd;
+
+    if (isStr(type)) 
+      return _.union(oldd, newd);
+
+    var ret = _.clone(oldd);
+    if (_.isFinite(newd[0]))
+      ret[0] = d3.min([ret[0], newd[0]]);
+    if (_.isFinite(newd[1]))
+      ret[1] = d3.max([ret[1], newd[1]]);
+    return ret;
+  }
+
   function estNumXTicks(xaxis, type, w) {
     var xscales = xaxis.scale();
     var ex = 40.0/5;
@@ -81,7 +157,7 @@ define(function(require) {
           SQL.push(col + " in ("+vals.join(',')+")");
         }
 
-        SQL = (SQL.length)? SQL.join(' and ') : null;
+        SQL = (SQL.length)? "("+SQL.join(' or ')+")" : null;
     } else {
       if (isTime(type)) {
         var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
@@ -110,7 +186,10 @@ define(function(require) {
     isStr: isStr,
     estNumXTicks: estNumXTicks,
     setAxisLabels: setAxisLabels,
-    toWhereClause: toWhereClause
+    toWhereClause: toWhereClause,
+    negateClause: negateClause,
+    getXDomain: getXDomain,
+    mergeDomain: mergeDomain
   }
 })
 

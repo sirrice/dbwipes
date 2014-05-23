@@ -24,77 +24,99 @@ body {
     overflow: hidden;
     text-align: right;
 
+    label, input {
+      display: inline;
+      cursor: pointer;
+    }
+
     .type {
       font-size: smaller;
       color: grey;
+      border: 1px solid white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .type:hover {
+      font-weight: bold;
+      background: steelblue;
+      color: white;
+    }
+   }
+ 
+  .cstat {
+    circle {
+      fill: #aeaeae;
+      stroke: none;
+    }
+    rect{
+      fill: #aeaeae;
+      stroke: none;
     }
   }
-  
-}
 
-
-.axis path, .axis line {
-  fill: none;
-  stroke: #aeaeae;
-  stroke-width: 1px;
-  shape-rendering: crispEdges;
-}
-.tick text {
-  fill: #aeaeae;
-  font-size: 10pt;
-}
-
-
-.cstat {
-  circle {
-    fill: #aeaeae;
-    stroke: none;
+  .mark:hover {
+    fill:steelblue;
   }
-  rect{
-    fill: #aeaeae;
-    stroke: none;
+
+
+}
+
+#query-container {
+  position:fixed; 
+  top: 0px; 
+  margin-left: 50%; 
+  background: white;
+  padding-bottom: 2em;
+
+
+  .axis path, .axis line {
+    fill: none;
+    stroke: #aeaeae;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
   }
-}
-
-.mark:hover {
-  fill:steelblue;
-}
-
-circle.selected {
-  fill: black;
-  size: 10;
-  stroke: black;
-}
-rect.selected {
-  fill: black;
-}
-rect.faded {
-  fill: whitesmoke;
-}
-rect.highlighted {
-  fill: red;
-}
-
-rect.extent {
-  fill: grey;
-  fill-opacity: 0.2;
-  stroke-width: 1px;
-  stroke: white;
-  shape-rendering: crispEdges;
-}
+  .tick text {
+    fill: #aeaeae;
+    font-size: 10pt;
+  }
 
 
-.legend {
-  margin-top: 10px;
+  circle.selected {
+    fill: black;
+    size: 10;
+    stroke: black;
+  }
+  rect.selected {
+    fill: black;
+  }
+  rect.faded {
+    fill: whitesmoke;
+  }
+  rect.highlighted {
+    fill: red;
+  }
 
-  span {
-    padding: 3px;
-    padding-left: 1em;
-    padding-right: 1em;
-    margin-right: 1em;
-    border-radius: 3px;
-    border: none;
-    color: white;
+  rect.extent {
+    fill: grey;
+    fill-opacity: 0.2;
+    stroke-width: 1px;
+    stroke: white;
+    shape-rendering: crispEdges;
+  }
+
+
+  .legend {
+    margin-top: 10px;
+
+    span {
+      padding: 3px;
+      padding-left: 1em;
+      padding-right: 1em;
+      margin-right: 1em;
+      border-radius: 3px;
+      border: none;
+      color: white;
+    }
   }
 }
 
@@ -171,6 +193,8 @@ rect.extent {
 
     .equiv-toggle {
       cursor: pointer;
+      padding: 5px;
+      padding-left: 1em;
     }
 
     .filter-clause:hover, .equiv-toggle:hover {

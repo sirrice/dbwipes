@@ -79,7 +79,6 @@ define(function(require) {
               d[xcol.alias] = "2000-01-01T" + d[xcol.alias];
             });
           }
-          // ensure vals and ranges are date objects
           _.each(resp.data, function(d) {
             d[xcol.alias] = new Date(d[xcol.alias]);
           });

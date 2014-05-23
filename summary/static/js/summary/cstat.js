@@ -41,57 +41,10 @@ define(function(require) {
         })
       }
 
-
-      var xdomain = null;
-      if (util.isNum(type)) {
-        var xvals = [];
-        _.each(stats, function(d) {
-          xvals.push.apply(xvals, d.range);
-          xvals.push(d.val);
-        });
-        xvals = _.reject(xvals, _.isNull);
-        xvals = _.filter(xvals, _.isFinite);
-        xdomain = [ d3.min(xvals), d3.max(xvals) ];
-
-        // expand the domain a bit
-        var diff = 1;
-        if (xdomain[0] != xdomain[1])
-          diff = (xdomain[1] - xdomain[0]) * 0.05;
-        xdomain[0] -= diff;
-        xdomain[1] += diff;
-        console.log([attrs.col, type, 'diff', diff, 'domain', xdomain[0], xdomain[1]])
-      } else if (util.isTime(type)) {
-        var xvals = [];
-        _.each(stats, function(d) {
-          xvals.push.apply(xvals, d.range);
-          xvals.push(d.val);
-        });
-        xvals = _.reject(xvals, _.isNull);
-        xdomain = [ d3.min(xvals), d3.max(xvals) ];
-
-        // expand the domain a bit
-        var diff = 1000*60*60*24; // 1 day
-        if (xdomain[0] != xdomain[1]) 
-          diff = (xdomain[1] - xdomain[0]) * 0.05;
-
-        xdomain[0] = new Date(+xdomain[0] - diff);
-        xdomain[1] = new Date(+xdomain[1] + diff);
-      } else {
-        xdomain = {};
-        _.each(stats, function(d) {
-          _.each(d.range, function(o) {
-            xdomain[o] = 1;
-          });
-          xdomain[d.val] = 1  ;
-        });
-        xdomain = _.keys(xdomain);
-      }
-
-
-      var ydomain = [
-        d3.min(stats, function(d) { return d.count }),
-        d3.max(stats, function(d) { return d.count })
-      ];
+      var getx = function(d) { return d.val; },
+          gety = function(d) { return d.count },
+          xdomain = util.getXDomain(stats, type, getx),
+          ydomain = [ d3.min(stats, gety), d3.max(stats, gety) ];
 
       this.set('type', type);
       this.set('xdomain', xdomain);
@@ -100,6 +53,7 @@ define(function(require) {
 
       return this;
     },
+
 
     validate: function(attrs, opts) {
       if (!attrs.col) return "col can't be null";

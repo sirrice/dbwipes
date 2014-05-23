@@ -40,7 +40,7 @@ requirejs([
   'summary/query', 'summary/queryview',
   'summary/scorpionquery', 'summary/scorpionview',
   'summary/scorpionresults', 'summary/scorpionresultsview',
-  'summary/drawingview'
+  'summary/drawingview', 'summary/util'
   ], function (
   $, d3,
   Where, WhereView, 
@@ -48,7 +48,7 @@ requirejs([
   Query, QueryView, 
   ScorpionQuery, ScorpionQueryView, 
   ScorpionResults, ScorpionResultsView,
-  DrawingView) {
+  DrawingView, util) {
 
 
   var q = new Query();
@@ -71,7 +71,7 @@ requirejs([
     });
   })
   where.on('change:selection', function() {
-    q.set('where', where.toSQL());
+    q.set('where', util.negateClause(where.toSQL()));
   });
 
 
@@ -152,13 +152,15 @@ requirejs([
     q.set(ppq);
   });
 
-  q.set(intelq);
+  q.set(btq);
 
 
 
 
   window.q = q;
   window.qv = qv;
+  window.sq = sq;
+  window.sqv = sqv;
   window.where = where;
 
 

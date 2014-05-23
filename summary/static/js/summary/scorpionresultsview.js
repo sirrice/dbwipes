@@ -36,10 +36,10 @@ define(function(require) {
     setActive: function(model) {
       var active = this.state.active;
       if (model) {
-        this.state.query.set('where', model.toSQL());
+        this.state.query.set('where',util.negateClause(model.toSQL()));
         this.state.where.setSelection(model.get('clauses'));
       } else if (active && model == null) {
-        this.state.query.set('where', this.state.where.toSQL());
+        this.state.query.set('where', util.negateClause(this.state.where.toSQL()));
         this.state.where.setSelection([]);
       } 
 

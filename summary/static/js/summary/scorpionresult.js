@@ -43,7 +43,7 @@ define(function(require) {
         return util.toWhereClause(clause.col, clause.type, clause.vals); 
       }).join(' and ');
       if (SQL.length > 0)
-        return "not("+SQL+")";
+        return SQL;
       return null;
     }
   });

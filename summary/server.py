@@ -13,6 +13,7 @@ from datetime import datetime
 from sqlalchemy import *
 from flask import Flask, request, render_template, g, redirect, Response
 from flask.ext.compress import Compress
+from flask.ext.cache import Cache
 
 
 from summary import Summary
@@ -20,6 +21,7 @@ import scorpionutil
 
 app = Flask(__name__)
 Compress(app)
+#app = Cache(app, config={'CACHE_TYPE': 'simple'})
 SUMMARYCACHE = '.summary.cache'
 
 
@@ -150,8 +152,6 @@ def query():
     data = [dict(zip(cur.keys(), vals)) for vals in rows]
     ret['data'] = data
     ret['schema'] = get_schema(g.db, table)
-
-    print data[:3]
   except Exception as e:
     traceback.print_exc()
   return json.dumps(ret, default=json_handler)
@@ -219,6 +219,7 @@ def scorpion():
       ]
     }
   ]
+  results = results * 5;
   ret['results'] = results
 
   return json.dumps(ret, default=json_handler)

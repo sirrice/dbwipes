@@ -101,15 +101,20 @@ define(function(require) {
           schema = this.model.get('schema'),
           xcol = this.model.get('x').alias,
           ycols = _.pluck(this.model.get('ys'), 'alias'),
-          type = schema[xcol],
+          type = schema[this.model.get('x').col],
           _this = this;
       var xs = _.pluck(data, xcol),
           yss = _.map(ycols, function(ycol) { return _.pluck(data, ycol) });
       console.log(yss)
 
+      var newCDomain = _.compact(_.union(this.state.cscales.domain(), ycols));
+      this.state.cscales.domain(newCDomain);
 
-      this.state.cscales.domain(_.compact(_.union(this.state.cscales.domain(), ycols)));
+      var getx = function(d) { return d[xcol]; };
+      var xdomain = util.getXDomain(data, type, getx);
+      this.state.xdomain = util.mergeDomain(this.state.xdomain, xdomain, type);
 
+      /*
       if (util.isStr(type)) {
         if (this.state.xdomain == null) this.state.xdomain = [];
         this.state.xdomain = _.union(this.state.xdomain, _.uniq(xs));
@@ -117,11 +122,13 @@ define(function(require) {
         if (this.state.xdomain == null) 
           this.state.xdomain = [Infinity, -Infinity];
 
+        xs = _.filter(_.compact(xs), _.isFinit)
         if (xs.length) {
           this.state.xdomain[0] = d3.min([this.state.xdomain[0], d3.min(xs)]);
           this.state.xdomain[1] = d3.max([this.state.xdomain[1], d3.max(xs)]);
         }
       }
+      */
 
       _.each(yss, function(ys) {
         if (this.state.ydomain == null) this.state.ydomain = [Infinity, -Infinity];

@@ -60,6 +60,33 @@ def expr_from_nonagg(s):
   return s
 
 
+def create_sql_obj(db, qjson):
+  x = qjson['x']
+  ys = qjson['ys']
+  sql = qjson['query']
+  dbname = qjson['db']
+  table = qjson['table']
+  where = qjson.get('where', '')
+
+  
+  select = Select()
+  nonagg = SelectExpr(x['alias'], [x['col']], x['expr'], x['col'])
+  select.append(nonagg)
+  for y in ys:
+    d = parse_agg(y['expr'])
+    agg = SelectAgg(y['alias'], d['func'], [y['col']], y['expr'], y['col'])
+    select.append(agg)
+  parsed = Query(
+    db, 
+    select, 
+    [table], 
+    filter(bool, [where]), 
+    x['expr'], 
+    expr_from_nonagg(x['expr'])
+  )
+
+  return parsed
+
 def scorpion_run(db, requestdata):
   """
   badsel:  { alias: { x:, y:, xalias:, yalias:, } }
@@ -68,39 +95,8 @@ def scorpion_run(db, requestdata):
   context = {}
 
   try:
-    # qjson, badsel, goodsel, errtypes, erreqs):
-    schema = requestdata.get('schema', {})
-    badsel = requestdata.get('badselection', {})
-    goodsel = requestdata.get('goodselection', {})
-    errtypes = requestdata.get('errtypes', {})
-    erreqs = requestdata.get('erreqs', {})
     qjson = requestdata.get('query', {})
-
-
-    x = qjson['x']
-    ys = qjson['ys']
-    sql = qjson['query']
-    dbname = qjson['db']
-    table = qjson['table']
-    where = qjson.get('where', '')
-
-    
-    select = Select()
-    nonagg = SelectExpr(x['alias'], [x['col']], x['expr'], x['col'])
-    select.append(nonagg)
-    for y in ys:
-      d = parse_agg(y['expr'])
-      agg = SelectAgg(y['alias'], d['func'], [y['col']], y['expr'], y['col'])
-      select.append(agg)
-    parsed = Query(
-      db, 
-      select, 
-      [table], 
-      filter(bool, [where]), 
-      x['expr'], 
-      expr_from_nonagg(x['expr'])
-    )
-
+    parsed = create_sql_obj(db, qjson)
     print parsed
   except Exception as e:
     traceback.print_exc()
@@ -110,6 +106,14 @@ def scorpion_run(db, requestdata):
 
 
   try:    
+    badsel = requestdata.get('badselection', {})
+    goodsel = requestdata.get('goodselection', {})
+    errtypes = requestdata.get('errtypes', {})
+    erreqs = requestdata.get('erreqs', {})
+    dbname = qjson['db']
+    x = qjson['x']
+    ys = qjson['ys']
+
     obj = SharedObj(db, '', dbname=dbname, parsed=parsed)
     obj.dbname = dbname
     obj.C = 0.2
@@ -163,7 +167,7 @@ def scorpion_run(db, requestdata):
       c=obj.c,
       complexity_multiplier=4.5,
       l=0.9,
-      max_wait=10,
+      max_wait=30,
       DEBUG=True
     )
     cost = time.time() - start

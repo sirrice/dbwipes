@@ -19,7 +19,7 @@ define(function(require) {
         yaxis: null,
         series: null,
         w: 350,
-        h: 40,
+        h: 50,
         lp: 70,
         marktype: 'rect'
       }
@@ -157,6 +157,7 @@ define(function(require) {
 
     },
 
+    // when scorpion results set the selection...
     setSelection: function(clause) {
       function withinClause(clause, val) {
         if (clause == null) return false;
@@ -205,21 +206,25 @@ define(function(require) {
           h = this.state.h,
           type = this.model.get('type'),
           _this = this;
+      var within = function(d, e) {
+        if (e[0] == e[1]) return false;
+        if (type == 'str') {
+          var bmin = xscales(d.val) + xscales.rangeBand()/4,
+              bmax = xscales(d.val) + 3*xscales.rangeBand()/4;
+          var b = !(e[1] < bmin || bmax < e[0]);
+        } else {
+          var b = e[0] <= d.val && e[1] >= d.val;
+        }
+        return b;
+      };
 
       var brushf = function(p) {
         var e = brush.extent()
         var selected = [];
         el.selectAll('.mark')
           .classed('highlighted', false)
-          .classed('selected', function(d){
-            if (type == 'str') {
-              var b = e[0] <= xscales(d.val) && e[1] >= xscales(d.val);
-            } else {
-              var b = e[0] <= d.val && e[1] >= d.val;
-            }
-            if (b) selected.push(d);
-            return b;
-          })
+          .classed('selected', function(d){ return within(d, e); })
+          .each(function(d) { if (within(d, e)) selected.push(d); })
         if (d3.event.type == 'brushend') {
           _this.model.set('selection', selected);
         }
@@ -229,10 +234,10 @@ define(function(require) {
           .x(xscales)
           .on('brush', brushf)
           .on('brushend', brushf)
-          .on('brushstart', brushf)
+          .on('brushstart', brushf);
       var gbrush = el.append('g')
           .attr('class', 'brush')
-          .call(brush)
+          .call(brush);
       gbrush.selectAll('rect')
           .attr('height', h)
 

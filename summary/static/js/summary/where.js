@@ -52,7 +52,7 @@ define(function(require) {
         return m.toSQLWhere();
       })).join(' and ');
       if (SQL.length)
-        return "not("+SQL+")";
+        return SQL;
       return null;
     }
   });

@@ -21,57 +21,77 @@ body .cstat-label {
   overflow: hidden;
   text-align: right;
 }
+body .cstat-label label,
+body .cstat-label input {
+  display: inline;
+  cursor: pointer;
+}
 body .cstat-label .type {
   font-size: smaller;
   color: grey;
+  border: 1px solid white;
+  border-radius: 4px;
+  cursor: pointer;
 }
-.axis path,
-.axis line {
+body .cstat-label .type:hover {
+  font-weight: bold;
+  background: steelblue;
+  color: white;
+}
+body .cstat circle {
+  fill: #aeaeae;
+  stroke: none;
+}
+body .cstat rect {
+  fill: #aeaeae;
+  stroke: none;
+}
+body .mark:hover {
+  fill: steelblue;
+}
+#query-container {
+  position: fixed;
+  top: 0px;
+  margin-left: 50%;
+  background: white;
+  padding-bottom: 2em;
+}
+#query-container .axis path,
+#query-container .axis line {
   fill: none;
   stroke: #aeaeae;
   stroke-width: 1px;
   shape-rendering: crispEdges;
 }
-.tick text {
+#query-container .tick text {
   fill: #aeaeae;
   font-size: 10pt;
 }
-.cstat circle {
-  fill: #aeaeae;
-  stroke: none;
-}
-.cstat rect {
-  fill: #aeaeae;
-  stroke: none;
-}
-.mark:hover {
-  fill: steelblue;
-}
-circle.selected {
+#query-container circle.selected {
   fill: black;
   size: 10;
   stroke: black;
 }
-rect.selected {
+#query-container rect.selected {
   fill: black;
 }
-rect.faded {
+#query-container rect.faded {
   fill: whitesmoke;
 }
-rect.highlighted {
-  fill: black;
+#query-container rect.highlighted {
+  fill: red;
 }
-rect.extent {
+#query-container rect.extent {
   fill: grey;
   fill-opacity: 0.2;
   stroke-width: 1px;
   stroke: white;
   shape-rendering: crispEdges;
 }
-.legend {
+#query-container .legend {
   margin-top: 10px;
 }
-.legend span {
+#query-container .legend span {
   padding: 3px;
   padding-left: 1em;
   padding-right: 1em;
@@ -141,6 +161,8 @@ rect.extent {
 }
 .scorpion-results .scorpion-result .equiv-toggle {
   cursor: pointer;
+  padding: 5px;
+  padding-left: 1em;
 }
 .scorpion-results .scorpion-result .filter-clause:hover,
 .scorpion-results .scorpion-result .equiv-toggle:hover {

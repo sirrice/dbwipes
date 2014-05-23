@@ -5,6 +5,10 @@
 
 </head>
 
+
+
+
+
 <div class="row">
   <div class="col-md-6">
     <h1>Scorpion</h1>
@@ -27,38 +31,48 @@
 
 
 
-  <div class="col-md-6" style="position:fixed; margin-left: 50%">
-    <h1>&nbsp;</h1>
+  <div class="col-md-6" style="padding-left:5em;">
     <div class="row">
-      <div class="col-md-12">
-        <span id="q-toggle">toggle plot</span>
-        <span id="q-load-bt" class="btn">load xx</span>
-        <span id="q-load-intel" class='btn'>load yy</span>
-        <span id="q-load-pp" class='btn'>load zz</span>
-      </div>
-    </div>
-    <div class="row"> 
-      <div class="col-md-12" id="right">
-        <div style="clear:both"></div>
+      <div class="col-md-11" style="margin-top: 600px;">
         <div id="scorpion-container"></div>
       </div>
     </div>
-
   </div>
 </div>
 
+<div id="query-container">
+  <h1>&nbsp;</h1>
+  <div class="row">
+    <div class="col-md-12">
+      <span id="q-toggle">toggle plot</span>
+      <span id="q-load-bt" class="btn">load xx</span>
+      <span id="q-load-intel" class='btn'>load yy</span>
+      <span id="q-load-pp" class='btn'>load zz</span>
+    </div>
+  </div>
 
+  <div class="row"> 
+    <div class="col-md-12" id="right">
+      <div style="clear:both"></div>
+    </div>
+  </div>
+</div>
 
 
 
 {%raw%}
 <script id="foo-template" type="text/x-underscore-template">
 <div class='row'>
-  <div class="col-md-2 cstat-label">
+  <div class="col-md-3 cstat-label">
     {{col}}
-    <div class="type">{{type}}</div>
+    <div class="type">
+      <label for="errcol_{{col}}">{{type}}</label>
+      <span>
+        <input type="checkbox" class="errcol" checked id="errcol_{{col}}" value="{{col}}"/>
+      </span>
+    </div>
   </div>
-	<div class="col-md-10 cstat-plot">
+	<div class="col-md-9 cstat-plot">
     <svg class=""></svg>
 	</div>
 </div>
