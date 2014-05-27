@@ -64,6 +64,7 @@ define(function(require) {
       var wait = $("#scorpion-wait").show();
       this.model.fetch({
         data: {
+          fake: true,
           json: JSON.stringify(this.model.toJSON()) ,
           db: this.model.get('query').get('db')
         }, 

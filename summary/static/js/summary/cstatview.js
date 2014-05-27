@@ -21,6 +21,7 @@ define(function(require) {
         w: 350,
         h: 50,
         lp: 70,
+        rectwidth: 1,
         marktype: 'rect'
       }
     },
@@ -120,10 +121,11 @@ define(function(require) {
         var intervals = _.times(xs.length-1, function(idx) { return xs[idx+1] - xs[idx]});
         var width = null;
         if (intervals.length)
-          width = d3.min(intervals)
+          width = d3.min(intervals) - 0.5
         if (!width)
           width = 10;
-        width = Math.max(2, width)
+        this.state.rectwidth = width = Math.max(1, width)
+
         var minv = xscales.invert(d3.min(xs) - Math.max(5, width)),
             maxv = xscales.invert(d3.max(xs) + Math.max(5, width));
         xscales.domain([minv, maxv]);
@@ -147,9 +149,9 @@ define(function(require) {
           .enter().append('rect')
             .attr({
               class: 'mark',
-              width: width,
+              width: function(d) { return Math.max(width, xscales(d.range[1]) - xscales(d.range[0])) },
               height: function(d) {return h-yscales(d.count)},
-              x: function(d) {return xscales(d.val) - width/2},
+              x: function(d) {return xscales(d.range[0]);},
               y: function(d) { return yscales(d.count)}
             })
       } 
@@ -172,7 +174,6 @@ define(function(require) {
       this.d3brush.clear();
       if (clause) {
         if (!util.isStr(clause.type)) {
-          console.log(['setextent to', clause.col, clause.vals]);
           var extent = [
             Math.max(clause.vals[0], this.state.xscales.domain()[0]),
             Math.min(clause.vals[1], this.state.xscales.domain()[1])
@@ -180,7 +181,8 @@ define(function(require) {
           this.d3brush.extent(extent);
         }
       }
-      this.d3brush(this.d3gbrush);
+      if (this.d3gbrush && this.d3brush)
+        this.d3brush(this.d3gbrush);
 
       if (clause) {
         this.d3svg.selectAll('.mark')
@@ -253,19 +255,25 @@ define(function(require) {
       }
       var _this = this,
           xscales = this.state.xscales,
-          xaxis = this.state.xaxis;
+          xaxis = this.state.xaxis,
+          width = this.state.rectwidth;
 
       var zoomf = function() {
         el.select('.axis.x').call(xaxis);
         el.selectAll('.mark') 
           .attr('x', function(d) {
-            return xscales(d.val);
+            return Math.max(xscales.range()[0], xscales(d.range[0]))
           })
-          .style('display', function(d) {
+          .attr('width', function(d) {
+            var minx = Math.max(xscales.range()[0], xscales(d.range[0]));
+            if (xscales(d.range[1]) < minx) return 0;
+            return Math.max(width, xscales(d.range[1]) - minx)
+          })
+          /*.style('display', function(d) {
             var x = xscales(d.val);
             var within = (x >= xscales.range()[0] && x <= xscales.range()[1]);
             return (within)? null : 'none';
-          });
+          });*/
         
       }
       var nullf = function(){}

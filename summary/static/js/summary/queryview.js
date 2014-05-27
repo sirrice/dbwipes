@@ -31,6 +31,7 @@ define(function(require) {
         lp: 60,
         tp: 20,
         bp: 15,
+        ip: 5,  // data-container inner padding
         marktype: 'circle'
       };
     },
@@ -102,10 +103,10 @@ define(function(require) {
           xcol = this.model.get('x').alias,
           ycols = _.pluck(this.model.get('ys'), 'alias'),
           type = schema[this.model.get('x').col],
-          _this = this;
+          _this = this,
+          ip = this.state.ip;
       var xs = _.pluck(data, xcol),
           yss = _.map(ycols, function(ycol) { return _.pluck(data, ycol) });
-      console.log(yss)
 
       var newCDomain = _.compact(_.union(this.state.cscales.domain(), ycols));
       this.state.cscales.domain(newCDomain);
@@ -113,22 +114,6 @@ define(function(require) {
       var getx = function(d) { return d[xcol]; };
       var xdomain = util.getXDomain(data, type, getx);
       this.state.xdomain = util.mergeDomain(this.state.xdomain, xdomain, type);
-
-      /*
-      if (util.isStr(type)) {
-        if (this.state.xdomain == null) this.state.xdomain = [];
-        this.state.xdomain = _.union(this.state.xdomain, _.uniq(xs));
-      } else {
-        if (this.state.xdomain == null) 
-          this.state.xdomain = [Infinity, -Infinity];
-
-        xs = _.filter(_.compact(xs), _.isFinit)
-        if (xs.length) {
-          this.state.xdomain[0] = d3.min([this.state.xdomain[0], d3.min(xs)]);
-          this.state.xdomain[1] = d3.max([this.state.xdomain[1], d3.max(xs)]);
-        }
-      }
-      */
 
       _.each(yss, function(ys) {
         if (this.state.ydomain == null) this.state.ydomain = [Infinity, -Infinity];
@@ -144,11 +129,11 @@ define(function(require) {
         if (util.isTime(type)) {
           xscales = d3.time.scale();
         }
-        xscales.range([0, this.state.w]);
+        xscales.range([0+ip, this.state.w-ip]);
 
         if (util.isStr(type)) {
           xscales = d3.scale.ordinal();
-          xscales.rangeRoundBands([0, this.state.w], 0.1);
+          xscales.rangeRoundBands([0+ip, this.state.w-ip], 0.1);
         }
         this.state.xscales = xscales;
       }
@@ -156,7 +141,7 @@ define(function(require) {
 
       if (this.state.yscales == null) {
         this.state.yscales = d3.scale.linear()
-          .range([this.state.h, 5])
+          .range([this.state.h-ip, 0+ip])
       }
       this.state.yscales.domain(this.state.ydomain);
 
@@ -194,14 +179,32 @@ define(function(require) {
         .text(this.model.get('x')['expr'])
     },
 
-    renderData: function(el, xalias, yalias) {
+    renderModifiedData: function(data) {
+      this.$(".updated").remove();
+      this.c.selectAll('g.data-container').classed('background', false);
+      if (!data) {
+        return;
+      }
+
+      this.c.selectAll('g.data-container').classed('background', true);
+      var xalias = this.model.get('x').alias;
+      var el = this.c.append('g')
+          .attr('class', 'updated');
+
+      _.each(this.model.get('ys'), function(ycol) {
+        this.renderData(el, data, xalias, ycol.alias);
+      }, this);
+    },
+
+    renderData: function(el, data, xalias, yalias) {
       var _this = this;
-      var data = _.map(this.model.get('data'), function(d) {
+      var data = _.map(data, function(d) {
         var ret = {
           x: d[xalias],
           y: d[yalias],
           px: _this.state.xscales(d[xalias]),
-          py: _this.state.yscales(d[yalias])
+          py: _this.state.yscales(d[yalias]),
+          yalias: yalias
         };
         ret[xalias] = d[xalias];
         ret[yalias] = d[yalias];
@@ -220,29 +223,45 @@ define(function(require) {
               cy: function(d) { return d.py },
               r: 2,
               fill: this.state.cscales(yalias),
-              stroke: this.state.cscales(yalias),
-              yalias: yalias
+              stroke: this.state.cscales(yalias)
             })
       }
     },
 
     renderBrush: function(el) {
-      var type = this.model.get('type'),
-          _this = this;
+      var type = this.model.get('schema')[this.model.get('x').col],
+          _this = this,
+          xscales = this.state.xscales,
+          yscales = this.state.yscales,
+          xr = 5,
+          yr = Math.abs(yscales.invert(0)-yscales.invert(5));
+
       var brushf = function(p) {
         var e = brush.extent()
         var selected = {};
         el.selectAll('.mark')
           .classed('selected', function(d){
-            if (type == 'str') {
-              var b = e[0][0] <= xscales(d.x) && e[1][0] >= xscales(d.x);
+            if (util.isNum(type)) {
+              var minx = e[0][0],
+                  maxx = e[1][0],
+                  x    = d.x;
+            } else if (util.isTime(type)) {
+              var minx = xscales(e[0][0]),
+                  maxx = xscales(e[1][0]),
+                  x    = d.px;
             } else {
-              var b = e[0][0] <= d.x && e[1][0] >= d.x;
+              var minx = e[0][0],
+                  maxx = e[1][0],
+                  x    = d.px;
             }
-            b = b && (e[0][1] <= d.y && e[1][1] > d.y);
+
+            var y = d.y,
+                bx = minx <= x+xr && maxx >= x-xr,
+                by = e[0][1] <= y+yr && e[1][1] >= y-yr,
+                b = bx && by;
 
             if (b) {
-              var yalias = d3.select(this).attr('yalias')
+              var yalias = d.yalias;
               if (!selected[yalias]) selected[yalias] = [];
               selected[yalias].push(d);
             }
@@ -334,6 +353,7 @@ define(function(require) {
       }
       this.$svg.show();
       this.queryform.$el.hide();
+      console.log("rendering " + this.model.get('where'))
 
 
       $(this.c[0]).empty()
@@ -341,7 +361,12 @@ define(function(require) {
       this.setupScales()
       this.renderAxes(this.c)
       _.each(this.model.get('ys'), function(ycol) {
-        this.renderData(this.c, this.model.get('x').alias, ycol.alias);
+        this.renderData(
+          this.c, 
+          this.model.get('data'),
+          this.model.get('x').alias, 
+          ycol.alias
+        );
       }, this);
       this.renderBrush(this.c);
       this.renderLabels(this.c);

@@ -130,9 +130,9 @@ def schema():
 @app.route('/api/query/', methods=['POST', 'GET'])
 @returns_json
 def query():
-  x = request.args.get('x')
-  ys = request.args.get('ys')
-  where = request.args.get('where')
+  #x = request.args.get('x')
+  #ys = request.args.get('ys')
+  #where = request.args.get('where')
   table = request.args.get('table')
   dbname = request.args.get('db')
   query = request.args.get('query')
@@ -152,6 +152,8 @@ def query():
     data = [dict(zip(cur.keys(), vals)) for vals in rows]
     ret['data'] = data
     ret['schema'] = get_schema(g.db, table)
+
+    print "%d points returned" % len(data)
   except Exception as e:
     traceback.print_exc()
   return json.dumps(ret, default=json_handler)
@@ -192,17 +194,19 @@ def column_distributions():
 @returns_json
 def scorpion():
   data =  json.loads(str(request.form['json']))
-  results = scorpionutil.scorpion_run(g.db, data)
-  return json.dumps(results, default=json_handler)
+  fake = bool(request.form.get('fake', False))
+  if not fake:
+    results = scorpionutil.scorpion_run(g.db, data)
+    return json.dumps(results, default=json_handler)
 
   ret = {}
   results = [
     {
       'score': 0.2,
       'c_range': [0, 1],
+      'count': 100,
       'clauses': [
-        {'col': 'light', 'type': 'num', 'vals': [500, 1000]},
-        {'col': 'sensor', 'type': 'str', 'vals': map(str, [16, 17, 18, 19, 20])}
+        {'col': 'sensor', 'type': 'str', 'vals': map(str, [18])}
       ],
       'alt_clauses': [
         {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]}
@@ -211,15 +215,14 @@ def scorpion():
     {
       'score': 0.2,
       'c_range': [0, 1],
+      'count': 100,
       'clauses': [
-        {'col': 'voltage', 'type': 'num', 'vals': [0, 1.5]},
-        {'col': 'humidity', 'type': 'num', 'vals': [-5000, .1]}
+        {'col': 'voltage', 'type': 'num', 'vals': [0, 2.0]}
       ],
       'alt_clauses': [
       ]
     }
   ]
-  results = results * 5;
   ret['results'] = results
 
   return json.dumps(ret, default=json_handler)

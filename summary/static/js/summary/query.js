@@ -18,7 +18,8 @@ define(function(require) {
         where: null,    // string
         table: null,
         db: null,
-        data: null
+        data: null,
+        limit: null
       }
     },
 
@@ -128,9 +129,7 @@ define(function(require) {
     },
 
     toSQL: function() {
-      function col2str(d) {
-        return d.expr + " as " + d.alias;
-      }
+      function col2str(d) { return d.expr + " as " + d.alias; }
       if (!this.get('x')) return '';
       var select = [col2str(this.get('x'))];
       select = select.concat(_.map(this.get('ys'), col2str));
@@ -141,13 +140,16 @@ define(function(require) {
       where = (where && where != '')? 'WHERE ' + where : null;
       var groupby = 'GROUP BY ' + this.get('x').expr;
       var orderby = 'ORDER BY ' + this.get('x').expr;
+      var limit = this.get('limit');
+      limit = (limit && limit != '')? 'LIMIT ' + limit : null;
 
       return _.compact([
         select,
         from,
         where,
         groupby,
-        orderby
+        orderby,
+        limit
       ]).join('\n');
     }
 

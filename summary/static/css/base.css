@@ -46,9 +46,6 @@ body .cstat rect {
   fill: #aeaeae;
   stroke: none;
 }
-body .mark:hover {
-  fill: steelblue;
-}
 body .axis path,
 body .axis line {
   fill: none;
@@ -59,6 +56,9 @@ body .axis line {
 body .tick text {
   fill: #aeaeae;
   font-size: 10pt;
+}
+body .mark:hover {
+  fill: steelblue;
 }
 body circle.selected {
   fill: black;
@@ -80,6 +80,21 @@ body rect.extent {
   stroke-width: 1px;
   stroke: white;
   shape-rendering: crispEdges;
+}
+body .background .mark {
+  fill-opacity: 0.25;
+  stroke-opacity: 0.25;
+}
+body table.tuples {
+  margin: 1em;
+}
+body table.tuples tr td,
+body table.tuples tr th {
+  padding: 5px;
+}
+body table.tuples tr th {
+  font-weight: bold;
+  text-align: center;
 }
 #query-container {
   position: fixed;
@@ -137,6 +152,9 @@ body rect.extent {
 .scorpion-results .scorpion-result .filter-clause .info .crange {
   margin-left: 2em;
 }
+.scorpion-results .scorpion-result .filter-clause.locked {
+  background: black;
+}
 .scorpion-results .scorpion-result .equiv-clauses {
   margin-left: 1em;
 }
@@ -167,6 +185,9 @@ body rect.extent {
 .scorpion-results .scorpion-result .filter-clause:hover,
 .scorpion-results .scorpion-result .equiv-toggle:hover {
   background: #359fdb;
+}
+.scorpion-results .scorpion-result .filter-clause.locked:hover {
+  background: black;
 }
 #walkthrough-container {
   position: absolute;

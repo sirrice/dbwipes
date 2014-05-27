@@ -11,12 +11,16 @@ define(function(require) {
   var ScorpionResultView = Backbone.View.extend({
     template: Handlebars.compile($("#scorpion-result-template").html()),
     events: {
-      "click .equiv-toggle":  "onToggle"
+      "click .equiv-toggle":  "onToggle",
+      "click .filter-clause": "onClick"
     },
 
     initialize: function() {
-      console.log(arguments)
       this.listenTo(this.model, 'change', this.render);
+    },
+
+    onClick: function() {
+      this.trigger("click", this);
     },
 
     onToggle: function() {
@@ -35,7 +39,6 @@ define(function(require) {
     render: function() {
       var _this = this,
           json = this.model.toJSON();
-      console.log(['scorpionresultview.render', json]);
 
       this.$el.html(this.template(json));
 

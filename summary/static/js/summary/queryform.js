@@ -76,7 +76,6 @@ define(function(require) {
         schema: this.model.get('schema')
       };
       this.trigger('submit');
-      this.resetState();
       this.model.set(q);
     },
 

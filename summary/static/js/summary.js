@@ -40,6 +40,7 @@ requirejs([
   'summary/query', 'summary/queryview',
   'summary/scorpionquery', 'summary/scorpionview',
   'summary/scorpionresults', 'summary/scorpionresultsview',
+  'summary/tupleview',
   'summary/drawingview', 'summary/util'
   ], function (
   $, d3,
@@ -48,6 +49,7 @@ requirejs([
   Query, QueryView, 
   ScorpionQuery, ScorpionQueryView, 
   ScorpionResults, ScorpionResultsView,
+  TupleView,
   DrawingView, util) {
 
 
@@ -90,6 +92,10 @@ requirejs([
   $("#scorpion-container").append(srv.render().el);
   $("body").append(sqv.render().$el.hide());
 
+  srv.on('modifiedData', function(data) {
+    qv.renderModifiedData(data);
+  });
+
   q.on('change:db change:table', function() {
     sq.set('badselection', {});
     sq.set('goodselection', {});
@@ -101,6 +107,18 @@ requirejs([
     sq.set('drawing', drawingmodel);
   });
 
+
+  /*
+  var tv = new TupleView({query: q, el: $("#tuples").get()[0]});
+
+  srv.on('setActive', function(model) {
+    if (model)
+      tv.model.set('where', model.toSQL());
+    else {
+      tv.model.set('where', null);
+    }
+  });
+  */
 
 
 
@@ -142,6 +160,18 @@ requirejs([
     db: 'penispros'
   };
 
+  var medq = {
+    //x: 'provider',
+    x: 'ccm_payor',
+    ys: [ { col: 'total_cost', expr: 'sum(total_cost)'} ],
+    schema: {
+      x: 'str',
+      'total_cost': 'num'
+    },
+    table: 'lqm',
+    db: 'med'
+  };
+
 
 
   $("#q-load-bt").click(function() { 
@@ -153,8 +183,12 @@ requirejs([
   $("#q-load-pp").click(function() { 
     q.set(ppq);
   });
+  $("#q-load-med").click(function() { 
+    q.set(medq);
+  });
 
-  q.set(btq);
+
+  q.set(intelq);
 
 
 

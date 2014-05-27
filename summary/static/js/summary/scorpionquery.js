@@ -94,7 +94,8 @@ define(function(require) {
               goodmean = this.mean('goodselection', yalias);
           if (!badmean) return;
           if (badmean && goodmean == null) 
-            errs.push("<div>select good examples for <strong>"+yalias+"</strong></div>");
+            this.get('errtypes')[yalias] = 3;
+            //errs.push("<div>select good examples for <strong>"+yalias+"</strong></div>");
           else
             this.get('errtypes')[yalias] = (goodmean > badmean)? 3 : 2;
         }, this) 

@@ -15,13 +15,20 @@
 
     <div class="row">
       <div class="col-md-12">
-        <span class="btn"></span>
+        <span class="btn">&nbsp;</span>
       </div>
     </div>
 
     <div class="row">
       <div class="col-md-12">
         <div id="facets"></div>
+
+        <div class='row'>
+          <div class="col-md-12">
+            <svg id="tuples" style="margin-top: 1em"></svg>
+          </div>
+        </div>
+
         <div class='row'>
           <div class="col-md-10 col-md-offset-2" id='where'></div>
         </div>
@@ -33,7 +40,7 @@
 
   <div class="col-md-6" style="padding-left:5em;">
     <div class="row">
-      <div class="col-md-11" style="margin-top: 600px;">
+      <div class="col-md-10" style="margin-top: 600px;">
         <div id="scorpion-container"></div>
       </div>
     </div>
@@ -47,6 +54,7 @@
       <span id="q-toggle">toggle plot</span>
       <span id="q-load-bt" class="btn">load xx</span>
       <span id="q-load-intel" class='btn'>load yy</span>
+      <span id="q-load-med" class='btn'>load ii</span>
       <span id="q-load-pp" class='btn'>load zz</span>
     </div>
   </div>
@@ -248,8 +256,27 @@
 </div>
 </script>
 
-{%endraw%}
 
+<script id="tuple-template" type="text/x-underscore-template">
+<table class="tuples">
+  <tr>
+    {{#each cols}}
+    <th>{{this}}</th>
+    {{/each}}
+  </tr>
+  {{#each data}}
+    <tr>
+      {{#each this}}
+      <td>{{this}}</td>
+      {{/each}}
+      <td>
+    </tr>
+  {{/each}}
+</table>
+</script>
+
+
+{%endraw%}
 
 
 

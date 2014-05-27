@@ -55,6 +55,7 @@ define(function(require) {
       xdomain[0] -= diff;
       xdomain[1] += diff;
     } else if (isTime(type)) {
+      xvals = _.map(xvals, function(v) { return new Date(v); });
       xdomain = [ d3.min(xvals), d3.max(xvals) ];
 
       diff = 1000*60*60*24; // 1 day
@@ -65,7 +66,7 @@ define(function(require) {
       xdomain[1] = new Date(+xdomain[1] + diff);
     } 
 
-    console.log([type, 'diff', diff, 'domain', JSON.stringify(xdomain)]);
+    //console.log([type, 'diff', diff, 'domain', JSON.stringify(xdomain)]);
     return xdomain;
   }
 

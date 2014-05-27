@@ -54,10 +54,6 @@ body {
     }
   }
 
-  .mark:hover {
-    fill:steelblue;
-  }
-
   .axis path, .axis line {
     fill: none;
     stroke: #aeaeae;
@@ -69,6 +65,10 @@ body {
     font-size: 10pt;
   }
 
+
+  .mark:hover {
+    fill:steelblue;
+  }
 
   circle.selected {
     fill: black;
@@ -93,7 +93,28 @@ body {
     shape-rendering: crispEdges;
   }
 
+  .background {
+    .mark {
+      fill-opacity: 0.25;
+      stroke-opacity: 0.25;
+    }
 
+  }
+
+
+  table.tuples {
+    margin: 1em;
+    tr {
+      td, th {
+        padding: 5px;
+      }
+      th {
+        font-weight: bold;
+        text-align: center;
+      }
+    
+    }
+  }
 }
 
 #query-container {
@@ -166,6 +187,9 @@ body {
       }
 
     }
+    .filter-clause.locked {
+      background: black;
+    }
 
 
     .equiv-clauses {
@@ -199,6 +223,9 @@ body {
 
     .filter-clause:hover, .equiv-toggle:hover {
       background: rgb(53, 159, 219);
+    }
+    .filter-clause.locked:hover {
+      background: black;
     }
 
 
