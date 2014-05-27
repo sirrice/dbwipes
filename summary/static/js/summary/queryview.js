@@ -97,22 +97,24 @@ define(function(require) {
       });
     },
 
-    setupScales: function() {
-      var data = this.model.get('data'),
-          schema = this.model.get('schema'),
-          xcol = this.model.get('x').alias,
-          ycols = _.pluck(this.model.get('ys'), 'alias'),
-          type = schema[this.model.get('x').col],
+    // persistently update scales information
+    setupScales: function(data) {
+      var schema = this.model.get('schema'),
+          xcol = this.model.get('x'),
+          xalias = xcol.alias,
+          ycols = this.model.get('ys'),
+          yaliases = _.pluck(ycols, 'alias'),
+          type = schema[xcol.col],
           _this = this,
-          ip = this.state.ip;
-      var xs = _.pluck(data, xcol),
-          yss = _.map(ycols, function(ycol) { return _.pluck(data, ycol) });
+          ip = this.state.ip,
+          xs = _.pluck(data, xalias),
+          yss = _.map(yaliases, function(yalias) { return _.pluck(data, yalias) }), 
+          newCDomain = _.compact(_.union(this.state.cscales.domain(), yaliases));
 
-      var newCDomain = _.compact(_.union(this.state.cscales.domain(), ycols));
       this.state.cscales.domain(newCDomain);
 
-      var getx = function(d) { return d[xcol]; };
-      var xdomain = util.getXDomain(data, type, getx);
+      var getx = function(d) { return d[xalias]; },
+          xdomain = util.getXDomain(data, type, getx);
       this.state.xdomain = util.mergeDomain(this.state.xdomain, xdomain, type);
 
       _.each(yss, function(ys) {
@@ -186,6 +188,8 @@ define(function(require) {
         return;
       }
 
+      this.setupScales(data);
+      this.render();
       this.c.selectAll('g.data-container').classed('background', true);
       var xalias = this.model.get('x').alias;
       var el = this.c.append('g')
@@ -213,6 +217,7 @@ define(function(require) {
 
       var dc = el.append('g')
         .attr('class', 'data-container')
+
       if (this.state.marktype == 'circle') {
         dc.selectAll('circle')
             .data(data)
@@ -358,7 +363,7 @@ define(function(require) {
 
       $(this.c[0]).empty()
 
-      this.setupScales()
+      this.setupScales(this.model.get('data'))
       this.renderAxes(this.c)
       _.each(this.model.get('ys'), function(ycol) {
         this.renderData(

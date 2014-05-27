@@ -36,6 +36,8 @@ def returns_json(f):
   @wraps(f)
   def json_returner(*args, **kwargs):
     r = f(*args, **kwargs)
+    if not isinstance(r, basestring):
+      r = json.dumps(r, default=json_handler)
     return Response(r, content_type='application/json')
   return json_returner
 
@@ -86,7 +88,7 @@ def index():
 def dbs():
   q = "SELECT datname FROM pg_database where datistemplate = false;"
   dbnames = [str(row[0]) for row in g.db.execute(q).fetchall()]
-  return json.dumps({'databases': dbnames})
+  return {'databases': dbnames}
 
 
 
@@ -96,7 +98,7 @@ def tables():
   cur = g.db.cursor()
   res = cur.execute("SELECT tablename from pg_tables WHERE schemaname = 'public'")
   tables = [str(row[0]) for row in res.fetchall()]
-  return json.dumps({'tables': tables})
+  return {'tables': tables}
 
 
 
@@ -119,12 +121,30 @@ def schema():
   table = request.args.get('table')
   
   if not table:
-    return json.dumps({})
+    return {}
 
   ret = {}
   ret['schema'] = get_schema(g.db, table)
-  return json.dumps(ret)
+  return ret
 
+
+@app.route('/api/status/', methods=['POST', 'GET'])
+@returns_json
+def status():
+  rid = request.args.get('requestid')
+
+  engine = create_engine('postgresql://localhost/status')
+  db = engine.connect()
+  cur = db.cursor()
+  cur.execute("SELECT status FROM status WHERE rid = %s ORDER BY id DESC LIMIT 1")
+  rows = cur.fetchall()
+  if len(rows):
+    status = rows[0][0]
+  else:
+    status = '?'
+  db.close()
+  engine.dispose()
+  return {'status': status}
 
 
 @app.route('/api/query/', methods=['POST', 'GET'])
@@ -138,7 +158,7 @@ def query():
   query = request.args.get('query')
   
   if not dbname or not query:
-    return json.dumps({})
+    return {}
 
   print query
   ret = {}
@@ -156,7 +176,7 @@ def query():
     print "%d points returned" % len(data)
   except Exception as e:
     traceback.print_exc()
-  return json.dumps(ret, default=json_handler)
+  return ret
 
 
 @app.route('/api/column_distributions/', methods=['POST', 'GET'])
@@ -186,7 +206,7 @@ def column_distributions():
     })
 
   context = { "data": data }
-  return json.dumps(context, default=json_handler)
+  return context
 
 
 
@@ -194,10 +214,10 @@ def column_distributions():
 @returns_json
 def scorpion():
   data =  json.loads(str(request.form['json']))
-  fake = bool(request.form.get('fake', False))
-  if not fake:
+  fake = request.form.get('fake', False)
+  if not fake or fake == 'false':
     results = scorpionutil.scorpion_run(g.db, data)
-    return json.dumps(results, default=json_handler)
+    return results
 
   ret = {}
   results = [
@@ -225,6 +245,6 @@ def scorpion():
   ]
   ret['results'] = results
 
-  return json.dumps(ret, default=json_handler)
+  return ret
 
 

@@ -12,6 +12,7 @@ define(function(require) {
         query: null,        // Query object
         yalias: null,
         score: 0,
+        count: 0,
         c_range: [],     // [minc, maxc]
         clauses: [],    // { col:, type:, vals: }
         alt_clauses: [], // {col:, type:, vals:}

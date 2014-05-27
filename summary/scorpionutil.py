@@ -168,7 +168,7 @@ def scorpion_run(db, requestdata):
       c=obj.c,
       complexity_multiplier=4.5,
       l=0.9,
-      max_wait=100,
+      max_wait=30,
       DEBUG=True
     )
     cost = time.time() - start
