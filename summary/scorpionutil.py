@@ -82,8 +82,8 @@ def create_sql_obj(db, qjson):
     select, 
     [table], 
     filter(bool, [where]), 
-    x['expr'], 
-    expr_from_nonagg(x['expr'])
+    [x['expr']], 
+    [expr_from_nonagg(x['expr']])
   )
 
   return parsed
