@@ -162,8 +162,12 @@ define(function(require) {
         SQL = (SQL.length)? "("+SQL.join(' or ')+")" : null;
     } else {
       if (isTime(type)) {
-        var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
-        vals = _.map(vals, function(v) { return new Date(v)});
+        if (type == 'time') {
+          var val2s = function(v) { return "'" + (new Date(v)).toLocaleTimeString() + "'";};
+        } else {
+          var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
+        }
+        //vals = _.map(vals, function(v) { return new Date(v)});
       } else {
         var val2s = function(v) { return +v };
       }

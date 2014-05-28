@@ -68,13 +68,13 @@ def teardown_request(exception):
     if hasattr(g, 'db'):
       g.db.close()
   except Exception as e:
-    print e
+    pass
 
   try:
     if hasattr(g, 'engine'):
       g.engine.dispose()
   except Exception as e:
-    print e
+    pass
 
 
 
@@ -128,23 +128,33 @@ def schema():
   return ret
 
 
+@app.route('/api/requestid/', methods=['POST', 'GET'])
+@returns_json
+def requestid():
+  try:
+    from scorpion.util import Status
+    status = Status()
+    requestid = status.reqid
+    status.close()
+    return {'requestid': requestid}
+  except Exception as e:
+    return {'error': str(e)}
+
+
+
 @app.route('/api/status/', methods=['POST', 'GET'])
 @returns_json
 def status():
-  rid = request.args.get('requestid')
+  try:
+    from scorpion.util import Status
+    rid = int(request.args.get('requestid'))
 
-  engine = create_engine('postgresql://localhost/status')
-  db = engine.connect()
-  cur = db.cursor()
-  cur.execute("SELECT status FROM status WHERE rid = %s ORDER BY id DESC LIMIT 1")
-  rows = cur.fetchall()
-  if len(rows):
-    status = rows[0][0]
-  else:
-    status = '?'
-  db.close()
-  engine.dispose()
-  return {'status': status}
+    status = Status(rid)
+    ret = status.latest_status()
+    status.close()
+    return {'status': ret}
+  except Exception as e:
+    return {'status': str(e)}
 
 
 @app.route('/api/query/', methods=['POST', 'GET'])
@@ -215,8 +225,9 @@ def column_distributions():
 def scorpion():
   data =  json.loads(str(request.form['json']))
   fake = request.form.get('fake', False)
+  requestid = request.form.get('requestid')
   if not fake or fake == 'false':
-    results = scorpionutil.scorpion_run(g.db, data)
+    results = scorpionutil.scorpion_run(g.db, data, requestid)
     return results
 
   ret = {}

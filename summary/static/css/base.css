@@ -243,8 +243,8 @@ body table.tuples tr th {
   background-color: white;
   content: "";
   border-radius: 100%;
-  animation: spin 2s ease infinite;
-  -webkit-animation: spin 2s ease infinite;
+  animation: spin 4s ease infinite;
+  -webkit-animation: spin 4s ease infinite;
 }
 .loading {
   position: absolute;

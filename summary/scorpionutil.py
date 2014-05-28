@@ -16,6 +16,7 @@ from scorpion.sql import Select, SelectExpr, SelectAgg, Query
 from scorpion.arch import SharedObj, extract_agg_vals
 from scorpion.parallel import parallel_debug
 from scorpion.errfunc import *
+from scorpion.util import Status
 
 
 
@@ -87,7 +88,7 @@ def create_sql_obj(db, qjson):
 
   return parsed
 
-def scorpion_run(db, requestdata):
+def scorpion_run(db, requestdata, requestid):
   """
   badsel:  { alias: { x:, y:, xalias:, yalias:, } }
   goodsel: { alias: { x:, y:, xalias:, yalias:, } }
@@ -156,6 +157,9 @@ def scorpion_run(db, requestdata):
     obj.errors = errors
     print obj.errors[0]
 
+    obj.status = Status(requestid)
+    print "status requid = ", requestid
+
     start = time.time()
     parallel_debug(
       obj,
@@ -175,15 +179,28 @@ def scorpion_run(db, requestdata):
     print "end to end took %.4f" % cost
 
 
+    obj.update_status('serializing results')
     context['results'] = create_scorpion_results(obj)
+
+    obj.update_status('done!')
 
   except Exception as e:
     traceback.print_exc()
     context['error'] = str(e)
+  finally:
+    try:
+      obj.status.close()
+    except:
+      pass
+
 
   return context
 
 def create_scorpion_results(obj):
+  """
+  Given the resulting rule clusters, package them into renderable
+  JSON objects
+  """
   results = []
   idx = 0
   nrules = 6 

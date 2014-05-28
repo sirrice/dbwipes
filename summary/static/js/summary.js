@@ -28,6 +28,9 @@ requirejs.config({
     },
     'handlebars': {
       exports: 'Handlebars'
+    },
+    'md5': {
+      exports: 'md5'
     }
   }
 });

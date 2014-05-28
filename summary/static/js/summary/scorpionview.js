@@ -5,8 +5,10 @@ define(function(require) {
       Backbone = require('backbone'),
       d3 = require('d3'),
       $ = require('jquery'),
+      md5 = require('md5'),
       util = require('summary/util'),
-      ScorpionQuery = require('summary/scorpionquery');
+      ScorpionQuery = require('summary/scorpionquery'),
+      StatusView = require('summary/status');
 
   var ScorpionView = Backbone.View.extend({
     template: Handlebars.compile($("#scorpion-template").html()),
@@ -34,8 +36,12 @@ define(function(require) {
     },
 
     onResult: function(resp) {
-      console.log(resp)
       $("#scorpion-wait").hide();
+      if (this.statusview) {
+        this.statusview.state.running = false;
+        this.statusview.$el.remove();
+        this.statusview = null;
+      }
       if (resp.errmsg) {
         this.$("#errmsg").text(resp.errormsg);
       } else {
@@ -50,7 +56,7 @@ define(function(require) {
         this.$("#errmsg").html(this.model.validationError);
         return false;
       }
-
+      var _this = this;
       console.log(this.model.get('erreqs'));
       console.log(this.model.get('badselection'));
 
@@ -61,17 +67,25 @@ define(function(require) {
       ignore_cols = _.compact(ignore_cols);
       this.model.set('ignore_cols', ignore_cols);
 
-      var wait = $("#scorpion-wait").show();
-      this.model.fetch({
-        data: {
-          fake: false,
-          json: JSON.stringify(this.model.toJSON()) ,
-          db: this.model.get('query').get('db')
-        }, 
-        type: 'POST',
-        success: this.onResult.bind(this),
-        error: this.onResult.bind(this)
-      });
+      $.get('/api/requestid', function(resp) {
+        console.log(resp);
+        var requestid = resp.requestid;
+        var wait = $("#scorpion-wait").show();
+        _this.model.fetch({
+          data: {
+            fake: false,
+            requestid: requestid,
+            json: JSON.stringify(_this.model.toJSON()) ,
+            db: _this.model.get('query').get('db')
+          }, 
+          type: 'POST',
+          success: _this.onResult.bind(_this),
+          error: _this.onResult.bind(_this)
+        });
+        _this.statusview = new StatusView({ requestid: requestid });
+        _this.statusview.render();
+        $("#scorpion_status").append(_this.statusview.$el);
+      }, 'json')
     },
 
     onClose: function() {
