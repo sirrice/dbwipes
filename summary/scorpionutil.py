@@ -99,7 +99,6 @@ def scorpion_run(db, requestdata, requestid):
     qjson = requestdata.get('query', {})
     parsed = create_sql_obj(db, qjson)
     print "parsed SQL"
-    print parsed.groupby
     print parsed
   except Exception as e:
     traceback.print_exc()
