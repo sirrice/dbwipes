@@ -44,7 +44,6 @@ def parse_agg(s):
   d = p.match(s).groupdict()
   klass = __agg2f__[d['func'].strip()]
   func = klass([Var(str(d['col']))])
-  print d
   return {
     'fname': d['func'],
     'func': func,
@@ -77,6 +76,7 @@ def create_sql_obj(db, qjson):
     d = parse_agg(y['expr'])
     agg = SelectAgg(y['alias'], d['func'], [y['col']], y['expr'], y['col'])
     select.append(agg)
+
   parsed = Query(
     db, 
     select, 
@@ -98,6 +98,8 @@ def scorpion_run(db, requestdata, requestid):
   try:
     qjson = requestdata.get('query', {})
     parsed = create_sql_obj(db, qjson)
+    print "parsed SQL"
+    print parsed.groupby
     print parsed
   except Exception as e:
     traceback.print_exc()
