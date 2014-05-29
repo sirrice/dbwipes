@@ -248,7 +248,8 @@ def scorpion():
       'c_range': [0, 1],
       'count': 100,
       'clauses': [
-        {'col': 'voltage', 'type': 'num', 'vals': [0, 2.0]}
+        {'col': 'voltage', 'type': 'num', 'vals': [0, 2.15]},
+        {'col': 'sensor', 'type': 'str', 'vals': ['18']}
       ],
       'alt_clauses': [
       ]

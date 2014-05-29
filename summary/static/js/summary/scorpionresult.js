@@ -28,10 +28,16 @@ define(function(require) {
       var json = {
         score: this.get('score'),
         clauses: _.map(this.get('clauses'), function(c){
-          return util.toWhereClause(c.col, c.type, c.vals);//.substr(0, 20);
+          var vals = c.vals;
+          if (util.isNum(c.type))
+            vals = _.map(c.vals, function(v) {return v.toPrecision(3); });
+          return util.toWhereClause(c.col, c.type, vals);//.substr(0, 20);
         }),
         alt_clauses: _.map(this.get('alt_clauses'), function(c) {
-          return util.toWhereClause(c.col, c.type, c.vals);//.substr(0, 20);
+          var vals = c.vals;
+          if (util.isNum(c.type))
+            vals = _.map(c.vals, function(v) {return v.toPrecision(3); });
+          return util.toWhereClause(c.col, c.type, vals);//.substr(0, 20);
         }),
         c_range: this.get('c_range').join(' - '),
         yalias: this.get('yalias')

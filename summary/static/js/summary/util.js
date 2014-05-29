@@ -159,7 +159,12 @@ define(function(require) {
           SQL.push(col + " in ("+vals.join(',')+")");
         }
 
-        SQL = (SQL.length)? "("+SQL.join(' or ')+")" : null;
+        if (SQL.length == 0)
+          SQL = null;
+        else if (SQL.length == 1)
+          SQL = SQL[0];
+        else
+          SQL = "("+SQL.join(' or ')+")";
     } else {
       if (isTime(type)) {
         if (type == 'time') {
