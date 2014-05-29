@@ -26,14 +26,16 @@ body .cstat-label input {
   display: inline;
   cursor: pointer;
 }
-body .cstat-label .type {
+body .cstat-label .type label {
   font-size: smaller;
-  color: grey;
+  color: black;
+  background: whitesmoke;
   border: 1px solid white;
   border-radius: 4px;
   cursor: pointer;
+  min-width: 50px;
 }
-body .cstat-label .type:hover {
+body .cstat-label .type label:hover {
   font-weight: bold;
   background: steelblue;
   color: white;

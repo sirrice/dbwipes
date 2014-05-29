@@ -44,7 +44,7 @@ define(function(require) {
         return;
       }
      var onSuccess = (function() {
-        _.delay(this.loadStatus.bind(this), 150)
+        _.delay(this.loadStatus.bind(this), 200)
       }).bind(this) ;
 
       this.model.fetch({

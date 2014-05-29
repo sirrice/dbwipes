@@ -26,6 +26,7 @@ define(function(require) {
 
     initialize: function() {
       this.on('change', this.onChange);
+      this.on('change:db change:table', this.onChangeDB);
     },
 
     ensureX: function() {
@@ -56,6 +57,10 @@ define(function(require) {
         this.fetch({data:this.toJSON()});
       }, this);
       this.attributes['where'] = where;
+    },
+
+    onChangeDB: function() {
+      this.set('where', null);
     },
 
     onChange: function() {

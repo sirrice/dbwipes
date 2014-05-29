@@ -15,7 +15,7 @@
 
     <div class="row">
       <div class="col-md-12">
-        <span class="btn">&nbsp;</span>
+        <span id="facet-togglecheckall" state='checked' class="btn btn-primary btn-sm">uncheck all</span>
       </div>
     </div>
 
@@ -74,7 +74,7 @@
   <div class="col-md-3 cstat-label">
     {{col}}
     <div class="type">
-      <label for="errcol_{{col}}">{{type}}</label>
+      <label style="min-width: 50px" class="btn btn-xs" for="errcol_{{col}}">{{type}}</label>
       <span>
         <input type="checkbox" class="errcol" checked id="errcol_{{col}}" value="{{col}}"/>
       </span>

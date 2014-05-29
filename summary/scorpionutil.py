@@ -172,7 +172,7 @@ def scorpion_run(db, requestdata, requestid):
       msethreshold=0.15,
       c=obj.c,
       complexity_multiplier=4.5,
-      l=0.9,
+      l=0.6,
       max_wait=30,
       DEBUG=True
     )

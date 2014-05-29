@@ -1,6 +1,7 @@
 // CStatsView
 define(function(require) {
-  var CStatView = require('summary/cstatview'),
+  var $ = require("jquery"),
+      CStatView = require('summary/cstatview'),
       Backbone = require('backbone');
 
   return Backbone.View.extend({
@@ -8,6 +9,26 @@ define(function(require) {
     initialize: function() {
       this.listenTo(this.collection, 'add', this.addOne);
       this.listenTo(this.collection, 'reset', this.onReset);
+      $("#facet-togglecheckall").click(this.toggleChecks.bind(this));
+    },
+
+    toggleChecks: function() {
+      var btn = $("#facet-togglecheckall");
+      var bchecked = false;
+      if (btn.attr('state') == 'checked') {
+        btn.text("check all");
+        btn.attr('state', 'unchecked');
+        bchecked = false;
+      } else {
+        btn.text('uncheck all');
+        btn.attr('state', 'checked');
+        bchecked = true;
+      }
+
+
+      this.$("input.errcol").each(function(idx, el) {
+        el.checked = bchecked;
+      });
     },
 
     onReset: function() {
