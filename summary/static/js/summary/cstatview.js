@@ -30,6 +30,7 @@ define(function(require) {
       this.$el.html(this.template(this.model.toJSON()));
       this.renderPlot(this.$('svg'));
       this.listenTo(this.model, 'setSelection', this.setSelection)
+      this.listenTo(this.model, 'change:selection', this.setCount)
       return this;
     },
 
@@ -157,6 +158,17 @@ define(function(require) {
       } 
 
 
+    },
+
+    setCount: function() {
+      var count = this.model.get('selection').length;
+      var sum = d3.sum(_.map(this.model.get('selection'), function(d) {
+        return d.count;
+      }));
+      if (count)
+        this.$('.count').text(count + ' vals ('+sum+' rows)');
+      else
+        this.$('.count').text(null);
     },
 
     // when scorpion results set the selection...

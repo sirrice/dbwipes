@@ -40,6 +40,9 @@ body .cstat-label .type label:hover {
   background: steelblue;
   color: white;
 }
+body .count {
+  font-size: smaller;
+}
 body .cstat circle {
   fill: #aeaeae;
   stroke: none;

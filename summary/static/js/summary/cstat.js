@@ -55,6 +55,7 @@ define(function(require) {
     },
 
 
+
     validate: function(attrs, opts) {
       if (!attrs.col) return "col can't be null";
       if (!attrs.type) return "type can't be null"
