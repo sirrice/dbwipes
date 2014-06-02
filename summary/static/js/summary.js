@@ -28,6 +28,10 @@ requirejs.config({
     },
     'handlebars': {
       exports: 'Handlebars'
+    },
+    'bootstrap': {
+      deps: ['jquery'],
+      exports: '$'
     }
   }
 });
@@ -41,7 +45,8 @@ requirejs([
   'summary/scorpionquery', 'summary/scorpionview',
   'summary/scorpionresults', 'summary/scorpionresultsview',
   'summary/tupleview',
-  'summary/drawingview', 'summary/util'
+  'summary/drawingview', 'summary/util',
+  'bootstrap'
   ], function (
   $, d3,
   Where, WhereView, 
@@ -51,6 +56,34 @@ requirejs([
   ScorpionResults, ScorpionResultsView,
   TupleView,
   DrawingView, util) {
+
+  $ = require('bootstrap');
+
+
+  $("[data-toggle=tooltip]").tooltip();
+
+  var st_on_text = "Query only what you highlight below" ,
+      st_off_text = "Queries will ignore what you highlight below";
+  $("#selection-type > input[type=checkbox]").click(function() {
+    where.trigger("change:selection");
+    var txt = (this.checked)? st_on_text : st_off_text;
+    $("#selection-type")
+      .attr('title', txt)
+      .tooltip('fixTitle')
+      .tooltip('show');
+  });
+    $("#selection-type")
+      .attr('title', st_on_text)
+      .tooltip('fixTitle')
+
+
+  var enableScorpion = window.enableScorpion = true;
+  // define all scorpion related variables so 
+  // they can be checked for null
+  var srs = null,
+      srv = null,
+      sq = null,
+      sqv = null;
 
 
   var q = new Query();
@@ -74,7 +107,8 @@ requirejs([
   })
   where.on('change:selection', function() {
     var newWhere = util.negateClause(where.toSQL());
-    srv.unlockAll();
+    if (srv)
+      srv.unlockAll();
     if (q.get('where') != newWhere)
       q.set('where', newWhere);
 
@@ -82,37 +116,42 @@ requirejs([
 
 
 
-  var srs = new ScorpionResults()
-  var srv = new ScorpionResultsView({
-    collection: srs, 
-    where: where, 
-    query: q
-  });
+  if (enableScorpion) {
+    srs = new ScorpionResults()
+    srv = new ScorpionResultsView({
+      collection: srs, 
+      where: where, 
+      query: q
+    });
 
-  var sq = new ScorpionQuery({query: q, results: srs});
-  var sqv = new ScorpionQueryView({model: sq, queryview: qv});
-  $("#scorpion-container").append(srv.render().el);
-  $("body").append(sqv.render().$el.hide());
+    sq = new ScorpionQuery({query: q, results: srs});
+    sqv = new ScorpionQueryView({model: sq, queryview: qv});
+    $("#scorpion-container").append(srv.render().el);
+    $("body").append(sqv.render().$el.hide());
 
-  srv.on('modifiedData', function(data) {
-    qv.renderModifiedData(data);
-  });
+    srv.on('modifiedData', function(data) {
+      qv.renderModifiedData(data);
+    });
 
-  q.on('change:db change:table', function() {
-    sq.set('badselection', {});
-    sq.set('goodselection', {});
-  });
-  qv.on('resetState', function() {
-    sq.set('badselection', {});
-    sq.set('goodselection', {});
-    sq.set('selection', {});
-  });
-  qv.on('change:selection', function(selection) {
-    sq.set('selection', selection);
-  });
-  qv.on('change:drawing', function(drawingmodel) {
-    sq.set('drawing', drawingmodel);
-  });
+    q.on('change:db change:table', function() {
+      sq.set('badselection', {});
+      sq.set('goodselection', {});
+    });
+    qv.on('resetState', function() {
+      sq.set('badselection', {});
+      sq.set('goodselection', {});
+      sq.set('selection', {});
+    });
+    qv.on('change:selection', function(selection) {
+      sq.set('selection', selection);
+    });
+    qv.on('change:drawing', function(drawingmodel) {
+      sq.set('drawing', drawingmodel);
+    });
+
+  } else {
+    $("#facet-togglecheckall").css("opacity", 0)
+  }
 
 
   /*
@@ -198,7 +237,7 @@ requirejs([
     q.set(intelq);
   });
   $("#q-load-pp").click(function() { 
-   // q.set(ppq);
+  // q.set(ppq);
     q.set(sigmodq)
   });
   $("#q-load-med").click(function() { 
@@ -213,10 +252,12 @@ requirejs([
 
   window.q = q;
   window.qv = qv;
-  window.sq = sq;
-  window.sqv = sqv;
   window.where = where;
 
+  if (enableScorpion) {
+    window.sq = sq;
+    window.sqv = sqv;
+  }
 
 
 });

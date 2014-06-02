@@ -79,6 +79,8 @@ define(function(require) {
       this.listenTo(this.model, 'change:db', this.resetState);
       this.listenTo(this.model, 'change:table', this.resetState);
       this.listenTo(this.model, 'change:data', this.render);
+      this.listenTo(this.model, 'fetch:start', this.fetchStart);
+      this.listenTo(this.model, 'fetch:end', this.fetchEnd);
     },
 
     resetState: function() {
@@ -95,6 +97,14 @@ define(function(require) {
           nbuckets: 500
         }
       });
+    },
+
+    fetchStart: function() {
+      $("#q_loading").show();
+    },
+
+    fetchEnd: function() {
+      $("#q_loading").hide();
     },
 
     // persistently update scales information
@@ -334,7 +344,7 @@ define(function(require) {
         .selectAll("span")
           .data(ys)
         .enter().append("span")
-          .text(function(d) { return d.alias; })
+          .text(function(d) { return d.expr; })
           .style("background", function(d) { return cscales(d.alias); });
     },
 

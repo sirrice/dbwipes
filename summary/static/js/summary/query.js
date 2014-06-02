@@ -72,6 +72,22 @@ define(function(require) {
     },
 
 
+    fetch: function(options) {
+      var model = this;
+      options || (options = {});
+      options.data || (options.data = this.toJSON());
+      var complete = options.complete;
+      var f = function(resp) {
+        model.trigger('fetch:end');
+        if (complete) complete(model, resp, options);
+      };
+      options.complete = f;
+      
+      this.trigger('fetch:start');
+      return Backbone.Model.prototype.fetch.call(this, options);
+    },
+
+
     // parse /api/query/ results
     parse: function(resp, opts) {
       var xcol = this.get('x'),

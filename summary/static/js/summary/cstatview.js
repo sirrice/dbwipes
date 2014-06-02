@@ -28,6 +28,7 @@ define(function(require) {
 
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
+      if (!window.enableScorpion) this.$('.errcol').hide();
       this.renderPlot(this.$('svg'));
       this.listenTo(this.model, 'setSelection', this.setSelection);
       this.listenTo(this.model, 'clearScorpionSelection', this.clearScorpionSelection);

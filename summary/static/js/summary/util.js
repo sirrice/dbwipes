@@ -14,6 +14,8 @@ define(function(require) {
 
   function negateClause(SQL) {
     if (!SQL) return null;
+    if ($("#selection-type > input[type=checkbox]").get()[0].checked) 
+      return SQL;
     return "not(" + SQL + ")";
   }
 

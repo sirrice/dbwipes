@@ -63,8 +63,9 @@ define(function(require) {
         query.set('where', where);
         query.fetch({
           data: query.toJSON(),
+          context: this,
           success: function(model, resp, opts) {
-            _this.trigger('modifiedData', resp.data);
+            this.trigger('modifiedData', resp.data);
           }
         });
       } else {
