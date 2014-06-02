@@ -65,7 +65,7 @@ define(function(require) {
           data: query.toJSON(),
           context: this,
           success: function(model, resp, opts) {
-            this.trigger('modifiedData', resp.data);
+            _this.trigger('modifiedData', resp.data);
           }
         });
       } else {
