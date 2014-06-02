@@ -75,6 +75,7 @@ requirejs([
     $("#selection-type")
       .attr('title', st_on_text)
       .tooltip('fixTitle')
+      .tooltip('show');
 
 
   var enableScorpion = window.enableScorpion = true;
