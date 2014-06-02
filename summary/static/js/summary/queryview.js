@@ -183,17 +183,19 @@ define(function(require) {
 
     renderModifiedData: function(data) {
       this.$(".updated").remove();
-      this.c.selectAll('g.data-container').classed('background', false);
+      this.c.selectAll('g.data-container')
+        .classed('background', false)
       if (!data) {
         return;
       }
 
       this.setupScales(data);
       this.render();
-      this.c.selectAll('g.data-container').classed('background', true);
+      this.c.selectAll('g.data-container')
+        .classed('background', true)
       var xalias = this.model.get('x').alias;
       var el = this.c.append('g')
-          .attr('class', 'updated');
+          .classed('updated', true)
 
       _.each(this.model.get('ys'), function(ycol) {
         this.renderData(el, data, xalias, ycol.alias);
@@ -222,8 +224,8 @@ define(function(require) {
         dc.selectAll('circle')
             .data(data)
           .enter().append('circle')
+            .classed('mark', true)
             .attr({
-              class: 'mark',
               cx: function(d) { return d.px },
               cy: function(d) { return d.py },
               r: 2,
@@ -244,12 +246,13 @@ define(function(require) {
       var brushf = function(p) {
         var e = brush.extent()
         var selected = {};
-        el.selectAll('.mark')
+        el.selectAll('.data-container:not(.background)')
+            .selectAll('.mark')
           .classed('selected', function(d){
             if (util.isNum(type)) {
-              var minx = e[0][0],
-                  maxx = e[1][0],
-                  x    = d.x;
+              var minx = xscales(e[0][0]),
+                  maxx = xscales(e[1][0]),
+                  x    = d.px;
             } else if (util.isTime(type)) {
               var minx = xscales(e[0][0]),
                   maxx = xscales(e[1][0]),
@@ -266,6 +269,7 @@ define(function(require) {
                 b = bx && by;
 
             if (b) {
+              //console.log([minx, maxx, x, xr, d.x, d.px]);
               var yalias = d.yalias;
               if (!selected[yalias]) selected[yalias] = [];
               selected[yalias].push(d);

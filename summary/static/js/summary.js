@@ -100,6 +100,11 @@ requirejs([
     sq.set('badselection', {});
     sq.set('goodselection', {});
   });
+  qv.on('resetState', function() {
+    sq.set('badselection', {});
+    sq.set('goodselection', {});
+    sq.set('selection', {});
+  });
   qv.on('change:selection', function(selection) {
     sq.set('selection', selection);
   });
@@ -172,6 +177,16 @@ requirejs([
     db: 'med'
   };
 
+  var sigmodq = {
+    x: 'g',
+    ys: [{col: 'v', expr: 'sum(v)'}],
+    scehma: {
+      g: 'num',
+      v: 'num'
+    },
+    table: 'data_3_3_1000_0d50_80uo',
+    db: 'sigmod'
+  };
 
 
   $("#q-load-bt").click(function() { 
@@ -181,7 +196,8 @@ requirejs([
     q.set(intelq);
   });
   $("#q-load-pp").click(function() { 
-    q.set(ppq);
+   // q.set(ppq);
+    q.set(sigmodq)
   });
   $("#q-load-med").click(function() { 
     q.set(medq);

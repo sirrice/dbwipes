@@ -97,6 +97,7 @@ def scorpion_run(db, requestdata, requestid):
 
   try:
     qjson = requestdata.get('query', {})
+    tablename = qjson['table']
     parsed = create_sql_obj(db, qjson)
     print "parsed SQL"
     print parsed
@@ -130,7 +131,7 @@ def scorpion_run(db, requestdata, requestid):
       agg.alias = y['alias']
 
 
-    xtype = db_type(db, table, x['col'])
+    xtype = db_type(db, tablename, x['col'])
 
     errors = []
     for agg in obj.parsed.select.aggregates:
@@ -173,8 +174,10 @@ def scorpion_run(db, requestdata, requestid):
       c=obj.c,
       complexity_multiplier=4.5,
       l=0.6,
-      max_wait=30,
-      DEBUG=True
+      max_wait=10,
+      use_cache=False,
+      granularity=10,
+      DEBUG=False
     )
     cost = time.time() - start
     print "end to end took %.4f" % cost

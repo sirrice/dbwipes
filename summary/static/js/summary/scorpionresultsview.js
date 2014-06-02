@@ -56,6 +56,7 @@ define(function(require) {
       console.log(['setactive', model, this.state.locked, where]);
       //this.state.query.set('where', where);
       this.state.where.setSelection(clauses);
+      this.state.query.attributes.where = where;
 
       if (where) {
         var query = new Query(this.state.query.toJSON());

@@ -30,7 +30,10 @@ SUMMARYCACHE = '.summary.cache'
 
 def json_handler(o):
   if hasattr(o, 'isoformat'):
-    return o.isoformat()
+    s =  o.isoformat()
+    if not s.endswith("Z"):
+      s += 'Z'
+    return s
 
 def returns_json(f):
   @wraps(f)
@@ -40,6 +43,14 @@ def returns_json(f):
       r = json.dumps(r, default=json_handler)
     return Response(r, content_type='application/json')
   return json_returner
+
+def cache_result(key, value):
+  engine = create_engine('postgresql://localhost/cache')
+  db = engine.connect()
+  q = "insert into requests values(%s, %s)"
+  db.execute(q, key, value)
+  db.close()
+  engine.dispose()
 
 @app.before_request
 def before_request():
@@ -228,6 +239,11 @@ def scorpion():
   requestid = request.form.get('requestid')
   if not fake or fake == 'false':
     results = scorpionutil.scorpion_run(g.db, data, requestid)
+    tostore = {
+      'request': str(request.form['json']), 
+      'result':  results
+    }
+    cache_result(str(datetime.now()), json.dumps(tostore, default=json_handler))
     return results
 
   ret = {}
