@@ -74,8 +74,10 @@ requirejs([
   })
   where.on('change:selection', function() {
     var newWhere = util.negateClause(where.toSQL());
+    srv.unlockAll();
     if (q.get('where') != newWhere)
       q.set('where', newWhere);
+
   });
 
 

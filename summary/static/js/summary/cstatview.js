@@ -29,7 +29,8 @@ define(function(require) {
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
       this.renderPlot(this.$('svg'));
-      this.listenTo(this.model, 'setSelection', this.setSelection)
+      this.listenTo(this.model, 'setSelection', this.setSelection);
+      this.listenTo(this.model, 'clearScorpionSelection', this.clearScorpionSelection);
       this.listenTo(this.model, 'change:selection', this.setCount)
       return this;
     },
@@ -212,6 +213,12 @@ define(function(require) {
           .classed('faded', false)
       }
 
+    },
+
+    clearScorpionSelection: function() {
+      this.d3svg.selectAll('.mark')
+        .classed('highlighted', false)
+        .classed('faded', false)
     },
 
 

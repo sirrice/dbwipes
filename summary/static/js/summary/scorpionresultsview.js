@@ -84,6 +84,25 @@ define(function(require) {
       this.setActive(model);
     },
 
+    clickResult: function(view) {
+      var model = (view)? view.model : null;
+      this.$list.find('.filter-clause').removeClass("locked");
+      this.toggleLocked(model); 
+      if (view)
+        view.$('.filter-clause')
+          .toggleClass("locked", this.state.locked == model);
+    },
+
+    unlockAll: function() {
+      if (this.state.locked) {
+        this.$list.find('.filter-clause').removeClass('locked');
+        this.state.locked = null;
+        this.trigger('modifiedData', null);
+        var selection = this.state.where.get('selection');
+        this.state.where.clearScorpionSelections();
+      }
+    },
+
     clear: function() {
       this.collection.reset();
     },
@@ -100,11 +119,7 @@ define(function(require) {
       this.$list.append(view.render().el);
       view.on('selected', function() { _this.setActive(view.model); });
       view.on('unselected', function() { _this.setActive(null); });
-      view.on('click', function() { 
-        _this.$list.find('.filter-clause').removeClass("locked");
-        _this.toggleLocked(view.model); 
-        view.$('.filter-clause').toggleClass("locked", _this.state.locked == view.model);
-      });
+      view.on('click', this.clickResult.bind(this));
       return this;
     }
   });

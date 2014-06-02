@@ -67,7 +67,7 @@ define(function(require) {
       this.ensureX();
       this.ensureYs();
       //this.ensureWhere();
-      console.log("fetching new query")
+      console.log("fetching new query " + this.get('where'))
       this.fetch({data:this.toJSON()});
     },
 

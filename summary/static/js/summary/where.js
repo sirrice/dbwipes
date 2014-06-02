@@ -36,6 +36,13 @@ define(function(require) {
       });
     },
 
+    clearScorpionSelections: function() {
+      this.each(function(model) {
+        model.set('selectiod', [])
+        model.trigger('clearScorpionSelection');
+      });
+    },
+
 
     parse: function(resp) {
       var data = resp.data;
