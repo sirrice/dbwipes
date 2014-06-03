@@ -85,6 +85,7 @@ define(function(require) {
 
     resetState: function() {
       this.state = this.defaults();
+      this.yscale = null;
       this.trigger("resetState");
     },
 
@@ -119,7 +120,9 @@ define(function(require) {
           ip = this.state.ip,
           xs = _.pluck(data, xalias),
           yss = _.map(yaliases, function(yalias) { return _.pluck(data, yalias) }), 
-          newCDomain = _.compact(_.union(this.state.cscales.domain(), yaliases));
+          newCDomain = _.compact(_.union(this.state.cscales.domain(), yaliases)),
+          prevxdomain = this.state.xdomain,
+          prevydomain = this.state.ydomain;
 
       this.state.cscales.domain(newCDomain);
 
@@ -149,12 +152,12 @@ define(function(require) {
         }
         this.state.xscales = xscales;
       }
-      this.state.xscales.domain(this.state.xdomain);
-
       if (this.state.yscales == null) {
         this.state.yscales = d3.scale.linear()
           .range([this.state.h-ip, 0+ip])
       }
+      
+      this.state.xscales.domain(this.state.xdomain);
       this.state.yscales.domain(this.state.ydomain);
 
       if (!this.state.xaxis) {
@@ -175,35 +178,48 @@ define(function(require) {
     },
 
     renderAxes: function(el) {
-      var xel = el.append('g')
-        .attr('class', 'axis x xaxis')
-        .attr('transform', "translate(0,"+this.state.h+")");
-      xel.append('rect')
-        .attr('width', this.state.w)
-        .attr('height', this.state.bp)
-        .attr('fill', 'none')
-        .attr('stroke', 'none')
-        .style('pointer-events', 'all')
-      xel.call(this.state.xaxis)
+      if(el.select('.xaxis').size() == 0) {
+        var xel = el.append('g')
+          .attr('class', 'axis x xaxis')
+          .attr('transform', "translate(0,"+this.state.h+")");
+        xel.append('rect')
+          .attr('width', this.state.w)
+          .attr('height', this.state.bp)
+          .attr('fill', 'none')
+          .attr('stroke', 'none')
+          .style('pointer-events', 'all')
+        xel.call(this.state.xaxis)
+      } else {
+        el.select('.axis.x').call(this.state.xaxis);
+      }
 
 
-      var yel = el.append('g')
-        .attr('class', 'axis y yaxis')
-      yel.append('rect')
-        .attr('width', this.state.lp)
-        .attr('height', this.state.h)
-        .attr('x', -this.state.lp)
-        .attr('fill', 'none')
-        .attr('stroke', 'none')
-        .style('pointer-events', 'all')
-      yel.call(this.state.yaxis)
+
+      if (el.select('.yaxis').size() == 0) {
+        var yel = el.append('g')
+          .attr('class', 'axis y yaxis')
+        yel.append('rect')
+          .attr('width', this.state.lp)
+          .attr('height', this.state.h)
+          .attr('x', -this.state.lp)
+          .attr('fill', 'none')
+          .attr('stroke', 'none')
+          .style('pointer-events', 'all')
+        yel.call(this.state.yaxis)
+      } else {
+        el.select('.axis.y').call(this.state.yaxis);
+      }
 
 
-      el.append('g')
-        .attr('transform', 'translate('+(this.state.w/2)+','+(this.state.h+25)+')')
-        .append('text')
-        .data([1])
-        .text(this.model.get('x')['expr'])
+
+      if (el.select('.xaxis-label').size() == 0) {
+        el.append('g')
+          .classed('xaxis-label', true)
+          .attr('transform', 'translate('+(this.state.w/2)+','+(this.state.h+25)+')')
+          .append('text')
+          .data([1])
+          .text(this.model.get('x')['expr'])
+      }
     },
 
     renderModifiedData: function(data) {
@@ -261,6 +277,7 @@ define(function(require) {
     },
 
     renderBrush: function(el) {
+      if (el.select('.brush').size() > 0) return;
       var type = this.model.get('schema')[this.model.get('x').col],
           _this = this,
           xscales = this.state.xscales,
@@ -335,6 +352,16 @@ define(function(require) {
 
 
     renderZoom: function(el) {
+      if (this.yscale) {
+        if (el.select('.axis.y').size() > 0) {
+          this.yzoom.event(el);
+          this.yzoom.scale(this.yscale);
+          this.yzoom.event(el);
+        }
+
+        return;
+      }
+
       var _this = this
           yscales = this.state.yscales,
           yaxis = this.state.yaxis,
@@ -353,6 +380,7 @@ define(function(require) {
               return 1;
             return 0;
           })
+        _this.yscale = d3.event.scale;
 
       };
 
@@ -368,22 +396,21 @@ define(function(require) {
               return 1;
             return 0;
           })
+        _this.xscale = d3.event.scale;
       };
 
 
 
-      var yzoom = d3.behavior.zoom()
+      this.yzoom = yzoom = d3.behavior.zoom()
         .y(this.state.yscales)
-        .scaleExtent([1, 100])
+        //.scaleExtent([1, 100])
         .on('zoom', yzoomf);
 
       el.select('.axis.y').call(yzoom)
-        .on("mousedown.zoom", null)
-        .on("touchstart.zoom", null)
-        .on("touchmove.zoom", null)
-        .on("touchend.zoom", null)
+        .style('cursor', 'ns-resize')
           
-      var xzoom = d3.behavior.zoom()
+      /*
+       this.xzoom = xzoom = d3.behavior.zoom()
         .x(this.state.xscales)
         .scaleExtent([1, 100])
         .on('zoom', xzoomf);
@@ -393,6 +420,7 @@ define(function(require) {
         .on("touchstart.zoom", null)
         .on("touchmove.zoom", null)
         .on("touchend.zoom", null)
+        */
     },
 
     renderLabels: function() {
@@ -437,7 +465,11 @@ define(function(require) {
       console.log("rendering " + this.model.get('where'))
 
 
-      $(this.c[0]).empty()
+      if (!this.state.xaxis) {
+        $(this.c[0]).empty();
+      } else {
+        this.$('.data-container').remove()
+      }
 
       this.setupScales(this.model.get('data'))
       this.renderAxes(this.c)
