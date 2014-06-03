@@ -78,7 +78,7 @@ requirejs([
       .tooltip('show');
 
 
-  var enableScorpion = (window.enableScorpion == null)? true : window.enableScorpion;
+  var enableScorpion = window.enableScorpion = true;
   // define all scorpion related variables so 
   // they can be checked for null
   var srs = null,
