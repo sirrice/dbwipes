@@ -127,7 +127,7 @@ requirejs([
 
     sq = new ScorpionQuery({query: q, results: srs});
     sqv = new ScorpionQueryView({model: sq, queryview: qv});
-    $("#scorpion-container").append(srv.render().el);
+    $("#scorpion-results-container").append(srv.render().el);
     $("body").append(sqv.render().$el.hide());
 
     srv.on('modifiedData', function(data) {

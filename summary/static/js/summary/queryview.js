@@ -175,14 +175,29 @@ define(function(require) {
     },
 
     renderAxes: function(el) {
-      el.append('g')
+      var xel = el.append('g')
         .attr('class', 'axis x xaxis')
-        .attr('transform', "translate(0,"+this.state.h+")")
-        .call(this.state.xaxis)
+        .attr('transform', "translate(0,"+this.state.h+")");
+      xel.append('rect')
+        .attr('width', this.state.w)
+        .attr('height', this.state.bp)
+        .attr('fill', 'none')
+        .attr('stroke', 'none')
+        .style('pointer-events', 'all')
+      xel.call(this.state.xaxis)
 
-      el.append('g')
+
+      var yel = el.append('g')
         .attr('class', 'axis y yaxis')
-        .call(this.state.yaxis)
+      yel.append('rect')
+        .attr('width', this.state.lp)
+        .attr('height', this.state.h)
+        .attr('x', -this.state.lp)
+        .attr('fill', 'none')
+        .attr('stroke', 'none')
+        .style('pointer-events', 'all')
+      yel.call(this.state.yaxis)
+
 
       el.append('g')
         .attr('transform', 'translate('+(this.state.w/2)+','+(this.state.h+25)+')')
@@ -320,17 +335,64 @@ define(function(require) {
 
 
     renderZoom: function(el) {
-      var _this = this;
-      function zoomed() {
-        el.select('.xaxis').call(_this.state.xaxis);
-      };
-      var zoom = d3.behavior.zoom()
-        .x(this.state.xscales)
-        .y(this.state.yscales)
-        .scaleExtent([1, 5])
-        .on('zoom', zoomed);
+      var _this = this
+          yscales = this.state.yscales,
+          yaxis = this.state.yaxis,
+          xscales = this.state.xscales,
+          xaxis = this.state.xaxis;
 
-      zoom(el);
+      function yzoomf() {
+        el.select('.axis.y').call(yaxis);
+        el.selectAll('.mark')
+          .attr('cy', function(d) {
+            return yscales(d.y);
+          })
+          .style('opacity', function(d) {
+            if (yscales.range()[0] >= yscales(d.y) && 
+                yscales(d.y) >= yscales.range()[1])
+              return 1;
+            return 0;
+          })
+
+      };
+
+      function xzoomf() {
+        el.select('.axis.x').call(xaxis);
+        el.selectAll('.mark')
+          .attr('cx', function(d) {
+            return xscales(d.x);
+          })
+          .style('opacity', function(d) {
+            if (xscales.range()[0] <= xscales(d.x) && 
+                xscales(d.x) <= xscales.range()[1])
+              return 1;
+            return 0;
+          })
+      };
+
+
+
+      var yzoom = d3.behavior.zoom()
+        .y(this.state.yscales)
+        .scaleExtent([1, 100])
+        .on('zoom', yzoomf);
+
+      el.select('.axis.y').call(yzoom)
+        .on("mousedown.zoom", null)
+        .on("touchstart.zoom", null)
+        .on("touchmove.zoom", null)
+        .on("touchend.zoom", null)
+          
+      var xzoom = d3.behavior.zoom()
+        .x(this.state.xscales)
+        .scaleExtent([1, 100])
+        .on('zoom', xzoomf);
+
+      el.select('.axis.x').call(xzoom)
+        .on("mousedown.zoom", null)
+        .on("touchstart.zoom", null)
+        .on("touchmove.zoom", null)
+        .on("touchend.zoom", null)
     },
 
     renderLabels: function() {
@@ -389,6 +451,7 @@ define(function(require) {
       }, this);
       this.renderBrush(this.c);
       this.renderLabels(this.c);
+      this.renderZoom(this.c);
 
       this.dv = new DrawingView({state: this.state});
       this.listenTo(this.dv, "change:drawing", (function() {

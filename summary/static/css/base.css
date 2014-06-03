@@ -208,14 +208,16 @@ body table.tuples tr th {
   position: absolute;
   top: 8em;
   left: 0px;
+  background: white;
+  z-index: 9999;
 }
 #walkthrough-container .walkthrough {
   width: 40%;
+  position: fixed;
+  left: -10px;
   background: white;
   border: 10px solid #647ca0;
   padding: 1em;
-  position: fixed;
-  left: -10px;
   padding-top: 0px;
   box-shadow: 4px 4px 10px -4px #929292;
 }
@@ -385,6 +387,7 @@ body table.tuples tr th {
     -webkit-transform: scale(1);
   }
 }
+/* Thanks http://proto.io/freebies/onoff/ !! */
 .onoffswitch {
   position: relative;
   width: 102px;
