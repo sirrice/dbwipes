@@ -96,8 +96,9 @@ body rect.extent {
   shape-rendering: crispEdges;
 }
 body .background .mark {
-  fill-opacity: 0.25;
-  stroke-opacity: 0.25;
+  fill-opacity: 0.15;
+  stroke-opacity: 0.05;
+  fill: grey;
 }
 body table.tuples {
   margin: 1em;
@@ -117,10 +118,10 @@ body table.tuples tr th {
   background: white;
   padding-bottom: 2em;
 }
-#query-container .legend {
+#right .legend {
   margin-top: 10px;
 }
-#query-container .legend span {
+#right .legend span {
   padding: 3px;
   padding-left: 1em;
   padding-right: 1em;

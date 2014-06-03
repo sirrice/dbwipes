@@ -14,8 +14,8 @@ define(function(require) {
         score: 0,
         count: 0,
         c_range: [],     // [minc, maxc]
-        clauses: [],    // { col:, type:, vals: }
-        alt_clauses: [], // {col:, type:, vals:}
+        clauses: [],     // { col:, type:, vals: }
+        alt_rules: [],   // [ {col:, type:, vals:} ]
         id: ScorpionResult._id++
       }
     },
@@ -33,15 +33,18 @@ define(function(require) {
             vals = _.map(c.vals, function(v) {return v.toPrecision(3); });
           return util.toWhereClause(c.col, c.type, vals);//.substr(0, 20);
         }),
-        alt_clauses: _.map(this.get('alt_clauses'), function(c) {
-          var vals = c.vals;
-          if (util.isNum(c.type))
-            vals = _.map(c.vals, function(v) {return v.toPrecision(3); });
-          return util.toWhereClause(c.col, c.type, vals);//.substr(0, 20);
+        alt_rules: _.map(this.get('alt_rules'), function(r) {
+          return _.map(r, function(c) {
+            var vals = c.vals;
+            if (util.isNum(c.type))
+              vals = _.map(c.vals, function(v) {return v.toPrecision(3); });
+            return util.toWhereClause(c.col, c.type, vals);//.substr(0, 20);
+          });
         }),
         c_range: this.get('c_range').join(' - '),
         yalias: this.get('yalias')
       };
+      console.log(json)
       return json;
     },
 

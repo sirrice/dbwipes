@@ -26,6 +26,9 @@ define(function(require) {
 
     initialize: function(attrs) {
       this.queryview = attrs.queryview;
+      this.donetext = "click when done drawing";
+      this.drawtext = "click to draw expected values for selected results";
+
       this.listenTo(this.model, 'change', this.onChange);
     },
 
@@ -106,16 +109,17 @@ define(function(require) {
     onDrawToggle: function() {
       var draw = this.$("#draw")
           qv = this.queryview;
+      
       if (qv.brushStatus() == 'all') {
         qv.disableBrush();
         qv.dv.enable();
         draw.addClass("drawing");
-        draw.text("click when done drawing");
+        draw.text(this.donetext);
       } else {
         qv.enableBrush();
         qv.dv.disable();
         draw.removeClass("drawing");
-        draw.text("click to draw");
+        draw.text(this.drawtext);
       }
     },
 
@@ -128,7 +132,7 @@ define(function(require) {
 
       var draw = this.$("#draw");
       var qv = this.queryview;
-      draw.text((qv.brushStatus() == 'all')? "click to draw" : "click when done drawing")
+      draw.text((qv.brushStatus() == 'all')? this.drawtext : this.donetext);
 
       return this;
     },

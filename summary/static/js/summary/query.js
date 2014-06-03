@@ -12,10 +12,12 @@ define(function(require) {
 
     defaults: function() {
       return {
-        x: null,        // { col:, expr:}
+        x: null,           // { col:, expr:}
         ys: null,
-        schema: null,   // { col -> type }
-        where: null,    // string
+        schema: null,      // { col -> type }
+        where: null,       // this changes depending on how user inteacts with rules/selection
+        basewhere: null,   // this WHERE is part of the query and should not be modified
+                           // only way to set basewhere is to click on a rule
         table: null,
         db: null,
         data: null,
@@ -157,8 +159,12 @@ define(function(require) {
       select = "SELECT " + select.join(', ');
 
       var from = 'FROM ' + this.get('table');
-      var where = this.get('where');
-      where = (where && where != '')? 'WHERE ' + where : null;
+      var basewhere = this.get('basewhere');
+      basewhere = (basewhere && basewhere != '')? basewhere : null;
+      var extrawhere = this.get('where');
+      extrawhere = (extrawhere && extrawhere != '')? extrawhere : null;
+      var where = _.compact([basewhere, extrawhere]);
+      where = (where.length)? 'WHERE ' + where.join(' AND ') : null;
       var groupby = 'GROUP BY ' + this.get('x').expr;
       var orderby = 'ORDER BY ' + this.get('x').expr;
       var limit = this.get('limit');

@@ -211,16 +211,13 @@ def create_scorpion_results(obj):
   nrules = 6 
   for yalias, clauses in obj.clauses.items():
     rules = [p[0] for p in obj.rules[yalias]]
-    clauses = [c.strip() for c in clauses]
 
-    for rule, clause in zip(rules[:nrules], clauses[:nrules]):
+    for rule in rules:
       clause_parts = rule.toCondDicts()
-      equiv_clause_parts = {}
+      alt_rules = []
       for r in rule.cluster_rules:
         dicts = r.toCondDicts()
-        for d in dicts:
-          equiv_clause_parts[str(d)] = d
-      equiv_clause_parts = equiv_clause_parts.values()
+        alt_rules.append(dicts)
       idx += 1
 
       rnd = lambda v: round(v, 3)
@@ -231,7 +228,7 @@ def create_scorpion_results(obj):
         'score': rnd(rule.quality),
         'c_range': map(rnd, rule.c_range),
         'clauses': clause_parts,
-        'alt_clauses': equiv_clause_parts
+        'alt_rules': alt_rules
       }
 
       results.append(result)

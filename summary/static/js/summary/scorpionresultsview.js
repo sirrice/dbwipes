@@ -58,21 +58,7 @@ define(function(require) {
       this.state.where.setSelection(clauses);
       this.state.query.attributes.where = where;
 
-      if (where) {
-        var query = new Query(this.state.query.toJSON());
-        query.set('where', where);
-        query.fetch({
-          data: query.toJSON(),
-          context: this,
-          success: function(model, resp, opts) {
-            _this.trigger('modifiedData', resp.data);
-          }
-        });
-      } else {
-        this.trigger('modifiedData', null);
-      }
-
-      this.trigger('setActive', model);
+      this.trigger('setActive', where);
     },
 
     toggleLocked: function(model) {

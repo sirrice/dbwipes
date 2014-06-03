@@ -27,11 +27,11 @@ define(function(require) {
       var toggle = this.$(".equiv-toggle"),
           equiv = this.$(".equiv-clauses");
 
-      if (toggle.text() == 'expand') {
+      if (toggle.text() == 'show rules in cluster') {
         toggle.text('hide');
         equiv.show();
       } else {
-        toggle.text('expand');
+        toggle.text('show rules in cluster');
         equiv.hide();
       }
     },

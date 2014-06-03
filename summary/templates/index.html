@@ -69,6 +69,7 @@
       <span id="q-load-intel" class='btn'>load yy</span>
       <span id="q-load-med" class='btn'>load ii</span>
       <span id="q-load-pp" class='btn'>load zz</span>
+      <span id="q-load-fec" class='btn'>load fec</span>
     </div>
   </div>
 
@@ -164,16 +165,18 @@
         <li class='clause-part'>{{this}}</li>
       {{/each}}
     </ul>
-    {{#if alt_clauses}}
+    {{#if alt_rules}}
     <div class="equiv-toggle-container">
-      <div class="equiv-toggle">expand</div>
+      <div class="equiv-toggle">show rules in cluster</div>
     </div>
     <div class="equiv-clauses" style="display:none;">
-      <ul class="equiv-clause">
-        {{#each alt_clauses}}
-        <li class="clause-part">{{this}}</li>
+        {{#each alt_rules}}
+        <ul class="equiv-clause">
+          {{#each this}}
+            <li class="clause-part">{{this}}</li>
+          {{/each}}
+        </ul>
         {{/each}}
-      </ul>
     </div>
     {{/if}}
   </div>
@@ -225,7 +228,7 @@
       <div class="row">
         <div class="col-sm-12">
           <span id="draw" class="form-control btn btn-default" >
-            click to draw
+            click to draw expected values for selected results
           </span>
         </div>
       </div>

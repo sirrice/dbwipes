@@ -88,6 +88,14 @@ def teardown_request(exception):
     pass
 
 
+@app.route('/1/', methods=["POST", "GET"])
+def index1():
+  return render_template("index1.html")
+
+@app.route('/2/', methods=["POST", "GET"])
+def index2():
+  return render_template("index2.html")
+
 
 @app.route('/', methods=["POST", "GET"])
 def index():
@@ -255,8 +263,8 @@ def scorpion():
       'clauses': [
         {'col': 'sensor', 'type': 'str', 'vals': map(str, [18])}
       ],
-      'alt_clauses': [
-        {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]}
+      'alt_rules': [
+        [ {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]}]
       ]
     },
     {
@@ -267,7 +275,11 @@ def scorpion():
         {'col': 'voltage', 'type': 'num', 'vals': [0, 2.15]},
         {'col': 'sensor', 'type': 'str', 'vals': ['18']}
       ],
-      'alt_clauses': [
+      'alt_rules': [
+        [ {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]},
+          {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]} ],
+        [ {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]},
+          {'col': 'humidity', 'type': 'num', 'vals': [0, 1.4]} ]
       ]
     }
   ]

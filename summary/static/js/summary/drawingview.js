@@ -73,6 +73,7 @@ define(function(require) {
         .attr("height", this.state.h)
 
       var g = this.d3g = d3svg.append('g')
+        .classed("drawing-container", true)
         .style("pointer-events", "all")
         .on('mousedown', this.onDown.bind(this))
         .on('mousemove', this.onMove.bind(this))

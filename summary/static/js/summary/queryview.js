@@ -7,7 +7,8 @@ define(function(require) {
       Where = require('summary/where'),
       util = require('summary/util'),
       DrawingView = require('summary/drawingview'),
-      QueryForm = require('summary/queryform');
+      QueryForm = require('summary/queryform'),
+      Query = require('summary/query');
 
 
 
@@ -220,6 +221,30 @@ define(function(require) {
           .data([1])
           .text(this.model.get('x')['expr'])
       }
+    },
+
+    // set base plot to background and render
+    // result with WHERE clause
+    renderWhereOverlay: function(where) {
+      if (!where) {
+        this.cancelWhereOverlay();
+        return;
+      }
+      var query = new Query(this.model.toJSON());
+      query.set('where', where);
+      query.fetch({
+        data: query.toJSON(),
+        context: this,
+        success: (function(model, resp, opts) {
+          this.renderModifiedData(resp.data);
+        }).bind(this)
+      });
+      return this;
+    },
+
+    cancelWhereOverlay: function() {
+      this.renderModifiedData(null);
+      return this;
     },
 
     renderModifiedData: function(data) {
@@ -485,6 +510,8 @@ define(function(require) {
       this.renderLabels(this.c);
       this.renderZoom(this.c);
 
+      
+      this.$(".drawing-container").remove()
       this.dv = new DrawingView({state: this.state});
       this.listenTo(this.dv, "change:drawing", (function() {
         this.trigger('change:drawing', this.dv.model);

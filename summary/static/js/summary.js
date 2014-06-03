@@ -1,6 +1,6 @@
 requirejs.config({
   //By default load any module IDs from js/lib
-  baseUrl: 'static/js/lib',
+  baseUrl: '/static/js/lib',
 
   //except, if the module ID starts with "app",
   //load it from the js/app directory. paths
@@ -78,7 +78,7 @@ requirejs([
       .tooltip('show');
 
 
-  var enableScorpion = window.enableScorpion = true;
+  var enableScorpion = (window.enableScorpion == null)? true : window.enableScorpion;
   // define all scorpion related variables so 
   // they can be checked for null
   var srs = null,
@@ -110,8 +110,12 @@ requirejs([
     var newWhere = util.negateClause(where.toSQL());
     if (srv)
       srv.unlockAll();
-    if (q.get('where') != newWhere)
-      q.set('where', newWhere);
+    if (newWhere && q.get('where') != newWhere) {
+      qv.renderWhereOverlay(newWhere);
+    } else {
+      qv.cancelWhereOverlay();
+      //q.set('where', newWhere);
+    }
 
   });
 
@@ -130,8 +134,8 @@ requirejs([
     $("#scorpion-results-container").append(srv.render().el);
     $("body").append(sqv.render().$el.hide());
 
-    srv.on('modifiedData', function(data) {
-      qv.renderModifiedData(data);
+    srv.on('setActive', function(where) {
+      qv.renderWhereOverlay(where);
     });
 
     q.on('change:db change:table', function() {
@@ -219,6 +223,17 @@ requirejs([
     db: 'med'
   };
 
+  var fecq = {
+    x: 'disb_dt',
+    ys: [{col: 'disb_amt', expr: 'sum(disb_amt)'}],
+    scehma: {
+      disb_dt: 'timestamp',
+      disb_amt: 'num'
+    },
+    table: 'expenses',
+    db: 'fec12'
+  };
+
   var sigmodq = {
     x: 'g',
     ys: [{col: 'v', expr: 'sum(v)'}],
@@ -244,6 +259,10 @@ requirejs([
   $("#q-load-med").click(function() { 
     q.set(medq);
   });
+  $("#q-load-fec").click(function() { 
+    q.set(fecq);
+  });
+
 
 
   q.set(intelq);
