@@ -209,8 +209,7 @@ def create_scorpion_results(obj):
   results = []
   idx = 0
   nrules = 6 
-  for yalias, clauses in obj.clauses.items():
-    rules = [p[0] for p in obj.rules[yalias]]
+  for yalias, rules in obj.rules.items():
 
     for rule in rules:
       clause_parts = rule.toCondDicts()
