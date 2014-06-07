@@ -247,6 +247,7 @@ def scorpion():
   requestid = request.form.get('requestid')
   if not fake or fake == 'false':
     results = scorpionutil.scorpion_run(g.db, data, requestid)
+    print results
     tostore = {
       'request': str(request.form['json']), 
       'result':  results

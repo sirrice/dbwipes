@@ -71,7 +71,6 @@ define(function(require) {
       this.model.set('ignore_cols', ignore_cols);
 
       $.get('/api/requestid', function(resp) {
-        console.log(resp);
         var requestid = resp.requestid;
         var wait = $("#scorpion-wait").show();
         _this.model.fetch({

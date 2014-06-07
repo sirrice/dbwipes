@@ -174,8 +174,8 @@ def scorpion_run(db, requestdata, requestid):
       c=obj.c,
       complexity_multiplier=4.5,
       l=0.6,
-      max_wait=10,
-      use_cache=False,
+      max_wait=25,
+      use_cache=True,
       granularity=10,
       ignore_attrs=obj.ignore_attrs,
       DEBUG=False

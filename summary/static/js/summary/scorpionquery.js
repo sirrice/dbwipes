@@ -110,6 +110,8 @@ define(function(require) {
       //
       // [ { score:, c_range:, clauses:, alt_clauses:, } ]
       //
+      console.log("scorpionquery got response");
+      console.log(resp);
       if (resp.results) {
         var q = this.get('query'),
             results = this.get('results');
