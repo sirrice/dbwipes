@@ -11,11 +11,12 @@ psycopg2.extensions.register_type(DEC2FLOAT)
 
 
 PORT = 8111
-HOST = '128.52.160.140'
-print "running on %s:%d" % (HOST, PORT)
+HOST = 'localhost' #128.52.160.140'
 
 if len(sys.argv) > 1:
   HOST = sys.argv[1]
+
+print "running on %s:%d" % (HOST, PORT)
 
 app.run(host=HOST, port=PORT, debug=True, threaded=True)
 

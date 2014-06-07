@@ -27,7 +27,7 @@ define(function(require) {
 
 
     initialize: function() {
-      this.on('change', this.onChange);
+      this.on('change:x change:ys change:basewhere', this.onChange);
       this.on('change:db change:table', this.onChangeDB);
     },
 
@@ -75,17 +75,17 @@ define(function(require) {
 
 
     fetch: function(options) {
+      $("#q_loading").show();
       var model = this;
       options || (options = {});
       options.data || (options.data = this.toJSON());
       var complete = options.complete;
       var f = function(resp) {
-        model.trigger('fetch:end');
+        $("#q_loading").hide()
         if (complete) complete(model, resp, options);
       };
       options.complete = f;
       
-      this.trigger('fetch:start');
       return Backbone.Model.prototype.fetch.call(this, options);
     },
 
