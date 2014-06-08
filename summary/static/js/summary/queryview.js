@@ -90,13 +90,6 @@ define(function(require) {
 
     onChange: function() {
       return;
-      this.model.get('where').fetch({
-        data: {
-          db: this.model.get('db'),
-          table: this.model.get('table'),
-          nbuckets: 500
-        }
-      });
     },
 
     // persistently update scales information

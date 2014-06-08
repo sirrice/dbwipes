@@ -45,6 +45,12 @@ define(function(require) {
         this.statusview.$el.remove();
         this.statusview = null;
       }
+
+      // hide the partial results
+      $("#scorpion-partialresults-container").fadeOut(500);
+      $("#scorpion-results-container").fadeIn(500);
+      this.model.get('partialresults').reset();
+
       if (resp.errmsg) {
         this.$("#errmsg").text(resp.errormsg);
       } else {
@@ -75,7 +81,7 @@ define(function(require) {
         var wait = $("#scorpion-wait").show();
         _this.model.fetch({
           data: {
-            fake: false,
+            fake: !$("#fake-type > input[type=checkbox]").get()[0].checked,
             requestid: requestid,
             json: JSON.stringify(_this.model.toJSON()) ,
             db: _this.model.get('query').get('db')
@@ -84,9 +90,17 @@ define(function(require) {
           success: _this.onResult.bind(_this),
           error: _this.onResult.bind(_this)
         });
-        _this.statusview = new StatusView({ requestid: requestid });
+
+        _this.statusview = new StatusView({ 
+          requestid: requestid ,
+          query: _this.model.get('query'),
+          results: _this.model.get('partialresults')
+        });
         _this.statusview.render();
         $("#scorpion_status").append(_this.statusview.$el);
+
+        $("#scorpion-results-container").fadeOut(500);
+        $("#scorpion-partialresults-container").fadeIn(500);
       }, 'json')
     },
 

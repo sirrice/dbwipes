@@ -19,7 +19,7 @@
       <div class="col-md-3">
         <span id="facet-togglecheckall" state='checked' class="btn btn-primary btn-sm">uncheck all</span>
       </div>
-      <div class="col-md-9">
+      <div class="col-md-3">
         <span>
           <div id="selection-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
               <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
@@ -29,6 +29,18 @@
               </label>
           </div>
         </span>
+      </div>
+      <div class="col-md-6">
+        <span>
+          <div id="fake-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
+              <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="fakeswitch" checked>
+              <label class="onoffswitch-label" for="fakeswitch">
+                  <span class="onoffswitch-inner"></span>
+                  <span class="onoffswitch-switch"></span>
+              </label>
+          </div>
+        </span>
+
       </div>
     </div>
 
@@ -54,7 +66,17 @@
   <div class="col-md-6" style="padding-left:5em;">
     <div class="row">
       <div class="col-md-10" style="margin-top: 600px;">
-        <div id="scorpion-results-container"></div>
+        <div id="scorpion-results-container" style="display:none">
+          <h2>Final Scorpion Results</h2>
+        </div>
+        <div id="scorpion-partialresults-container" style="display:none">
+          <h2>
+            Partial Results
+            <span style="font-size:12pt; color: grey;">
+              These results may change as scorpion refines the results
+            </span>
+          </h2>
+        </div>
       </div>
     </div>
   </div>

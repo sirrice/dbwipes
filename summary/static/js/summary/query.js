@@ -63,6 +63,7 @@ define(function(require) {
 
     onChangeDB: function() {
       this.set('where', null);
+      this.onChange()
     },
 
     onChange: function() {

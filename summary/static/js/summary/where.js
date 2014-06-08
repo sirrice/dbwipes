@@ -38,7 +38,7 @@ define(function(require) {
 
     clearScorpionSelections: function() {
       this.each(function(model) {
-        model.set('selectiod', [])
+        model.set('selection', [])
         model.trigger('clearScorpionSelection');
       });
     },

@@ -13,34 +13,24 @@ from datetime import datetime
 from sqlalchemy import *
 from flask import Flask, request, render_template, g, redirect, Response
 from flask.ext.compress import Compress
-from flask.ext.cache import Cache
 
 
 from summary import Summary
+from scorpion.util import ScorpionEncoder
 import scorpionutil
 
 app = Flask(__name__)
 Compress(app)
-#app = Cache(app, config={'CACHE_TYPE': 'simple'})
 SUMMARYCACHE = '.summary.cache'
 
 
-
-
-
-def json_handler(o):
-  if hasattr(o, 'isoformat'):
-    s =  o.isoformat()
-    if not s.endswith("Z"):
-      s += 'Z'
-    return s
 
 def returns_json(f):
   @wraps(f)
   def json_returner(*args, **kwargs):
     r = f(*args, **kwargs)
     if not isinstance(r, basestring):
-      r = json.dumps(r, default=json_handler)
+      r = json.dumps(r, cls=ScorpionEncoder)
     return Response(r, content_type='application/json')
   return json_returner
 
@@ -163,25 +153,40 @@ def requestid():
 
 @app.route('/api/status/', methods=['POST', 'GET'])
 @returns_json
-def status():
+def api_status():
   try:
     from scorpion.util import Status
     rid = int(request.args.get('requestid'))
 
     status = Status(rid)
     ret = status.latest_status()
+    label_rules = status.get_rules()
     status.close()
-    return {'status': ret}
+
+    partial_rules = []
+    for label, rules in label_rules:
+      partial_rules.extend(rules)
+    rules_hash = hash(str(partial_rules))
+
+    return {
+      'status': ret,
+      'results': partial_rules,
+      'hash': rules_hash
+    }
   except Exception as e:
-    return {'status': str(e)}
+    return {
+      'status': str(e),
+      'results': []
+    }
+
 
 
 @app.route('/api/query/', methods=['POST', 'GET'])
 @returns_json
 def query():
-  #x = request.args.get('x')
-  #ys = request.args.get('ys')
-  #where = request.args.get('where')
+  x = request.args.get('x')
+  ys = request.args.get('ys')
+  where = request.args.get('where')
   table = request.args.get('table')
   dbname = request.args.get('db')
   query = request.args.get('query')
@@ -247,12 +252,8 @@ def scorpion():
   requestid = request.form.get('requestid')
   if not fake or fake == 'false':
     results = scorpionutil.scorpion_run(g.db, data, requestid)
-    print results
-    tostore = {
-      'request': str(request.form['json']), 
-      'result':  results
-    }
-    cache_result(str(datetime.now()), json.dumps(tostore, default=json_handler))
+    pdb.set_trace()
+    print json.dumps(results, cls=ScorpionEncoder)
     return results
 
   ret = {}
@@ -284,8 +285,15 @@ def scorpion():
       ]
     }
   ]
-  ret['results'] = results
 
+  from scorpion.util import Status
+  status = Status(requestid)
+  status.update_rules('label', results)
+  status.close()
+
+  time.sleep(3)
+
+  ret['results'] = results
   return ret
 
 

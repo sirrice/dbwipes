@@ -84,7 +84,9 @@ requirejs([
   var srs = null,
       srv = null,
       sq = null,
-      sqv = null;
+      sqv = null,
+      psrs = null,
+      psrv = null;
 
 
   var q = new Query();
@@ -108,8 +110,10 @@ requirejs([
   })
   where.on('change:selection', function() {
     var newWhere = util.negateClause(where.toSQL());
-    if (srv)
+    if (srv) {
       srv.unlockAll();
+      psrv.unlockAll();
+    }
     if (newWhere && q.get('where') != newWhere) {
       qv.renderWhereOverlay(newWhere);
     } else {
@@ -128,15 +132,35 @@ requirejs([
       where: where, 
       query: q
     });
-
-    sq = new ScorpionQuery({query: q, results: srs});
-    sqv = new ScorpionQueryView({model: sq, queryview: qv});
+    psrs = new ScorpionResults()
+    psrv = new ScorpionResultsView({
+      collection: psrs, 
+      where: where, 
+      query: q
+    });
     $("#scorpion-results-container").append(srv.render().el);
+    $("#scorpion-partialresults-container").append(psrv.render().el);
+
+
+
+    sq = new ScorpionQuery({
+      query: q, 
+      results: srs, 
+      partialresults: psrs
+    });
+    sqv = new ScorpionQueryView({
+      model: sq, 
+      queryview: qv
+    });
     $("body").append(sqv.render().$el.hide());
 
     srv.on('setActive', function(where) {
       qv.renderWhereOverlay(where);
     });
+    psrv.on('setActive', function(where) {
+      qv.renderWhereOverlay(where);
+    });
+
 
     q.on('change:db change:table', function() {
       sq.set('badselection', {});
@@ -277,6 +301,11 @@ requirejs([
   if (enableScorpion) {
     window.sq = sq;
     window.sqv = sqv;
+    window.srs = srs;
+    window.srv = srv;
+    window.psrs = psrs;
+    window.psrv = psrv;
+
   }
 
 

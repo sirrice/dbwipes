@@ -69,15 +69,19 @@ define(function(require) {
         scales = d3.scale.ordinal();
       
       if (scaletype == 'y' && util.isNum(type)) {
-        if (domain[1] > Math.max(1,domain[0]) * 100)  {
+        if (domain[1] > d3.max([1,domain[0]]) * 100)  {
           scales = d3.scale.log()
-          domain[0] = Math.max(domain[0], 1);
+          domain[0] = d3.max([domain[0], 1]);
         }
       }
 
       scales.domain(domain).range(range);
-      if (util.isStr(type))
-        scales.rangeRoundBands(range, 0.1);
+      if (util.isStr(type)) {
+        scales.rangeRoundBands(range);//, 0.1);
+        if (scales.rangeBand() <= 2) {
+          scales.rangePoints(range);
+        }
+      }
       return scales;
     },
 
@@ -108,9 +112,9 @@ define(function(require) {
           .enter().append('rect')
             .attr({
               class: 'mark',
-              width: xscales.rangeBand(),
+              width: d3.max([1,xscales.rangeBand()]),
               height: function(d) {return yscales(d.count)},
-              x: function(d) {return xscales(d.val)},
+              x: function(d) { return xscales(d.val) },
               y: function(d) { return h-yscales(d.count)}
             })
       } else {
@@ -127,10 +131,10 @@ define(function(require) {
           width = d3.min(intervals) - 0.5
         if (!width)
           width = 10;
-        this.state.rectwidth = width = Math.max(1, width)
+        this.state.rectwidth = width = d3.max([1, width])
 
-        var minv = xscales.invert(d3.min(xs) - Math.max(5, width)),
-            maxv = xscales.invert(d3.max(xs) + Math.max(5, width));
+        var minv = xscales.invert(d3.min(xs) - d3.max([5, width])),
+            maxv = xscales.invert(d3.max(xs) + d3.max([5, width]));
         xscales.domain([minv, maxv]);
 
         if (!_.isNaN(xscales.domain()[0]) && col == 'light'){
@@ -152,7 +156,7 @@ define(function(require) {
           .enter().append('rect')
             .attr({
               class: 'mark',
-              width: function(d) { return Math.max(width, xscales(d.range[1]) - xscales(d.range[0])) },
+              width: function(d) { return d3.max([width, xscales(d.range[1]) - xscales(d.range[0])]) },
               height: function(d) {return h-yscales(d.count)},
               x: function(d) {return xscales(d.range[0]);},
               y: function(d) { return yscales(d.count)}
@@ -189,8 +193,8 @@ define(function(require) {
       if (clause) {
         if (!util.isStr(clause.type)) {
           var extent = [
-            Math.max(clause.vals[0], this.state.xscales.domain()[0]),
-            Math.min(clause.vals[1], this.state.xscales.domain()[1])
+            d3.max([clause.vals[0], this.state.xscales.domain()[0]]),
+            d3.min([clause.vals[1], this.state.xscales.domain()[1]])
           ];
           this.d3brush.extent(extent);
         }
@@ -282,12 +286,12 @@ define(function(require) {
         el.select('.axis.x').call(xaxis);
         el.selectAll('.mark') 
           .attr('x', function(d) {
-            return Math.max(xscales.range()[0], xscales(d.range[0]))
+            return d3.max([xscales.range()[0], xscales(d.range[0])]);
           })
           .attr('width', function(d) {
-            var minx = Math.max(xscales.range()[0], xscales(d.range[0]));
+            var minx = d3.max([xscales.range()[0], xscales(d.range[0])]);
             if (xscales(d.range[1]) < minx) return 0;
-            return Math.max(width, xscales(d.range[1]) - minx)
+            return d3.max([width, xscales(d.range[1]) - minx])
           })
           /*.style('display', function(d) {
             var x = xscales(d.val);

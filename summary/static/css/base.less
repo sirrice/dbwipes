@@ -250,6 +250,23 @@ body {
 
 
   } /* /.scorpion-result */
+
+}
+
+#scorpion-partialresults-container {
+  .scorpion-result {
+    .filter-clause {
+      background: rgb(151, 151, 151);
+    }
+    
+    .equiv-clause, .equiv-toggle {
+      background: rgb(123, 128, 133);
+    }
+      
+    .filter-clause:hover, .equiv-toggle:hover {
+      background: rgb(123, 128, 133);
+    }
+  }
 }
 
 
@@ -485,13 +502,11 @@ body {
 }
 
 .onoffswitch-inner:before {
-    content: "Select";
     padding-left: 12px;
     background-color: #EBEBEB; color: #000000;
 }
 
 .onoffswitch-inner:after {
-    content: "Remove";
     padding-right: 12px;
     background-color: #EBEBEB; color: #000000;
     text-align: right;
@@ -513,5 +528,27 @@ body {
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px; 
     background-color: #6ADE85; 
+}
+
+
+#selection-type {
+  .onoffswitch-inner:before {
+      content: "Select";
+  }
+
+  .onoffswitch-inner:after {
+      content: "Remove";
+  }
+}
+
+
+#fake-type {
+  .onoffswitch-inner:before {
+      content: "Real";
+  }
+
+  .onoffswitch-inner:after {
+      content: "Fake";
+  }
 }
 

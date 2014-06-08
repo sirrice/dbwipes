@@ -174,8 +174,8 @@ def scorpion_run(db, requestdata, requestid):
       c=obj.c,
       complexity_multiplier=4.5,
       l=0.6,
-      max_wait=25,
-      use_cache=True,
+      max_wait=20,
+      use_cache=False,
       granularity=10,
       ignore_attrs=obj.ignore_attrs,
       DEBUG=False
@@ -206,31 +206,11 @@ def create_scorpion_results(obj):
   Given the resulting rule clusters, package them into renderable
   JSON objects
   """
+  from scorpion.learners.cn2sd.rule import rule_to_json
   results = []
-  idx = 0
   nrules = 6 
   for yalias, rules in obj.rules.items():
-
     for rule in rules:
-      clause_parts = rule.toCondDicts()
-      alt_rules = []
-      for r in rule.cluster_rules:
-        dicts = r.toCondDicts()
-        alt_rules.append(dicts)
-      idx += 1
-
-      rnd = lambda v: round(v, 3)
-      result = {
-        'id': idx,
-        'yalias': yalias,
-        'count': len(rule.examples),
-        'score': rnd(rule.quality),
-        'c_range': map(rnd, rule.c_range),
-        'clauses': clause_parts,
-        'alt_rules': alt_rules
-      }
-
+      result = rule_to_json(rule, yalias=yalias)
       results.append(result)
   return results
-
-

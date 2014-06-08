@@ -59,6 +59,7 @@ define(function(require) {
       this.state.query.attributes.where = where;
 
       this.trigger('setActive', where);
+      return this;
     },
 
     toggleLocked: function(model) {
@@ -69,6 +70,7 @@ define(function(require) {
       }
       console.log(['newstate:', this.state.locked])
       this.setActive(model);
+      return this;
     },
 
     clickResult: function(view) {
@@ -88,15 +90,22 @@ define(function(require) {
         var selection = this.state.where.get('selection');
         this.state.where.clearScorpionSelections();
       }
+      return this;
     },
 
     clear: function() {
+      this.unlockAll();
+      this.setActive();
       this.collection.reset();
+      return this;
     },
 
     reset: function() {
+      this.unlockAll();
+      this.setActive();
       this.$list.empty();
       this.collection.each(this.addTo.bind(this));
+      return this;
     },
 
 

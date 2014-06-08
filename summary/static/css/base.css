@@ -205,6 +205,17 @@ body table.tuples tr th {
 .scorpion-results .scorpion-result .filter-clause.locked:hover {
   background: black;
 }
+#scorpion-partialresults-container .scorpion-result .filter-clause {
+  background: #979797;
+}
+#scorpion-partialresults-container .scorpion-result .equiv-clause,
+#scorpion-partialresults-container .scorpion-result .equiv-toggle {
+  background: #7b8085;
+}
+#scorpion-partialresults-container .scorpion-result .filter-clause:hover,
+#scorpion-partialresults-container .scorpion-result .equiv-toggle:hover {
+  background: #7b8085;
+}
 #walkthrough-container {
   position: absolute;
   top: 8em;
@@ -432,13 +443,11 @@ body table.tuples tr th {
   box-sizing: border-box;
 }
 .onoffswitch-inner:before {
-  content: "Select";
   padding-left: 12px;
   background-color: #EBEBEB;
   color: #000000;
 }
 .onoffswitch-inner:after {
-  content: "Remove";
   padding-right: 12px;
   background-color: #EBEBEB;
   color: #000000;
@@ -466,4 +475,16 @@ body table.tuples tr th {
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
   right: 0px;
   background-color: #6ADE85;
+}
+#selection-type .onoffswitch-inner:before {
+  content: "Select";
+}
+#selection-type .onoffswitch-inner:after {
+  content: "Remove";
+}
+#fake-type .onoffswitch-inner:before {
+  content: "Real";
+}
+#fake-type .onoffswitch-inner:after {
+  content: "Fake";
 }

@@ -124,6 +124,7 @@ define(function(require) {
         results.reset(newresults);
         resp.results = results;
       }
+      console.log("scorpionquery parsed true response")
       return resp;
     },
 
