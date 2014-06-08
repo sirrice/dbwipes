@@ -184,22 +184,29 @@ def api_status():
 @app.route('/api/query/', methods=['POST', 'GET'])
 @returns_json
 def query():
-  x = request.args.get('x')
-  ys = request.args.get('ys')
-  where = request.args.get('where')
-  table = request.args.get('table')
-  dbname = request.args.get('db')
-  query = request.args.get('query')
-  
-  if not dbname or not query:
-    return {}
+  ret = { }
+  jsonstr = request.args.get('json')
+  if not jsonstr:
+    print "query: no json string.  giving up"
+    return ret
 
+  args = json.loads(jsonstr)
+  dbname = args.get('db')
+  table = args.get('table')
+
+  o, params = scorpionutil.create_sql_obj(g.db, args)
+  query = str(o)
+  print args
   print query
-  ret = {}
+  print params
+
+  if not dbname or not table or not query:
+    print "query: no db/table/query.  giving up"
+    return ret
 
   try:
     conn = g.db
-    cur = conn.execute(query)
+    cur = conn.execute(query, [params])
     rows = cur.fetchall()
     cur.close()
 
@@ -207,9 +214,11 @@ def query():
     ret['data'] = data
     ret['schema'] = get_schema(g.db, table)
 
-    print "%d points returned" % len(data)
   except Exception as e:
     traceback.print_exc()
+    ret = {}
+
+  print "%d points returned" % len(ret.get('data', []))
   return ret
 
 
@@ -252,7 +261,6 @@ def scorpion():
   requestid = request.form.get('requestid')
   if not fake or fake == 'false':
     results = scorpionutil.scorpion_run(g.db, data, requestid)
-    pdb.set_trace()
     print json.dumps(results, cls=ScorpionEncoder)
     return results
 

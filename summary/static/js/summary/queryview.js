@@ -216,7 +216,10 @@ define(function(require) {
       var query = new Query(this.model.toJSON());
       query.set('where', where);
       query.fetch({
-        data: query.toJSON(),
+        data: {
+          json: JSON.stringify(query.toJSON()),
+          db: query.get('db')
+        },
         context: this,
         success: (function(model, resp, opts) {
           this.renderModifiedData(resp.data);

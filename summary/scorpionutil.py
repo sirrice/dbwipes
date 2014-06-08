@@ -59,15 +59,59 @@ def expr_from_nonagg(s):
     return ' as '.join(s.split(' as ')[:-1])
   return s
 
+def foo_where(where_json, negate=False):
+  is_type = lambda s, types: any([t in s for t in types])
+  l = []
+  args = []
+  for clause_json in where_json:
+    ctype = clause_json['type']
+    col = clause_json['col']
+    vals = clause_json['vals']
+
+    if not vals: continue
+
+    if is_type(ctype, ['num', 'int', 'float', 'double', 'date', 'time']):
+      q = "%%s <= %s and %s < %%s" % (col, col)
+      args.extend(vals)
+    else:
+      tmp = []
+      vals = list(vals)
+      if None in vals:
+        tmp.append("(%s is null)" % col)
+
+      realvals = list(filter(lambda v: v is not None, vals))
+      if len(realvals) == 1:
+        tmp.append("(%s = %%s)" % col)
+        args.append(realvals[0])
+      elif len(realvals):
+        tmp.append("(%s in %%s)" % col)
+        args.append(tuple(list(realvals)))
+      q = ' or '.join(tmp)
+
+    l.append(q)
+
+  q = ' and '.join(filter(bool, l))
+  if negate and q:
+    q = "not(%s)" % q
+  return q, args
+
+
+
 
 def create_sql_obj(db, qjson):
   x = qjson['x']
   ys = qjson['ys']
-  sql = qjson['query']
+  #sql = qjson['query']
   dbname = qjson['db']
   table = qjson['table']
-  where = qjson.get('where', '')
+  negate = qjson.get('negate', False)
+  where_json = qjson.get('where', [])
+  basewhere_json = qjson.get('basewhere', [])
 
+  where, args = foo_where(where_json, negate)
+  basewhere, baseargs = foo_where(basewhere_json, False)
+  where = ' and '.join(filter(bool, [where, basewhere]))
+  args.extend(baseargs)
   
   select = Select()
   nonagg = SelectExpr(x['alias'], [x['col']], x['expr'], x['col'])
@@ -81,12 +125,12 @@ def create_sql_obj(db, qjson):
     db, 
     select, 
     [table], 
-    filter(bool, [where]), 
+    [where],
     [x['expr']], 
     [expr_from_nonagg(x['expr'])]
   )
 
-  return parsed
+  return parsed, args
 
 def scorpion_run(db, requestdata, requestid):
   """
@@ -98,7 +142,7 @@ def scorpion_run(db, requestdata, requestid):
   try:
     qjson = requestdata.get('query', {})
     tablename = qjson['table']
-    parsed = create_sql_obj(db, qjson)
+    parsed, params = create_sql_obj(db, qjson)
     print "parsed SQL"
     print parsed
   except Exception as e:
@@ -118,7 +162,7 @@ def scorpion_run(db, requestdata, requestid):
     x = qjson['x']
     ys = qjson['ys']
 
-    obj = SharedObj(db, '', dbname=dbname, parsed=parsed)
+    obj = SharedObj(db, dbname=dbname, parsed=parsed, params=params)
     obj.dbname = dbname
     obj.C = 0.2
     obj.ignore_attrs = map(str, ignore_attrs )

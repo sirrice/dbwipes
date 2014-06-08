@@ -41,14 +41,14 @@ define(function(require) {
           clauses = [],
           _this = this;
       if (model != null) {
-        where = util.negateClause(model.toSQL());
+        where = model.get('clauses');
         clauses = model.get('clauses');
       } else if (model == null) {
         if (this.state.locked != null) {
-          where = util.negateClause(this.state.locked.toSQL());
+          where = this.state.locked.get('clauses')
           clauses = this.state.locked.get('clauses');
         } else {
-          where = util.negateClause(this.state.where.toSQL());
+          where = this.state.where.toJSON();
           clauses = [];
         }
       }
@@ -56,7 +56,6 @@ define(function(require) {
       console.log(['setactive', model, this.state.locked, where]);
       //this.state.query.set('where', where);
       this.state.where.setSelection(clauses);
-      this.state.query.attributes.where = where;
 
       this.trigger('setActive', where);
       return this;

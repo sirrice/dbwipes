@@ -77,7 +77,7 @@ define(function(require) {
 
       scales.domain(domain).range(range);
       if (util.isStr(type)) {
-        scales.rangeRoundBands(range);//, 0.1);
+        scales.rangeRoundBands(range, 0.1);
         if (scales.rangeBand() <= 2) {
           scales.rangePoints(range);
         }

@@ -78,6 +78,9 @@ requirejs([
       .tooltip('show');
 
 
+  // to avoid fetching same queries repeatedly
+  window.prev_fetched_json = null;
+
   var enableScorpion = window.enableScorpion = true;
   // define all scorpion related variables so 
   // they can be checked for null
@@ -109,16 +112,16 @@ requirejs([
     });
   })
   where.on('change:selection', function() {
-    var newWhere = util.negateClause(where.toSQL());
+    var whereJson = where.toJSON();
     if (srv) {
       srv.unlockAll();
       psrv.unlockAll();
     }
-    if (newWhere && q.get('where') != newWhere) {
-      qv.renderWhereOverlay(newWhere);
+    if (!_.isEqual(q.get('where'), whereJson)) {
+      console.log(["where.change:selection", whereJson])
+      qv.renderWhereOverlay(whereJson);
     } else {
       qv.cancelWhereOverlay();
-      //q.set('where', newWhere);
     }
 
   });
@@ -154,11 +157,13 @@ requirejs([
     });
     $("body").append(sqv.render().$el.hide());
 
-    srv.on('setActive', function(where) {
-      qv.renderWhereOverlay(where);
+    srv.on('setActive', function(whereJson) {
+      if (!_.isEqual(q.get('where'), whereJson)) 
+        qv.renderWhereOverlay(whereJson);
     });
-    psrv.on('setActive', function(where) {
-      qv.renderWhereOverlay(where);
+    psrv.on('setActive', function(whereJson) {
+      if (!_.isEqual(q.get('where'), whereJson)) 
+        qv.renderWhereOverlay(whereJson);
     });
 
 

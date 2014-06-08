@@ -26,6 +26,18 @@ define(function(require) {
     },
 
 
+    // return as a format consistent with
+    // how Where.toJSON() generates toJSON() objects
+    // [{
+    //    col: 
+    //    type:
+    //    vals:
+    // }]
+    toSQLJSON: function() {
+      return this.get('clauses');
+    },
+
+
     toJSON: function() {
       var json = {
         score: this.get('score'),

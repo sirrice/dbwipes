@@ -21,7 +21,7 @@ define(function(require) {
         table: null,
         db: null,
         data: null,
-        limit: null
+        limit: null,
       }
     },
 
@@ -49,17 +49,6 @@ define(function(require) {
       this.attributes['ys'] = ys;
     },
 
-    // @deprecated
-    ensureWhere: function() {
-      var where = this.get('where');
-      if (!where) {
-        where = new Where;
-      }
-      this.listenTo(where, 'change:selection', function() {
-        this.fetch({data:this.toJSON()});
-      }, this);
-      this.attributes['where'] = where;
-    },
 
     onChangeDB: function() {
       this.set('where', null);
@@ -71,18 +60,37 @@ define(function(require) {
       this.ensureYs();
       //this.ensureWhere();
       console.log("fetching new query " + this.get('where'))
-      this.fetch({data:this.toJSON()});
+      this.fetch({
+        data: {
+          json: JSON.stringify(this.toJSON()),
+          db: this.get('db')
+        }
+      });
     },
 
+    normalize_where: function() {
+      var w = this.get('where');
+      if (w == '""' || w == "''" || w == "" || w == null || !w.length) {
+        return '';
+      }
+      w = JSON.stringify(w);
+      return w;
+    },
 
     fetch: function(options) {
+      if (_.isEqual(window.prev_fetched_json, this.toJSON())) {
+        console.log(['query.fetch', 'redundant. cancelling']);
+        return;
+      }
+      window.prev_fetched_json = this.toJSON();
       $("#q_loading").show();
       var model = this;
       options || (options = {});
       options.data || (options.data = this.toJSON());
       var complete = options.complete;
       var f = function(resp) {
-        $("#q_loading").hide()
+        $("#q_loading").hide();
+        console.log(["query.fetch", 'got', resp]);
         if (complete) complete(model, resp, options);
       };
       options.complete = f;
@@ -139,20 +147,51 @@ define(function(require) {
 
 
     toJSON: function() {
+      function encodeWhere(where) {
+        if (!where) return [];
+        return _.map(where, function(w) {
+          if (util.isTime(w.type)) {
+            if (w.type == 'time') {
+              var f = function(v) { 
+                return "'" + (new Date(v)).toLocaleTimeString() + "'";
+              };
+            } else {
+              var f = function(v) {
+                return "'" + (new Date(v)).toISOString() + "'";
+              };
+            }
+          } else if (util.isNum(w.type)) {
+            var f = function(v) { return +v; };
+          } else {
+            var f = function(v) { return _.flatten([v])[0]; };
+          }
+          return {
+            col: w.col,
+            type: w.type,
+            vals: _.map(w.vals, f)
+          };
+
+        });
+      };
+
+
       var ret = {
         x: this.get('x'),
         ys: this.get('ys'),
         table: this.get('table'),
         db: this.get('db'),
-        query: this.toSQL()
+        basewhere: encodeWhere(this.get('basewhere')),
+        where: encodeWhere(this.get('where')),
+        limit: this.get('limit'),
+        negate: !$("#selection-type > input[type=checkbox]").get()[0].checked
+        //query: this.toSQL()
       };
-      if (this.get('where')) {
-        ret.where = this.get('where');
-      }
+      
       return ret;
     },
 
     toSQL: function() {
+      throw Error("Query.toSQL should not be called anymore");
       function col2str(d) { return d.expr + " as " + d.alias; }
       if (!this.get('x')) return '';
       var select = [col2str(this.get('x'))];

@@ -220,8 +220,6 @@ class Summary(object):
       return None
 
     groupby = None
-    if 'char' in col_type or 'text' in col_type:
-      groupby = self.get_char_stats(col_name)
 
     if 'time' == col_type:
       groupby = self.get_time_stats(col_name)
@@ -242,6 +240,8 @@ class Summary(object):
     if self.dbtype == 'pg' and is_numeric:
       stats = self.get_numeric_stats(col_name)
       return stats
+    if any([s in col_type for s in ['char', 'text']]):
+      return self.get_char_stats(col_name)
 
     groupby = self.get_col_groupby(col_name, col_type)
     if groupby:
@@ -298,6 +298,16 @@ class Summary(object):
 
 
   def get_char_stats(self, col_name):
+    q = """select %s as GRP, min(%s), max(%s), count(*)
+    FROM %s GROUP BY GRP
+    ORDER BY count(*) desc
+    LIMIT %d"""
+    q = q % (col_name, col_name, col_name, self.tablename, self.nbuckets)
+    rows = [{ 'val': x, 'count': count, 'range':[minv, maxv]} for (x, minv, maxv, count) in self.query(q)]
+    return rows
+
+
+    
     groupby = col_name
     return groupby
     return self.get_group_stats(col_name, groupby)
