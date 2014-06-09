@@ -217,8 +217,7 @@ def scorpion_run(db, requestdata, requestid):
     start = time.time()
     parallel_debug(
       obj,
-      nprocesses=4,
-      parallelize=False,
+      parallel=True,
       nstds=0,
       errperc=0.001,
       epsilon=0.008,

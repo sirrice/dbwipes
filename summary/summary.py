@@ -146,7 +146,7 @@ class Summary(object):
 
   @make_cache
   def get_distinct_count(self, col):
-    q = "SELECT count(distinct %s) FROM %s" % (col, self.tablename)
+    q = "SELECT count(distinct %s) FROM %s %s" % (col, self.tablename, self.where)
     return self.query(q)[0][0]
 
   @make_cache
@@ -269,7 +269,13 @@ class Summary(object):
     if ndistinct == 0:
       return []
     if ndistinct == 1:
-      val = self.query("SELECT %s from %s where %s is not null" % (c, self.tablename, c))[0][0]
+      if self.where:
+        q = "SELECT %s from %s %s AND %s is not null"
+        args = (c, self.tablename, self.where, c)
+      else:
+        q = "SELECT %s from %s WHERE %s is not null"
+        args = (c, self.tablename, c)
+      val = self.query(q % args)[0][0]
       return [{'val': val, 'count': self.nrows, 'range': [val, val]}]
 
     q = """
