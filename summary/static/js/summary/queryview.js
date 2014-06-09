@@ -423,24 +423,21 @@ define(function(require) {
 
       this.yzoom = yzoom = d3.behavior.zoom()
         .y(this.state.yscales)
-        //.scaleExtent([1, 100])
         .on('zoom', yzoomf);
 
       el.select('.axis.y').call(yzoom)
         .style('cursor', 'ns-resize')
           
-      /*
-       this.xzoom = xzoom = d3.behavior.zoom()
-        .x(this.state.xscales)
-        .scaleExtent([1, 100])
-        .on('zoom', xzoomf);
+      var type = this.model.get('schema')[this.model.get('x').col];
 
-      el.select('.axis.x').call(xzoom)
-        .on("mousedown.zoom", null)
-        .on("touchstart.zoom", null)
-        .on("touchmove.zoom", null)
-        .on("touchend.zoom", null)
-        */
+      if (!util.isStr(type)) {
+        this.xzoom = xzoom = d3.behavior.zoom()
+          .x(this.state.xscales)
+          .on('zoom', xzoomf);
+
+        el.select('.axis.x').call(xzoom)
+          .style('cursor', 'ew-resize');
+      }
     },
 
     renderLabels: function() {
