@@ -5,7 +5,7 @@ import pdb
 from sqlalchemy import create_engine, engine
 
 
-def get_bdb(fname, new=False, fsync=False, recover=False):
+def get_cache(fname, new=False, fsync=False, recover=False):
   eng = create_engine('postgresql://localhost/cache')
   db = eng.connect()
 
@@ -20,7 +20,7 @@ def make_cache(f):
   @wraps(f)
   def _f(self, *args, **kwargs):
     try:
-      key = str(map(str, (f.__name__, self.engine, self.tablename, self.nbuckets, map(str, args))))
+      key = str(map(str, (f.__name__, self.engine, self.tablename, self.where, self.nbuckets, map(str, args))))
       print key
       vals = self._cache.execute('select val from cache where key = %s', key).fetchall()
       if len(vals):
@@ -62,10 +62,15 @@ class Summary(object):
 
     self.tablename = tablename
     self.nbuckets = nbuckets
+    self.where = ''
 
-    self._engine, self._cache = get_bdb(CACHELOC)
+    self._engine, self._cache = get_cache(CACHELOC)
 
-  def __call__(self):
+  def __call__(self, where=''):
+    where = where.strip()
+    if where:
+      self.where = 'WHERE %s' % where
+
     stats = []
     self.nrows = self.get_num_rows()
     self.col_types = self.get_columns_and_types()
@@ -253,9 +258,9 @@ class Summary(object):
 
   def get_group_stats(self, col_name, groupby):
     q = """select %s as GRP, min(%s), max(%s), count(*) 
-    from %s group by GRP 
+    from %s  %s group by GRP 
     order by GRP limit %d"""
-    q = q % (groupby, col_name, col_name, self.tablename, self.nbuckets)
+    q = q % (groupby, col_name, col_name, self.tablename, self.where, self.nbuckets)
     rows = [{ 'val': x, 'count': count, 'range':[minv, maxv]} for (x, minv, maxv, count) in self.query(q)]
     return rows
 
@@ -269,16 +274,17 @@ class Summary(object):
 
     q = """
     with bound as (
-      SELECT min(%s) as min, max(%s) as max, avg(%s) as avg, stddev(%s) as std FROM %s
+      SELECT min(%s) as min, max(%s) as max, avg(%s) as avg, stddev(%s) as std FROM %s %s
     )
     SELECT width_bucket(%s::numeric, (avg-2.5*std), (avg+2.5*std), %d) as bucket,
            min(%s) as min,
            max(%s) as max,
            count(*) as count
     FROM %s, bound
+    %s
     GROUP BY bucket
     """
-    q = q % (c, c, c, c, self.tablename, c, self.nbuckets, c, c, self.tablename)
+    q = q % (c, c, c, c, self.tablename, self.where, c, self.nbuckets, c, c, self.tablename, self.where)
     stats = []
     for (val, minv, maxv, count) in self.query(q):
       if val is None:
@@ -299,10 +305,12 @@ class Summary(object):
 
   def get_char_stats(self, col_name):
     q = """select %s as GRP, min(%s), max(%s), count(*)
-    FROM %s GROUP BY GRP
+    FROM %s 
+    %s
+    GROUP BY GRP
     ORDER BY count(*) desc
     LIMIT %d"""
-    q = q % (col_name, col_name, col_name, self.tablename, self.nbuckets)
+    q = q % (col_name, col_name, col_name, self.tablename, self.where, self.nbuckets)
     rows = [{ 'val': x, 'count': count, 'range':[minv, maxv]} for (x, minv, maxv, count) in self.query(q)]
     return rows
 

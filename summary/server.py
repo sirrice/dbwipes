@@ -227,6 +227,7 @@ def query():
 def column_distributions():
   dbname = request.args.get('db', 'intel')
   tablename = request.args.get('table', 'readings')
+  where = request.args.get('where', '')
   try:
     nbuckets = int(request.args.get('nbuckets', 100))
   except Exception as e:
@@ -237,7 +238,8 @@ def column_distributions():
   #  #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
 
   summary = Summary(dbname, tablename, nbuckets=nbuckets, CACHELOC=SUMMARYCACHE)
-  stats = summary()
+  print 'where: %s' % where
+  stats = summary(where=where)
   summary.close()
 
   data = []

@@ -46,6 +46,10 @@ define(function(require) {
           xdomain = util.getXDomain(stats, type, getx),
           ydomain = [ d3.min(stats, gety), d3.max(stats, gety) ];
 
+      if (ydomain[0] == ydomain[1]) 
+        ydomain[0] = 0;
+
+
       this.set('type', type);
       this.set('xdomain', xdomain);
       this.set('ydomain', ydomain);

@@ -64,9 +64,14 @@ def foo_where(where_json, negate=False):
   l = []
   args = []
   for clause_json in where_json:
+    if 'sql' in clause_json:
+      l.append(clause_json['sql'])
+      continue
+
     ctype = clause_json['type']
     col = clause_json['col']
     vals = clause_json['vals']
+
 
     if not vals: continue
 

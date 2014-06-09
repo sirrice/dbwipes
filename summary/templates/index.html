@@ -167,6 +167,21 @@
     </div>
   </div>
   <div class='row'>
+    <div class="col-md-4">where</div>
+    <div class="col-md-8 input-x">
+      {{#each basewheres}}
+      <div>
+        <input class="form-control" name="q-where" 
+               value="{{this.sql}}" placeholder="expression">
+      </div>
+      {{/each}}
+      <div>
+        <input class="form-control" name="q-where" 
+               value="" placeholder="expression">
+      </div>
+    </div>
+  </div>
+  <div class='row'>
     <div class="col-md-4"></div>
     <div class="col-md-8 input-ys"><button class='q-submit btn btn-primary'>Execute Query</button></div>
   </div>

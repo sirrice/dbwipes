@@ -18,7 +18,7 @@ define(function(require) {
 
     events: {
       'click .q-add':     "onAggAdd",
-      'click .q-submit':  "onSubmit"
+      'click .q-submit':  "onSubmit",
     },
 
     defaults: function() {
@@ -59,7 +59,6 @@ define(function(require) {
       var yexprs = this.$("input[name=q-y-expr]").map(getVal).get();
       var ycols = this.$("input[name=q-y-col]").map(getVal).get();
       var ys = _.zip(yexprs, ycols);
-
       ys = _.compact(_.map(ys, function(pair) {
         if (pair[0] == '' || pair[1] == '') return null;
         var y = splitAlias(pair[0], pair[1]);
@@ -67,11 +66,18 @@ define(function(require) {
         return y;
       }));
 
+      var basewheres = this.$("input[name=q-where]").map(getVal).get();
+      basewheres = [_.compact(basewheres).map(function(w) {
+        return { col: null, type: null, vals: null, sql: w }
+      })];
+      console.log(basewheres);
+
       var q = {
         db: db,
         table: table,
         x: x,
         ys: ys,
+        basewheres: basewheres,
         where: this.model.get('where'),
         schema: this.model.get('schema')
       };

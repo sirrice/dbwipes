@@ -103,13 +103,14 @@ requirejs([
   var where = new Where;
   var whereview = new WhereView({collection: where, el: $("#where")});
   var csv = new CStatsView({collection: where, el: $("#facets")});
-  q.on('change:db change:table', function() {
+  q.on('change:db change:table change:basewheres', function() {
     where.reset()
     where.fetch({
       data: {
         db: q.get('db'),
         table: q.get('table'),
-        nbuckets: 500
+        nbuckets: 500,
+        where: _.compact(_.pluck(_.flatten(q.get('basewheres')), 'sql')).join(' AND ')
       },
       reset: true
     });

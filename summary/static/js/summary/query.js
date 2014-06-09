@@ -12,12 +12,12 @@ define(function(require) {
 
     defaults: function() {
       return {
-        x: null,           // { col:, expr:}
+        x: null,            // { col:, expr:}
         ys: null,
-        schema: null,      // { col -> type }
-        where: null,       // this changes depending on how user inteacts with rules/selection
-        basewhere: null,   // this WHERE is part of the query and should not be modified
-                           // only way to set basewhere is to click on a rule
+        schema: null,       // { col -> type }
+        where: null,        // this changes depending on how user inteacts with rules/selection
+        basewheres: null,   // this WHERE is part of the query and should not be modified
+                            // only way to set basewhere is to click on a rule
         table: null,
         db: null,
         data: null,
@@ -27,7 +27,7 @@ define(function(require) {
 
 
     initialize: function() {
-      this.on('change:x change:ys change:basewhere', this.onChange);
+      this.on('change:x change:ys change:basewheres', this.onChange);
       this.on('change:db change:table', this.onChangeDB);
     },
 
@@ -142,39 +142,18 @@ define(function(require) {
       function encodeWhere(where) {
         if (!where) return [];
         return where;
-        return _.map(where, function(w) {
-          if (util.isTime(w.type)) {
-            if (w.type == 'time') {
-              var f = function(v) { 
-                return "'" + (new Date(v)).toLocaleTimeString() + "'";
-              };
-            } else {
-              var f = function(v) {
-                return "'" + (new Date(v)).toISOString() + "'";
-              };
-            }
-          } else if (util.isNum(w.type)) {
-            var f = function(v) { return +v; };
-          } else {
-            var f = function(v) { return _.flatten([v])[0]; };
-          }
-          return {
-            col: w.col,
-            type: w.type,
-            vals: _.map(w.vals, f)
-          };
-
-        });
       };
-
+      var basewheres = this.get('basewheres') || [];
+      basewheres = _.flatten(basewheres.map(encodeWhere));
+      var where = encodeWhere(this.get('where'));
 
       var ret = {
         x: this.get('x'),
         ys: this.get('ys'),
         table: this.get('table'),
         db: this.get('db'),
-        basewhere: encodeWhere(this.get('basewhere')),
-        where: encodeWhere(this.get('where')),
+        where: _.union(basewheres, where),
+        basewheres: basewheres,
         limit: this.get('limit'),
         negate: !$("#selection-type > input[type=checkbox]").get()[0].checked
         //query: this.toSQL()
@@ -186,32 +165,6 @@ define(function(require) {
 
     toSQL: function() {
       throw Error("Query.toSQL should not be called anymore");
-      function col2str(d) { return d.expr + " as " + d.alias; }
-      if (!this.get('x')) return '';
-      var select = [col2str(this.get('x'))];
-      select = select.concat(_.map(this.get('ys'), col2str));
-      select = "SELECT " + select.join(', ');
-
-      var from = 'FROM ' + this.get('table');
-      var basewhere = this.get('basewhere');
-      basewhere = (basewhere && basewhere != '')? basewhere : null;
-      var extrawhere = this.get('where');
-      extrawhere = (extrawhere && extrawhere != '')? extrawhere : null;
-      var where = _.compact([basewhere, extrawhere]);
-      where = (where.length)? 'WHERE ' + where.join(' AND ') : null;
-      var groupby = 'GROUP BY ' + this.get('x').expr;
-      var orderby = 'ORDER BY ' + this.get('x').expr;
-      var limit = this.get('limit');
-      limit = (limit && limit != '')? 'LIMIT ' + limit : null;
-
-      return _.compact([
-        select,
-        from,
-        where,
-        groupby,
-        orderby,
-        limit
-      ]).join('\n');
     }
 
   })
