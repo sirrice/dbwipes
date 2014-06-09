@@ -16,8 +16,8 @@
     </h1>
 
     <div class="row">
-      <div class="col-md-3">
-        <span id="facet-togglecheckall" state='checked' class="btn btn-primary btn-sm">uncheck all</span>
+      <div class="col-md-2">
+        <span id="facet-togglecheckall" state='checked' class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Remove all attributes from Scorpion analysis">uncheck all</span>
       </div>
       <div class="col-md-3">
         <span>
@@ -42,7 +42,7 @@
         </span>
       </div>
       <div class="col-md-3">
-        <span id="apply-btn" class="btn btn-primary btn-sm">Apply current selection</span>
+        <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Apply current selection</span>
       </div>
     </div>
 
@@ -89,7 +89,7 @@
   <h1>&nbsp;</h1>
   <div class="row">
     <div class="col-md-12">
-      <span id="q-toggle" data-toggle="tooltip" data-placement="top" title="Click to show query builder form" >toggle plot</span>
+      <span id="q-toggle" data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >toggle plot</span>
       <span id="q-load-bt" class="btn">load xx</span>
       <span id="q-load-intel" class='btn'>load yy</span>
       <span id="q-load-med" class='btn'>load ii</span>
@@ -100,7 +100,7 @@
 
   <div class="row"> 
     <div class="col-md-12" id="right">
-      <div style="clear:both"></div>
+      <div style="clear:both;"></div>
     </div>
   </div>
 </div>
@@ -110,7 +110,7 @@
 {%raw%}
 <script id="foo-template" type="text/x-underscore-template">
 <div class='row'>
-  <div class="col-md-3 cstat-label">
+  <div class="col-md-2 cstat-label">
     {{col}}
     <div class="type" >
       <label style="min-width: 50px" class="btn btn-xs" for="errcol_{{col}}"   data-toggle="tooltip" data-placement="top" title="Check to include this attribute in scorpion query" >{{type}}</label>
@@ -120,7 +120,7 @@
     </div>
     <div class="count"></div>
   </div>
-	<div class="col-md-9 cstat-plot">
+	<div class="col-md-10 cstat-plot">
     <svg class=""></svg>
 	</div>
 </div>
@@ -128,7 +128,7 @@
 
 <script id="q-err-template" type="text/x-underscore-template">
 <div class='row'>
-<div class="col-md-12"  style="border: 3px solid whitesmoke; border-radius: 4px; background: whitesmoke; padding: 2em">
+<div class="col-md-12"  style="padding: 2em">
   <div class='row'>
     <div class="col-md-4"></div>
     <div class="col-md-4 input-ys"><input class="form-control" name="q-db" value="{{db}}" placeholder="database"></div>

@@ -72,13 +72,13 @@ requirejs([
       .tooltip('fixTitle')
       .tooltip('show');
   });
-    $("#selection-type")
-      .attr('title', st_on_text)
-      .tooltip('fixTitle')
-      .tooltip('show');
-    _.delay(function() {
-      $("#selection-type").tooltip('hide');
-    }, 5000);
+  $("#selection-type")
+    .attr('title', st_on_text)
+    .tooltip('fixTitle')
+    .tooltip('show');
+  _.delay(function() {
+    $("#selection-type").tooltip('hide');
+  }, 5000);
 
 
   $("#apply-btn").click(function() {

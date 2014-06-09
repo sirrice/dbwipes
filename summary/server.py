@@ -203,8 +203,8 @@ def api_tuples():
 
   query = """WITH XXXX as (select count(*) from %s WHERE 1 = 1 %s)
   SELECT * FROM %s 
-  WHERE random() <= 200.0 / (select * from XXXX) %s 
-  LIMIT 200"""
+  WHERE random() <= 50.0 / (select * from XXXX) %s 
+  LIMIT 50"""
   query = query % (table, where, table, where)
   try:
     conn = g.db

@@ -42,6 +42,11 @@ define(function(require) {
     initialize: function() {
       this.state = this.defaults();
 
+      this.$el
+        .css("padding", "1em")
+        .css("padding-bottom", "1.5em")
+        .css("box-shadow", "grey 0px 3px 2px -1px")
+        .css("background", "white");
 
       this.$svg = $("<svg id='viz'></svg>").prependTo(this.$el);
       this.svg = this.$svg.get()[0];

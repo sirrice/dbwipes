@@ -146,7 +146,7 @@ define(function(require) {
           SQL.push(col + " is null");
         }
 
-        var nonnulls = _.compact(vals);
+        var nonnulls = _.reject(vals, _.isNull);
         if (nonnulls.length == 1) {
           var v = nonnulls[0];
           if (_.isString(v)) 
