@@ -63,10 +63,32 @@ define(function(require) {
 
 
     toJSON: function() {
+      var type = this.get('type');
+      var vals = _.pluck(this.get('selection'), 'range');
+      if (vals.length > 0) {
+        if (util.isStr(type)) {
+          vals = vals.map(function(v) { return _.flatten([v])[0]; });
+        } else {
+          console.log(vals)
+          vals = [d3.min(_.pluck(vals, 0)), d3.max(_.pluck(vals,1))];
+          console.log(vals)
+          if (util.isTime(type)) {
+            if (type == 'time') 
+              vals = vals.map(function(v) { 
+                return "'" + v.toLocaleTimeString() + "'";
+              });
+            else
+              vals = vals.map(function(v) { 
+                return "'" + v.toISOString() + "'";
+              });
+          }
+        }
+      }
+
       return {
         col: this.get('col'),
         type: this.get('type'),
-        vals: _.pluck(this.get('selection'), 'range')
+        vals: vals
       };
     },
 

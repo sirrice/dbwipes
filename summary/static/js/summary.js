@@ -76,6 +76,9 @@ requirejs([
       .attr('title', st_on_text)
       .tooltip('fixTitle')
       .tooltip('show');
+    _.delay(function() {
+      $("#selection-type").tooltip('hide');
+    }, 5000);
 
 
   // to avoid fetching same queries repeatedly
@@ -302,6 +305,7 @@ requirejs([
   window.q = q;
   window.qv = qv;
   window.where = where;
+  window.csv = csv;
 
   if (enableScorpion) {
     window.sq = sq;

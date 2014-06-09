@@ -68,21 +68,13 @@ define(function(require) {
       });
     },
 
-    normalize_where: function() {
-      var w = this.get('where');
-      if (w == '""' || w == "''" || w == "" || w == null || !w.length) {
-        return '';
-      }
-      w = JSON.stringify(w);
-      return w;
-    },
-
     fetch: function(options) {
       if (_.isEqual(window.prev_fetched_json, this.toJSON())) {
         console.log(['query.fetch', 'redundant. cancelling']);
         return;
       }
       window.prev_fetched_json = this.toJSON();
+
       $("#q_loading").show();
       var model = this;
       options || (options = {});
@@ -149,6 +141,7 @@ define(function(require) {
     toJSON: function() {
       function encodeWhere(where) {
         if (!where) return [];
+        return where;
         return _.map(where, function(w) {
           if (util.isTime(w.type)) {
             if (w.type == 'time') {
@@ -186,6 +179,7 @@ define(function(require) {
         negate: !$("#selection-type > input[type=checkbox]").get()[0].checked
         //query: this.toSQL()
       };
+      console.log(ret)
       
       return ret;
     },
