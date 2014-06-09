@@ -12,20 +12,26 @@ define(function(require) {
 
 
   var TupleQuery = Backbone.Model.extend({
-    url: "/api/query/",
+    url: "/api/tuples/",
 
     defaults: function() {
       return {
         cols: [],
         data: [],
+        where: [],
         query: null
       };
     },
 
     initialize: function() {
       this.on('change:where', (function() {
-        if (this.get('where')) 
-          this.fetch({ data: this.toJSON() });
+        console.log(['tupleview.fetch', this.toJSON()])
+        this.fetch({ 
+          data: {
+            json: JSON.stringify(this.toJSON()),
+            db: this.get('query').get('db')
+          }
+        });
       }).bind(this));
         
     },
@@ -58,35 +64,25 @@ define(function(require) {
     toDataJSON: function() {
       var cols = this.get('cols'),
           data = this.get('data');
-
       data = _.map(data, function(d) {
-        return _.map(cols, function(col) { return d[col]; });
+        return _.map(cols, function(col) { return String(d[col]).substr(0, 10); });
       });
 
       return {
+        nrows: data.length,
         cols: cols,
         data: data
       };
     },
 
     toJSON: function() {
+      var q = this.get('query');
       var json = {
         db: this.get('query').get('db'),
         table: this.get('query').get('table'),
-        query: this.toSQL()
+        where: this.get('where')
       };
       return json;
-    },
-
-    toSQL: function() {
-      var select = "SELECT *",
-          from = "FROM " + this.get('query').get('table'),
-          where = 'WHERE ' + this.get('where')
-      return _.compact([
-        select,
-        from,
-        where
-      ]).join('\n');
     }
   });
 
@@ -115,7 +111,8 @@ define(function(require) {
     },
 
     render: function() {
-      //this.$el.html(this.template(this.model.toDataJSON()));
+      this.$el.html(this.template(this.model.toDataJSON()));
+      return this;
       var q = this.model.get('query'),
           xcol = q.get('x').col,
           xtype = q.get('schema')[xcol],

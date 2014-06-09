@@ -70,7 +70,6 @@ define(function(require) {
       basewheres = [_.compact(basewheres).map(function(w) {
         return { col: null, type: null, vals: null, sql: w }
       })];
-      console.log(basewheres);
 
       var q = {
         db: db,

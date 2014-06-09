@@ -21,6 +21,7 @@ define(function(require) {
         w: 350,
         h: 50,
         lp: 70,
+        bp: 18,
         rectwidth: 1,
         marktype: 'rect'
       }
@@ -87,14 +88,27 @@ define(function(require) {
 
 
     renderAxes: function(el) {
-      el.append('g')
+      var xel = el.append('g')
         .attr('class', 'axis x xaxis')
         .attr('transform', "translate(0,"+this.state.h+")")
-        .call(this.state.xaxis)
+      xel.append('rect')
+        .attr('width', this.state.w)
+        .attr('height', this.state.bp)
+        .attr('fill', 'none')
+        .attr('stroke', 'none')
+        .style('pointer-events', 'all');
+      xel.call(this.state.xaxis)
 
-      el.append('g')
-        .attr('class', 'axis y yaxis')
-        .call(this.state.yaxis)
+      var yel = el.append('g')
+        .attr('class', 'axis y yaxis');
+      yel.append('rect') 
+        .attr('width', this.state.lp)
+        .attr('height', this.state.h)
+        .attr('x', -this.state.lp)
+        .attr('fill', 'none')
+        .attr('stroke', 'none')
+        .style('pointer-events', 'all');
+      yel.call(this.state.yaxis)
     },
 
 
@@ -273,45 +287,71 @@ define(function(require) {
     },
 
     renderZoom: function(el) {
-      if (util.isStr(this.model.get('type'))) {
-        // sorry, don't support discrete zooming...
-        return;
-      }
       var _this = this,
           xscales = this.state.xscales,
           xaxis = this.state.xaxis,
-          width = this.state.rectwidth;
+          width = this.state.rectwidth,
+          yaxis = this.state.yaxis,
+          yscales = this.state.yscales,
+          h = this.state.h;
 
-      var zoomf = function() {
-        el.select('.axis.x').call(xaxis);
-        el.selectAll('.mark') 
-          .attr('x', function(d) {
-            return d3.max([xscales.range()[0], xscales(d.range[0])]);
+
+      function yzoomf() {
+        el.select('.axis.y').call(yaxis);
+        el.selectAll('.mark')
+          .attr('y', function(d) {
+            return Math.max(0, Math.min(h, yscales(d.count)));
           })
-          .attr('width', function(d) {
-            var minx = d3.max([xscales.range()[0], xscales(d.range[0])]);
-            if (xscales(d.range[1]) < minx) return 0;
-            return d3.max([width, xscales(d.range[1]) - minx])
+          .attr('height', function(d) {
+            var y = Math.max(0, Math.min(h, yscales(d.count)));
+            return Math.max(0, Math.min(h, yscales(0)) - y)
           })
-          /*.style('display', function(d) {
-            var x = xscales(d.val);
-            var within = (x >= xscales.range()[0] && x <= xscales.range()[1]);
-            return (within)? null : 'none';
-          });*/
-        
+          
+        _this.yscale = d3.event.scale;
+
+      };
+
+
+      this.yzoom = yzoom = d3.behavior.zoom()
+        .y(this.state.yscales)
+        //.scaleExtent([1, 100])
+        .on('zoom', yzoomf);
+
+      el.select('.axis.y').call(yzoom)
+        .style('cursor', 'ns-resize')
+ 
+
+      if (!util.isStr(this.model.get('type'))) {
+        // sorry, don't support discrete zooming...
+
+        var zoomf = function() {
+          el.select('.axis.x').call(xaxis);
+          el.selectAll('.mark') 
+            .attr('x', function(d) {
+              return d3.max([xscales.range()[0], xscales(d.range[0])]);
+            })
+            .attr('width', function(d) {
+              var minx = d3.max([xscales.range()[0], xscales(d.range[0])]);
+              if (xscales(d.range[1]) < minx) return 0;
+              return d3.max([width, xscales(d.range[1]) - minx])
+            })
+            /*.style('display', function(d) {
+              var x = xscales(d.val);
+              var within = (x >= xscales.range()[0] && x <= xscales.range()[1]);
+              return (within)? null : 'none';
+            });*/
+          
+        }
+
+        var zoom = d3.behavior.zoom()
+          .x(xscales)
+          .scaleExtent([1, 1000])
+          .on('zoom', zoomf)
+        el.select('.axis.x').call(zoom)
+          .style('cursor', 'ew-resize')
       }
-      var nullf = function(){}
 
-      var zoom = d3.behavior.zoom()
-        .x(xscales)
-        .scaleExtent([1, 1000])
-        .on('zoom', zoomf)
-
-      el.call(zoom)
-        .on("mousedown.zoom", null)
-        .on("touchstart.zoom", null)
-        .on("touchmove.zoom", null)
-        .on("touchend.zoom", null)
+      return this;
     },
 
 
@@ -322,7 +362,7 @@ define(function(require) {
       var c = this.d3svg
           .attr('class', 'cstat-container')
           .attr('width', this.state.w+this.state.lp)
-          .attr('height', this.state.h+15)
+          .attr('height', this.state.h+this.state.bp)
         .append('g')
           .attr('transform', "translate("+this.state.lp+", 0)")
           .attr('width', this.state.w)

@@ -19,7 +19,7 @@
       <div class="col-md-3">
         <span id="facet-togglecheckall" state='checked' class="btn btn-primary btn-sm">uncheck all</span>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-3">
         <span>
           <div id="selection-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
               <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
@@ -30,7 +30,7 @@
           </div>
         </span>
       </div>
-      <div class="col-md-7">
+      <div class="col-md-3">
         <span>
           <div id="fake-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
               <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="fakeswitch" checked>
@@ -40,7 +40,9 @@
               </label>
           </div>
         </span>
-
+      </div>
+      <div class="col-md-3">
+        <span id="apply-btn" class="btn btn-primary btn-sm">Apply current selection</span>
       </div>
     </div>
 
@@ -50,7 +52,8 @@
 
         <div class='row'>
           <div class="col-md-12">
-            <svg id="tuples" style="margin-top: 1em"></svg>
+            <!--<svg id="tuples" style="margin-top: 1em"></svg>-->
+            <div id="tuples"></div>
           </div>
         </div>
 
@@ -67,15 +70,15 @@
     <div class="row">
       <div class="col-md-10" style="margin-top: 600px;">
         <div id="scorpion-results-container" style="display:none">
-          <h2>Final Scorpion Results</h2>
+          <h3>Final Scorpion Results</h3>
         </div>
         <div id="scorpion-partialresults-container" style="display:none">
-          <h2>
+          <h3>
             Partial Results
             <span style="font-size:12pt; color: grey;">
-              (may change as scorpion refines rules)
+              changes as scorpion refines rules
             </span>
-          </h2>
+          </h3>
         </div>
       </div>
     </div>
@@ -314,21 +317,23 @@
 
 
 <script id="tuple-template" type="text/x-underscore-template">
-<table class="tuples">
+<h3>{{nrows}} highlighted rows</h3>
+<div class="table-responsive">
+<table class="tuples table table-striped table-condensed table-hover">
+  <thead>
   <tr>
-    {{#each cols}}
-    <th>{{this}}</th>
-    {{/each}}
+    {{#each cols}} <th>{{this}}</th> {{/each}}
   </tr>
+  </thead>
+  <tbody>
   {{#each data}}
     <tr>
-      {{#each this}}
-      <td>{{this}}</td>
-      {{/each}}
-      <td>
+      {{#each this}} <td>{{this}}</td> {{/each}}
     </tr>
   {{/each}}
+  </tbody>
 </table>
+</div>
 </script>
 
 

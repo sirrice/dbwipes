@@ -180,10 +180,55 @@ def api_status():
     }
 
 
+@app.route('/api/tuples/', methods=['POST', 'GET'])
+@returns_json
+def api_tuples():
+  from scorpionutil import foo_where
+  ret = { }
+  jsonstr = request.args.get('json')
+  if not jsonstr:
+    print "query: no json string.  giving up"
+    return ret
+
+  args = json.loads(jsonstr)
+  dbname = args.get('db')
+  table = args.get('table')
+  where = args.get('where', []) or []
+
+  where, params = foo_where(where)
+  if where:
+    where = 'AND %s' % where
+  print where
+  print params
+
+  query = """WITH XXXX as (select count(*) from %s WHERE 1 = 1 %s)
+  SELECT * FROM %s 
+  WHERE random() <= 200.0 / (select * from XXXX) %s 
+  LIMIT 200"""
+  query = query % (table, where, table, where)
+  try:
+    conn = g.db
+    cur = conn.execute(query, [params+params])
+    rows = cur.fetchall()
+    cur.close()
+
+    data = [dict(zip(cur.keys(), vals)) for vals in rows]
+    ret['data'] = data
+    ret['schema'] = get_schema(g.db, table)
+
+  except Exception as e:
+    traceback.print_exc()
+    ret = {}
+    raise
+
+  print "%d points returned" % len(ret.get('data', []))
+  return ret
+
+
 
 @app.route('/api/query/', methods=['POST', 'GET'])
 @returns_json
-def query():
+def api_query():
   ret = { }
   jsonstr = request.args.get('json')
   if not jsonstr:

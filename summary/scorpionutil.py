@@ -110,13 +110,16 @@ def create_sql_obj(db, qjson):
   dbname = qjson['db']
   table = qjson['table']
   negate = qjson.get('negate', False)
-  where_json = qjson.get('where', [])
-  basewhere_json = qjson.get('basewhere', [])
+  where_json = qjson.get('where', []) or []
+  basewheres_json = qjson.get('basewheres', []) or []
 
   where, args = foo_where(where_json, negate)
-  basewhere, baseargs = foo_where(basewhere_json, False)
-  where = ' and '.join(filter(bool, [where, basewhere]))
+  print where
+  basewheres, baseargs = foo_where(basewheres_json, False)
+  print basewheres
+  where = ' and '.join(filter(bool, [where, basewheres]))
   args.extend(baseargs)
+  print where
   
   select = Select()
   nonagg = SelectExpr(x['alias'], [x['col']], x['expr'], x['col'])

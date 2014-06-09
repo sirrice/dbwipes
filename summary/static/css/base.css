@@ -100,12 +100,15 @@ body .background .mark {
   stroke-opacity: 0.05;
   fill: grey;
 }
-body table.tuples {
-  margin: 1em;
+body #tuples {
+  height: 500px;
+  overflow-y: scroll;
+  margin-top: 1em;
 }
 body table.tuples tr td,
 body table.tuples tr th {
   padding: 5px;
+  font-size: 9pt;
 }
 body table.tuples tr th {
   font-weight: bold;

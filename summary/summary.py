@@ -21,7 +21,7 @@ def make_cache(f):
   def _f(self, *args, **kwargs):
     try:
       key = str(map(str, (f.__name__, self.engine, self.tablename, self.where, self.nbuckets, map(str, args))))
-      print key
+      #print key
       vals = self._cache.execute('select val from cache where key = %s', key).fetchall()
       if len(vals):
         return json.loads(vals[0][0])
@@ -75,12 +75,12 @@ class Summary(object):
     self.nrows = self.get_num_rows()
     self.col_types = self.get_columns_and_types()
     for col, typ in self.col_types:
-      print "stats for: %s\t%s" % (col, typ)
+      #print "stats for: %s\t%s" % (col, typ)
       col_stats = self.get_col_stats(col, typ)
       if col_stats is None:
-        print "\tgot None"
+        #print "\tgot None"
         continue
-      print "\tgot %d" % (len(col_stats))
+      #print "\tgot %d" % (len(col_stats))
       stats.append((col, typ, col_stats))
     return stats
 
@@ -110,7 +110,7 @@ class Summary(object):
       print e
       pass
 
-    print self._cache.closed, self.db.closed
+    #print self._cache.closed, self.db.closed
 
 
   def query(self, q, *args):

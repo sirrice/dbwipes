@@ -16,7 +16,7 @@ define(function(require) {
         ys: null,
         schema: null,       // { col -> type }
         where: null,        // this changes depending on how user inteacts with rules/selection
-        basewheres: null,   // this WHERE is part of the query and should not be modified
+        basewheres: [],     // this WHERE is part of the query and should not be modified
                             // only way to set basewhere is to click on a rule
         table: null,
         db: null,
@@ -70,7 +70,6 @@ define(function(require) {
 
     fetch: function(options) {
       if (_.isEqual(window.prev_fetched_json, this.toJSON())) {
-        console.log(['query.fetch', 'redundant. cancelling']);
         return;
       }
       window.prev_fetched_json = this.toJSON();
@@ -82,7 +81,6 @@ define(function(require) {
       var complete = options.complete;
       var f = function(resp) {
         $("#q_loading").hide();
-        console.log(["query.fetch", 'got', resp]);
         if (complete) complete(model, resp, options);
       };
       options.complete = f;
@@ -139,26 +137,21 @@ define(function(require) {
 
 
     toJSON: function() {
-      function encodeWhere(where) {
-        if (!where) return [];
-        return where;
-      };
       var basewheres = this.get('basewheres') || [];
-      basewheres = _.flatten(basewheres.map(encodeWhere));
-      var where = encodeWhere(this.get('where'));
+      basewheres = _.compact(_.flatten(basewheres));
+      var where = this.get('where');
 
       var ret = {
         x: this.get('x'),
         ys: this.get('ys'),
         table: this.get('table'),
         db: this.get('db'),
-        where: _.union(basewheres, where),
+        where: where,
         basewheres: basewheres,
         limit: this.get('limit'),
         negate: !$("#selection-type > input[type=checkbox]").get()[0].checked
         //query: this.toSQL()
       };
-      console.log(ret)
       
       return ret;
     },

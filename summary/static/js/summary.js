@@ -81,6 +81,20 @@ requirejs([
     }, 5000);
 
 
+  $("#apply-btn").click(function() {
+    if (qv.overlayquery && qv.overlayquery.get('where')) {
+      var ws = _.chain(qv.overlayquery.get('where'))
+        .filter(function(w) { return w.vals && w.vals.length; })
+        .compact()
+        .map(function(w) { return util.toWhereClause(w.col, w.type, w.vals);})
+        .map(function(w) { return util.negateClause(w); })
+        .map(function(w) { return {col: null, sql: w}; })
+        .each(function(w) { q.get('basewheres').push(w); })
+        .value();
+      q.trigger('change:basewheres');
+    }
+  });
+
   // to avoid fetching same queries repeatedly
   window.prev_fetched_json = null;
 
@@ -192,17 +206,23 @@ requirejs([
   }
 
 
-  /*
   var tv = new TupleView({query: q, el: $("#tuples").get()[0]});
 
-  srv.on('setActive', function(model) {
-    if (model)
-      tv.model.set('where', model.toSQL());
-    else {
-      tv.model.set('where', null);
-    }
+  srv.on('setActive', function(whereJSON) {
+    tv.model.set('where', whereJSON);
   });
-  */
+  where.on('change:selection', function() {
+    tv.model.set('where', where.toJSON());
+    tv.model.trigger('change:where')
+  });
+  q.on('change', function() {
+    tv.model.set('where', 
+      _.compact(_.flatten(_.union(q.get('basewheres'), q.get('where')))));
+    tv.model.trigger('change:where');
+  });
+  window.tv = tv;
+
+
 
 
 

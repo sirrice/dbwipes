@@ -157,6 +157,9 @@ define(function(require) {
           .scale(this.state.yscales)
           .tickSize(0,0)
           .orient('left');
+        if (this.state.ydomain[1] > 10000000) {
+          this.state.yaxis.tickFormat(d3.format('.2e'))
+        };
       }
 
     },
@@ -213,7 +216,7 @@ define(function(require) {
         this.cancelWhereOverlay();
         return;
       }
-      var query = new Query(this.model.toJSON());
+      this.overlayquery = query = new Query(this.model.toJSON());
       query.set('where', where);
       query.fetch({
         data: {
@@ -230,6 +233,7 @@ define(function(require) {
 
     cancelWhereOverlay: function() {
       this.renderModifiedData(null);
+      this.overlayquery = null;
       return this;
     },
 
