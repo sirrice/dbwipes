@@ -119,6 +119,7 @@ body table.tuples tr th {
   top: 0px;
   margin-left: 50%;
   padding-bottom: 2em;
+  background: white;
 }
 #right .legend {
   margin-top: 10px;
