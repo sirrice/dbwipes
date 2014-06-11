@@ -279,7 +279,7 @@ requirejs([
   var fecq = {
     x: 'disb_dt',
     ys: [{col: 'disb_amt', expr: 'sum(disb_amt)'}],
-    scehma: {
+    schema: {
       disb_dt: 'timestamp',
       disb_amt: 'num'
     },
@@ -290,7 +290,7 @@ requirejs([
   var sigmodq = {
     x: 'g',
     ys: [{col: 'v', expr: 'sum(v)'}],
-    scehma: {
+    schema: {
       g: 'num',
       v: 'num'
     },

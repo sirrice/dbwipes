@@ -52,6 +52,7 @@ define(function(require) {
 
     onChangeDB: function() {
       this.set('where', null);
+      this.set('basewheres', []);
       this.onChange()
     },
 
