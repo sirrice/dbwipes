@@ -191,7 +191,7 @@ define(function(require) {
         this.$('.count').text(null);
     },
 
-    // when scorpion results set the selection...
+    // programatically se the selection
     setSelection: function(clause) {
       function withinClause(clause, val) {
         if (clause == null) return false;
@@ -216,21 +216,28 @@ define(function(require) {
       if (this.d3gbrush && this.d3brush)
         this.d3brush(this.d3gbrush);
 
+      var selected = [];
       if (clause) {
         this.d3svg.selectAll('.mark')
           .classed('selected', false)
           .classed('highlighted', function(d) {
-            return withinClause(clause, d.val);
+            if (withinClause(clause, d.val)) {
+              selected.push(d);
+              return true;
+            } 
+            return false;
           })
           .classed('faded', function(d) {
             return !withinClause(clause, d.val);
           })
+          console.log(selected)
       } else {
         this.d3svg.selectAll('.mark')
           .classed('selected', false)
           .classed('highlighted', false)
           .classed('faded', false)
       }
+      this.model.set('selection', selected);
 
     },
 
@@ -370,6 +377,7 @@ define(function(require) {
 
 
       c.append('rect')
+        .classed("plot-background", true)
         .attr('width', this.state.w)
         .attr('height', this.state.h)
         .attr('fill', 'none')

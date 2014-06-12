@@ -15,7 +15,7 @@ define(function(require) {
         x: null,            // { col:, expr:}
         ys: null,
         schema: null,       // { col -> type }
-        where: null,        // this changes depending on how user inteacts with rules/selection
+        where: [],          // this changes depending on how user inteacts with rules/selection
         basewheres: [],     // this WHERE is part of the query and should not be modified
                             // only way to set basewhere is to click on a rule
         table: null,
@@ -51,7 +51,7 @@ define(function(require) {
 
 
     onChangeDB: function() {
-      this.set('where', null);
+      this.set('where', []);
       this.set('basewheres', []);
       this.onChange()
     },
@@ -59,7 +59,6 @@ define(function(require) {
     onChange: function() {
       this.ensureX();
       this.ensureYs();
-      //this.ensureWhere();
       console.log("fetching new query " + this.get('where'))
       this.fetch({
         data: {

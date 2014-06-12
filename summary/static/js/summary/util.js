@@ -170,14 +170,23 @@ define(function(require) {
     } else {
       if (isTime(type)) {
         if (type == 'time') {
-          var val2s = function(v) { return "'" + (new Date(v)).toLocaleTimeString() + "'";};
+          var val2s = function(v) { 
+            if (_.isDate(v))
+              return "'" + (new Date(v)).toLocaleTimeString() + "'";
+            return v;
+          };
         } else {
-          var val2s = function(v) { return "'" + (new Date(v)).toISOString() + "'"; }
+          var val2s = function(v) { 
+            if(_.isDate(v)) 
+              return "'" + (new Date(v)).toISOString() + "'"; 
+            return v;
+          };
         }
         //vals = _.map(vals, function(v) { return new Date(v)});
       } else {
         var val2s = function(v) { return +v };
       }
+      console.log(vals)
 
       if (vals.length == 1) {
         SQL = col + " = " + val2s(vals[0]);

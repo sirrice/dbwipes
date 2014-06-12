@@ -46,7 +46,8 @@ define(function(require) {
         .css("padding", "1em")
         .css("padding-bottom", "1.5em")
         .css("box-shadow", "grey 0px 3px 2px -1px")
-        .css("background", "white");
+        .css("background", "white")
+        .attr('id', 'queryview-container');
 
       this.$svg = $("<svg id='viz'></svg>").prependTo(this.$el);
       this.svg = this.$svg.get()[0];
@@ -65,22 +66,14 @@ define(function(require) {
         .attr('stroke', 'none')
         .style('pointer-events', 'all')
 
-
-
       this.queryform = new QueryForm({model: this.model});
       this.listenTo(this.queryform, 'submit', this.resetState.bind(this));
       this.$el.append(this.queryform.render().el)
 
-
       this.$toggle = $("#q-toggle")
         .addClass("btn btn-primary")
         .css("margin-left", this.state.lp)
-        .click((function() {
-          this.queryform.render().$el.toggle();
-          this.$('.legend').toggle();
-          this.$svg.toggle();
-        }).bind(this));
-          
+        .click(this.toggleQueryForm.bind(this));
 
       this.listenTo(this.model, 'change:db', this.resetState);
       this.listenTo(this.model, 'change:table', this.resetState);
@@ -95,6 +88,28 @@ define(function(require) {
 
     onChange: function() {
       return;
+    },
+
+    showQueryForm: function() {
+      this.$toggle.text("Show Visualization");
+      this.queryform.render().$el.show();
+      this.$('.legend').hide();
+      this.$svg.hide();
+    },
+
+    hideQueryForm: function() {
+      this.$toggle.text("Show Query Form");
+      this.queryform.render().$el.hide();
+      this.$('.legend').show();
+      this.$svg.show();
+    },
+
+    toggleQueryForm: function() {
+      if (this.queryform.render().$el.css('display') == 'none') {
+        this.showQueryForm();
+      } else {
+        this.hideQueryForm();
+      }
     },
 
     // persistently update scales information

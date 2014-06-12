@@ -13,17 +13,28 @@ define(function(require) {
     initialize: function() {
       var _this = this;
       this.id = Where.id_++;
+      this.bTriggerModelSelection = true;
       this.on('add', function(model) {
-        this.listenTo(model, 'change:selection', function() {
-          _this.trigger('change:selection', _this);
-        })
+        this.listenTo(
+          model, 
+          'change:selection', 
+          _this.onModelSelection.bind(_this)
+        );
       });
     },
 
+    onModelSelection: function() {
+      console.log("onmodelselection " + this.bTriggerModelSelection)
+      if (this.bTriggerModelSelection) {
+        this.trigger('change:selection');
+      }
+    },
 
     // Sets each cstat to the corresponding selection clause
     // @param clauses list of { col:, type:, vals: } objects
     setSelection: function(clauses) {
+      this.bTriggerModelSelection = false;
+
       var col2clause = {};
       _.each(clauses, function(clause) {
         col2clause[clause.col] = clause;
@@ -31,16 +42,22 @@ define(function(require) {
 
       this.each(function(model) {
         var col = model.get('col');
-        model.set('selection', []);
         model.trigger('setSelection', col2clause[col]);
       });
+      console.log("manual trigger change:selection")
+      this.trigger('change:selection');
+      this.bTriggerModelSelection = true;
+
     },
 
     clearScorpionSelections: function() {
+      this.bTriggerModelSelection = false;
       this.each(function(model) {
         model.set('selection', [])
         model.trigger('clearScorpionSelection');
       });
+      this.trigger('change:selection');
+      this.bTriggerModelSelection = true;
     },
 
 
@@ -51,7 +68,9 @@ define(function(require) {
     },
 
     toJSON: function() {
-      return _.compact(_.invoke(this.models, 'toJSON'));
+      return _.filter(_.invoke(this.models, 'toJSON'), function(j) {
+        return j && j.vals && j.vals.length > 0;
+      });
     },
 
     toSQL: function() {
