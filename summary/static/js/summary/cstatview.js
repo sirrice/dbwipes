@@ -242,9 +242,6 @@ define(function(require) {
     },
 
     clearScorpionSelection: function() {
-      console.log('clear scorpion seelction')
-      console.log(this.d3brush)
-      this.d3brush.extent([]);
       this.d3brush.clear();
       this.d3brush(this.d3gbrush);
       this.d3svg.selectAll('.mark')

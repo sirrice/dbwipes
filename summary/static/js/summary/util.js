@@ -84,9 +84,9 @@ define(function(require) {
       return _.union(oldd, newd);
 
     var ret = _.clone(oldd);
-    if (_.isFinite(newd[0]))
+    if (!_.isNull(newd[0]) && (_.isFinite(newd[0]) || isTime(newd[0])))
       ret[0] = d3.min([ret[0], newd[0]]);
-    if (_.isFinite(newd[1]))
+    if (!_.isNull(newd[1]) && (_.isFinite(newd[1]) || isTime(newd[1])))
       ret[1] = d3.max([ret[1], newd[1]]);
     return ret;
   }

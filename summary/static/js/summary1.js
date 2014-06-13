@@ -337,7 +337,7 @@ requirejs([
       style: { width: "400px" },
       buttons: btns,
     });
-    step.on("hide", function() {
+    step.on("show", function() {
       qv.hideQueryForm();
     })
 
@@ -356,9 +356,9 @@ requirejs([
     });
 
     step = tour.addStep('facets-2', {
-      attachTo: "#facets right",
+      attachTo: "#tuples top",
       title: "Faceting Panel",
-      text: "Each facet on the left corresponds with one of the columns in the sample records table.",
+      text: "<p>Each facet on the left corresponds with one of the columns in the sample records table.</p>",
       showCancelLink: true,
       classes: "shepherd-theme-arrows",
       highlight: false,
