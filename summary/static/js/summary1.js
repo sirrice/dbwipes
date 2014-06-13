@@ -599,7 +599,7 @@ requirejs([
 
 
     tour.start();
-    _.delay(function(){ tour.show('dist-filter-2'); }, 1000)
+    //_.delay(function(){ tour.show('dist-filter-2'); }, 1000)
   }
 
 
