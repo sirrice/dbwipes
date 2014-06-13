@@ -158,7 +158,7 @@ define(function(require) {
               return "'" + v.replace(re, "\\'") + "'";
             return v;
           });
-          SQL.push(col + " in ("+vals.join(',')+")");
+          SQL.push(col + " in ("+vals.join(', ')+")");
         }
 
         if (SQL.length == 0)

@@ -8,18 +8,16 @@ define(function(require) {
 
 
   var WhereView = Backbone.View.extend({
-    tagName: "ul",
-    className: 'whereview',
-
     initialize: function() {
       var collection = this.collection;
       this.listenTo(collection, 'add', this.addOne);
       this.listenTo(collection, 'reset', this.onReset);
+      this.listenTo(collection, 'change:selection', this.render);
     },
 
     onReset: function() {
-      this.$el.empty();
-      this.collection.each(this.addOne.bind(this));
+      this.render();
+      return this;
     },
 
     addOne: function(model) {
@@ -29,7 +27,8 @@ define(function(require) {
     },
 
     render: function() {
-      console.log(this.el)
+      this.$el.empty();
+      this.collection.each(this.addOne.bind(this));
       return this;
     }
 

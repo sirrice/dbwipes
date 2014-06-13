@@ -36,6 +36,8 @@ body #where .clause {
   padding-left: 1em;
   padding-right: 2em;
   margin-bottom: 2px;
+  max-height: 3em;
+  overflow: hidden;
 }
 body #where .clause a {
   color: white;
@@ -43,7 +45,6 @@ body #where .clause a {
   cursor: pointer;
   float: right;
   margin-right: -1em;
-  margin-top: .5em;
 }
 body .cstat-label {
   overflow: hidden;

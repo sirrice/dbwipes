@@ -26,7 +26,7 @@ define(function(require) {
         return this;
       }
 
-      var s = this.model.toSQLWhere();
+      var s = util.negateClause(this.model.toSQLWhere());
       this.$el.html("<div class='clause'><a>x</a>" + s + "</div>");
       this.$el.show()
       return this;
