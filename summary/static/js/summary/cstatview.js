@@ -191,7 +191,7 @@ define(function(require) {
         this.$('.count').text(null);
     },
 
-    // programatically se the selection
+    // programatically set the selection
     setSelection: function(clause) {
       function withinClause(clause, val) {
         if (clause == null) return false;
@@ -242,9 +242,15 @@ define(function(require) {
     },
 
     clearScorpionSelection: function() {
+      console.log('clear scorpion seelction')
+      console.log(this.d3brush)
+      this.d3brush.extent([]);
+      this.d3brush.clear();
+      this.d3brush(this.d3gbrush);
       this.d3svg.selectAll('.mark')
+        .classed('selected', false)
         .classed('highlighted', false)
-        .classed('faded', false)
+        .classed('faded', false);
     },
 
 
@@ -270,6 +276,7 @@ define(function(require) {
         var selected = [];
         el.selectAll('.mark')
           .classed('highlighted', false)
+          .classed('faded', false)
           .classed('selected', function(d){ return within(d, e); })
           .each(function(d) { if (within(d, e)) selected.push(d); })
         if (d3.event.type == 'brushend') {

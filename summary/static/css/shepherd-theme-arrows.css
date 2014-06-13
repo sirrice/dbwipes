@@ -30,6 +30,7 @@
     -ms-transform: translateZ(0);
     -o-transform: translateZ(0);
     transform: translateZ(0);
+    box-shadow: black 0px 1px 10px 0px;
     -webkit-filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.5));
     -moz-filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.5));
     filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.5)); }

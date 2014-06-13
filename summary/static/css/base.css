@@ -26,6 +26,25 @@ body #facet-togglecheckall {
 body #where {
   margin-top: 2em;
 }
+body #where .clause {
+  list-style-type: none;
+  font-family: arial;
+  background: grey;
+  color: white;
+  padding: 3px;
+  border-radius: 4px;
+  padding-left: 1em;
+  padding-right: 2em;
+  margin-bottom: 2px;
+}
+body #where .clause a {
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  float: right;
+  margin-right: -1em;
+  margin-top: .5em;
+}
 body .cstat-label {
   overflow: hidden;
   text-align: right;
@@ -120,6 +139,13 @@ body table.tuples tr th {
   margin-left: 50%;
   padding-bottom: 2em;
   background: white;
+}
+#q .q-where-close {
+  cursor: pointer;
+  position: absolute;
+  right: 2em;
+  vertical-align: middle;
+  padding-top: .4em;
 }
 #right .legend {
   margin-top: 10px;

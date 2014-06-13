@@ -8,10 +8,13 @@ define(function(require) {
 
   // View to render the selected stuff for debugging
   var SelectionView = Backbone.View.extend({
+    events: {
+      "click .clause a": 'onClose'
+    },
+
     initialize: function() {
       this.listenTo(this.model, 'change:selection', this.render);
     },
-
 
     render: function() {
       var sel = this.model.get('selection'),
@@ -24,15 +27,21 @@ define(function(require) {
       }
 
       var s = this.model.toSQLWhere();
-      this.$el.html("<div class='clause'>" + s + "</div>");
-      this.$el.show();
+      this.$el.html("<div class='clause'><a style='float: right; right: 1em;'>x</a>" + s + "</div>");
+      this.$el.show()
       return this;
     },
 
     clear: function() {
       this.$el.hide();
       return this;
+    },
+
+    onClose: function() {
+      this.model.set('selection', []);
+      this.model.trigger('clearScorpionSelection');
     }
+
 
   })
 

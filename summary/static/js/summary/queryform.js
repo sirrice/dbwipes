@@ -17,8 +17,9 @@ define(function(require) {
     ycolhtml: "<div><input class='form-control' name='q-y-col' placeholder='attribute'/></div>",
 
     events: {
-      'click .q-add':     "onAggAdd",
-      'click .q-submit':  "onSubmit",
+      'click .q-add':         "onAggAdd",
+      'click .q-submit':      "onSubmit",
+      'click .q-where-close': 'onWhereClose'
     },
 
     defaults: function() {
@@ -84,8 +85,16 @@ define(function(require) {
       this.model.set(q);
     },
 
+    onWhereClose: function(el) {
+      var idx = $(el).data('idx'),
+          basewheres = this.model.get('basewheres');
+      basewheres.splice(idx, 1);
+      this.model.trigger('change:basewheres');
+    },
+
     render: function(errText) {
-      var json = this.model.toJSON();
+      var json = this.model.toJSON(),
+          _this = this;
       json['error'] = errText;
       this.$el.attr('id', 'q');
       this.$el.html(this.errtemplate(json));

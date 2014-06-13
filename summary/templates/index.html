@@ -42,9 +42,15 @@
         </span>
       </div>
       <div class="col-md-3">
-        <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Apply current selection</span>
+        <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Add Filter to Query</span>
       </div>
     </div>
+
+    <div class='row'>
+      <div class="col-md-10 col-md-offset-2" style='max-width:450px; padding-left: 80px;' id='where'></div>
+    </div>
+
+
 
     <div class="row">
       <div class="col-md-12">
@@ -52,15 +58,11 @@
 
         <div class='row'>
           <div class="col-md-12">
-            <!--<svg id="tuples" style="margin-top: 1em"></svg>-->
             <div id="tuples"></div>
           </div>
         </div>
 
-        <div class='row'>
-          <div class="col-md-10 col-md-offset-2" id='where'></div>
         </div>
-      </div>
     </div>
   </div>
 
@@ -92,7 +94,7 @@
   <h1>&nbsp;</h1>
   <div class="row">
     <div class="col-md-12">
-      <span id="q-toggle" data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
+      <span id="q-toggle" class="btn-sm"  data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
       <span id="q-load-bt" class="btn">load xx</span>
       <span id="q-load-intel" class='btn'>load yy</span>
       <span id="q-load-med" class='btn'>load ii</span>

@@ -29,17 +29,17 @@
         </span>
       </div>
       <div class="col-md-3">
-        <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Apply current selection</span>
+        <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Add Filters to Query</span>
       </div>
+    </div>
+
+    <div class='row'>
+      <div class="col-md-10 col-md-offset-2" style='max-width:450px; padding-left: 80px;' id='where'></div>
     </div>
 
     <div class="row">
       <div class="col-md-12">
         <div id="facets"></div>
-
-        <div class='row'>
-          <div class="col-md-10 col-md-offset-2" style="display:none;" id='where'></div>
-        </div>
       </div>
     </div>
   </div>
@@ -56,7 +56,7 @@
   <h1>&nbsp;</h1>
   <div class="row">
     <div class="col-md-12">
-      <span id="q-toggle" data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
+      <span id="q-toggle" class="btn-sm" data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
     </div>
   </div>
 
@@ -112,7 +112,7 @@
     </div>
   </div>
   <div class='row'>
-    <div class="col-md-4">groupby</div>
+    <div class="col-md-4">GROUP BY clause</div>
     <div class="col-md-5 input-x">
       <input class="form-control" name="q-x-expr" value="{{x.expr}} as {{x.alias}}" placeholder="expression">
     </div>
@@ -121,7 +121,7 @@
     </div>
   </div>
   <div class='row'>
-    <div class="col-md-4">aggregates <span class='q-add'>+</span></div>
+    <div class="col-md-4">SELECT clauses <span id="q-add-select-expr" class='q-add btn btn-primary btn-xs'>add</span></div>
     <div class="col-md-5 input-ys-expr">
       {{#each ys}}
       <div>
@@ -138,17 +138,16 @@
     </div>
   </div>
   <div class='row'>
-    <div class="col-md-4">where</div>
+    <div class="col-md-4">WHERE clauses</div>
     <div class="col-md-8 input-x">
       {{#each basewheres}}
-      <div>
-        <input class="form-control" name="q-where" 
-               value="{{this.sql}}" placeholder="expression">
+			<div>
+				<a data-idx="{{this.idx}}" class="q-where-close" style="">x</a>
+				<input data-idx="{{this.idx}}" class="form-control" name="q-where" value="{{this.sql}}" placeholder="expression">
       </div>
       {{/each}}
-      <div>
-        <input class="form-control" name="q-where" 
-               value="" placeholder="expression">
+			<div>
+				<input data-idx="new" class="form-control" name="q-where" value="" placeholder="expression">
       </div>
     </div>
   </div>
@@ -290,7 +289,7 @@
 <table class="tuples table table-striped table-condensed table-hover">
   <thead>
   <tr>
-    {{#each cols}} <th>{{this}}</th> {{/each}}
+		{{#each cols}} <th data-col="{{this}}">{{this}}</th> {{/each}}
   </tr>
   </thead>
   <tbody>

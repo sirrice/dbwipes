@@ -171,6 +171,7 @@ define(function(require) {
       if (isTime(type)) {
         if (type == 'time') {
           var val2s = function(v) { 
+            // the values could have already been string encoded.  
             if (_.isDate(v))
               return "'" + (new Date(v)).toLocaleTimeString() + "'";
             return v;

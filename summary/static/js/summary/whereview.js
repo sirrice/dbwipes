@@ -8,6 +8,8 @@ define(function(require) {
 
 
   var WhereView = Backbone.View.extend({
+    tagName: "ul",
+    className: 'whereview',
 
     initialize: function() {
       var collection = this.collection;
@@ -24,7 +26,14 @@ define(function(require) {
       var view = new SelectionView({model: model});
       var vel = view.render().el;
       this.$el.append(vel);
+    },
+
+    render: function() {
+      console.log(this.el)
+      return this;
     }
+
+
   })
 
   return WhereView
