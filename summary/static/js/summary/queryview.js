@@ -451,6 +451,41 @@ define(function(require) {
 
       el.select('.axis.y').call(yzoom)
         .style('cursor', 'ns-resize')
+
+      var yStart = null;
+      var curYScale = null;
+      el.select('.yaxis')
+        .on('mousedown.qvy', function() {
+          if (d3.event.shiftKey) {
+            yStart = d3.event.y;
+            curYScale = yzoom.scale();
+            yzoom.on('zoom', null);
+            el.select('.yaxis rect').style('pointer-events', 'none');
+            console.log('disabled things');
+            d3.select('body')
+              .on('mousemove.qvy', function() {
+                var diff = ((yStart - d3.event.y) / 100);
+                if (diff >= 0) { 
+                  diff += 1.0; 
+                } else if (diff < 0) { 
+                  diff = 1.0 / (Math.abs(diff)+1);
+                }
+                yzoom.scale(diff*curYScale);
+                yzoomf();
+              })
+              .on('mouseup.qvy', function() {
+                d3.select('body')
+                  .on('mousemove.qvy', null)
+                  .on('mouseup.qvy', null);
+                yzoom.on('zoom', yzoomf);
+                el.select('.yaxis rect').style('pointer-events', 'all');
+              });
+          }
+        })
+
+
+
+
           
       var type = this.model.get('schema')[this.model.get('x').col];
 
@@ -461,6 +496,36 @@ define(function(require) {
 
         el.select('.axis.x').call(xzoom)
           .style('cursor', 'ew-resize');
+
+
+        var xStart = null;
+        var curXScale = null;
+        el.select('.xaxis')
+          .on('mousedown.qvx', function() {
+            if (d3.event.shiftKey) {
+              xStart = d3.event.x;
+              curXScale = xzoom.scale();
+              d3.select('body')
+                .on('mousemove.qvx', function() {
+                  var diff = ((d3.event.x - xStart) / 100);
+                  if (diff >= 0) { 
+                    diff += 1.0; 
+                  } else if (diff < 0) { 
+                    diff = 1.0 / (Math.abs(diff)+1);
+                  }
+                  console.log(diff)
+                  xzoom.scale(diff*curXScale);
+
+                })
+                .on('mouseup.qvx', function() {
+                  d3.select('body')
+                    .on('mousemove.qvx', null)
+                    .on('mouseup.qvx', null);
+                });
+            }
+          })
+
+
       }
     },
 

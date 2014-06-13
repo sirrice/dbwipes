@@ -70,7 +70,7 @@ define(function(require) {
         scales = d3.scale.ordinal();
       
       if (scaletype == 'y' && util.isNum(type)) {
-        if (domain[1] > d3.max([1,domain[0]]) * 100)  {
+        if (false && domain[1] > d3.max([1,domain[0]]) * 1000)  {
           scales = d3.scale.log()
           domain[0] = d3.max([domain[0], 1]);
         }
@@ -127,9 +127,11 @@ define(function(require) {
             .attr({
               class: 'mark',
               width: d3.max([1,xscales.rangeBand()]),
-              height: function(d) {return yscales(d.count)},
               x: function(d) { return xscales(d.val) },
-              y: function(d) { return h-yscales(d.count)}
+              //height: function(d) {return yscales(d.count)},
+              //y: function(d) { return h-yscales(d.count)}
+              height: function(d) {return yscales(0)-yscales(d.count)},
+              y: function(d) { return yscales(d.count)}
             })
       } else {
         var xs =_.pluck(stats, 'val');
@@ -315,23 +317,60 @@ define(function(require) {
             return Math.max(0, Math.min(h, yscales(d.count)));
           })
           .attr('height', function(d) {
-            var y = Math.max(0, Math.min(h, yscales(d.count)));
-            return Math.max(0, Math.min(h, yscales(0)) - y)
+            var bot = Math.max(0, Math.min(h, yscales(d.count)));
+            var height = yscales(0) - bot;
+            return Math.min(h, Math.max(0, height));
           })
-          
-        _this.yscale = d3.event.scale;
-
       };
-
 
       this.yzoom = yzoom = d3.behavior.zoom()
         .y(this.state.yscales)
-        //.scaleExtent([1, 100])
+        .scaleExtent([.1, 10000])
         .on('zoom', yzoomf);
 
       el.select('.axis.y').call(yzoom)
         .style('cursor', 'ns-resize')
- 
+      
+      if (!window.zoom) {
+        window.zoom = yzoom;
+        window.el = el;
+        window.yzoomf = yzoomf
+        window.yaxis = yaxis;
+      }
+
+      var yStart = null;
+      var curYScale = null;
+      el.select('.yaxis')
+        .on('mousedown.cstaty', function() {
+          if (d3.event.shiftKey) {
+            yStart = d3.event.y;
+            curYScale = yzoom.scale();
+            yzoom.on('zoom', null);
+            el.select('.yaxis rect').style('pointer-events', 'none');
+            console.log('disabled things');
+            d3.select('body')
+              .on('mousemove.cstaty', function() {
+                var diff = ((yStart - d3.event.y) / 5);
+                if (diff >= 0) { 
+                  diff += 1.0; 
+                } else if (diff < 0) { 
+                  diff = 1.0 / (Math.abs(diff)+1);
+                }
+                yzoom.scale(diff*curYScale);
+                //yzoomf();
+              })
+              .on('mouseup.cstaty', function() {
+                d3.select('body')
+                  .on('mousemove.cstaty', null)
+                  .on('mouseup.cstaty', null);
+                yzoom.on('zoom', yzoomf);
+                el.select('.yaxis rect').style('pointer-events', 'all');
+              });
+          }
+        })
+
+
+
 
       if (!util.isStr(this.model.get('type'))) {
         // sorry, don't support discrete zooming...
@@ -357,10 +396,38 @@ define(function(require) {
 
         var zoom = d3.behavior.zoom()
           .x(xscales)
-          .scaleExtent([1, 1000])
+          .scaleExtent([.8, 1000])
           .on('zoom', zoomf)
         el.select('.axis.x').call(zoom)
           .style('cursor', 'ew-resize')
+
+        var xStart = null;
+        var curXScale = null;
+        el.select('.xaxis')
+          .on('mousedown.cstatx', function() {
+            if (d3.event.shiftKey) {
+              xStart = d3.event.x;
+              curXScale = zoom.scale();
+              d3.select('body')
+                .on('mousemove.cstatx', function() {
+                  var diff = ((d3.event.x - xStart) / 100);
+                  if (diff >= 0) { 
+                    diff += 1.0; 
+                  } else if (diff < 0) { 
+                    diff = 1.0 / (Math.abs(diff)+1);
+                  }
+                  console.log(diff)
+                  zoom.scale(diff*curXScale);
+
+                })
+                .on('mouseup.cstatx', function() {
+                  d3.select('body')
+                    .on('mousemove.cstatx', null)
+                    .on('mouseup.cstatx', null);
+                });
+            }
+          })
+
       }
 
       return this;
