@@ -200,7 +200,8 @@ requirejs([
     step = tour.addStep('start', {
       id: 1,
       title: "Welcome to Scorpion!",
-      text: "This is a tutorial to walk you through parts of the interface.  The sample dataset we will use is a sensor dataset (more text)",
+      text: "<p>This is a tutorial to walk you through parts of the interface. </p>"+
+            "<p>The dataset we will use is a sensor dataset containing voltage, light, and humidity readings from 54 different sensors installed around a building</p> ",
       classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
       style: { width: "500px" },
       showCancelLink: true
