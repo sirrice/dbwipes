@@ -27,7 +27,7 @@ define(function(require) {
       }
 
       var s = this.model.toSQLWhere();
-      this.$el.html("<div class='clause'><a style='float: right; right: 1em;'>x</a>" + s + "</div>");
+      this.$el.html("<div class='clause'><a>x</a>" + s + "</div>");
       this.$el.show()
       return this;
     },

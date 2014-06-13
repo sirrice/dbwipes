@@ -419,7 +419,6 @@ requirejs([
       highlight: true,
       buttons: btns,
     });
-
     step.on('show', function() {
       $(".cstat-plot:first .xaxis rect")
         .attr("stroke", "rgb(18, 179, 255)")
@@ -435,12 +434,13 @@ requirejs([
 
 
     step = tour.addStep('dist-filter', {
-      attachTo: ".cstat-plot .plot-background bottom",
+      attachTo: ".cstat-plot .plot-background right",
       title: "Filtering",
       text: "<p>You can also select portions of this distribution to filter the query.</p><p>Click Next to see an example</p>",
       showCancelLink: true,
       classes: "shepherd-theme-arrows",
-      tetherOptions: { offset: '-28px 0px' },
+      //tetherOptions: { offset: '-28px 0px' },
+      tetherOptions: { offset: '0px -10px' },
       style: { width: '400px'},
       highlight: true,
       buttons: btns,
@@ -452,15 +452,16 @@ requirejs([
     })
 
     step = tour.addStep('dist-filter-2', {
-      attachTo: ".cstat-plot .plot-background bottom",
+      attachTo: ".cstat-plot .plot-background right",
       title: "Filtering (example)",
       text: "<p>This selects records from <i>3/03/2004</i> to <i>3/07/2004</i></p>"+
-            "<p>Notice it changes the subset of data shown in the visualization on the right</p>"+
+            "<p>Notice it changes the subset of data shown in the visualization on the right.</p>"+
             "<p>You can resize and drag the selection around.  Clicking outside of it will clear the filter.</p>"+
             "<p>Go ahead and give it a try</p>",
       showCancelLink: true,
       classes: "shepherd-theme-arrows",
-      tetherOptions: { offset: '-28px 0px' },
+      //tetherOptions: { offset: '-28px 0px' },
+      tetherOptions: { offset: '0px -10px' },
       style: { width: '400px'},
       highlight: true,
       buttons: btns,
@@ -471,6 +472,20 @@ requirejs([
     step.on('hide', function() {
       $(".cstat-plot:first .plot-background").attr("stroke", "none");
     })
+
+    step = tour.addStep('dist-filter-3', {
+      attachTo: "#where right",
+      title: "Filtering (example)",
+      text: "<p>The filters that you add are also listed textually.</p>",
+      showCancelLink: true,
+      classes: "shepherd-theme-arrows",
+      //tetherOptions: { offset: '-28px 0px' },
+      tetherOptions: { offset: '0px -10px' },
+      style: { width: '400px'},
+      highlight: true,
+      buttons: btns,
+    });
+
 
 
     tour.addStep('facets-2', {
@@ -584,7 +599,7 @@ requirejs([
 
 
     tour.start();
-    _.delay(function(){ tour.show('qformbtn-clicked'); }, 1000)
+    _.delay(function(){ tour.show('dist-filter-2'); }, 1000)
   }
 
 
