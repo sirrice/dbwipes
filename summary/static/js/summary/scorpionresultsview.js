@@ -48,15 +48,14 @@ define(function(require) {
           where = this.state.locked.get('clauses')
           clauses = this.state.locked.get('clauses');
         } else {
-          where = this.state.where.toJSON();
+          //where = this.state.where.toJSON();
+          where = []; 
           clauses = [];
         }
       }
 
-      console.log(['setactive', model, this.state.locked, where]);
-      //this.state.query.set('where', where);
+      console.log(['setactive', model, this.state.locked, JSON.stringify(where)]);
       this.state.where.setSelection(clauses);
-
       this.trigger('setActive', where);
       return this;
     },
@@ -67,7 +66,7 @@ define(function(require) {
       } else {
         this.state.locked = model;
       }
-      console.log(['newstate:', this.state.locked])
+      console.log(['srv.toggleLocked', this.state.locked])
       this.setActive(model);
       return this;
     },

@@ -232,12 +232,20 @@ define(function(require) {
     // set base plot to background and render
     // result with WHERE clause
     renderWhereOverlay: function(where) {
-      if (!where) {
+      if (!where || !where.length) {
+        console.log(['qv.renderoverlay', 'canceloverlay']);
         this.cancelWhereOverlay();
         return;
       }
+      if (_.isEqual(this.model.get('where'), where)) {
+        console.log(['qv.renderoverlay', 'cached']);
+        return;
+      }
+
       this.overlayquery = query = new Query(this.model.toJSON());
       query.set('where', where);
+      console.log(['qv.renderoverlay', JSON.stringify(where), query])
+
       query.fetch({
         data: {
           json: JSON.stringify(query.toJSON()),
@@ -245,6 +253,7 @@ define(function(require) {
         },
         context: this,
         success: (function(model, resp, opts) {
+          console.log(['qv.fetch', 'success', resp.data]);
           this.renderModifiedData(resp.data);
         }).bind(this)
       });

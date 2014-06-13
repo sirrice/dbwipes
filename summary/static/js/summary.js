@@ -130,18 +130,11 @@ requirejs([
     });
   })
   where.on('change:selection', function() {
-    var whereJson = where.toJSON();
     if (srv) {
       srv.unlockAll();
       psrv.unlockAll();
     }
-    if (!_.isEqual(q.get('where'), whereJson)) {
-      console.log(["where.change:selection", whereJson])
-      qv.renderWhereOverlay(whereJson);
-    } else {
-      qv.cancelWhereOverlay();
-    }
-
+    qv.renderWhereOverlay(where.toJSON());
   });
 
 
@@ -175,14 +168,14 @@ requirejs([
     });
     $("body").append(sqv.render().$el.hide());
 
+    /*
     srv.on('setActive', function(whereJson) {
-      if (!_.isEqual(q.get('where'), whereJson)) 
-        qv.renderWhereOverlay(whereJson);
+      qv.renderWhereOverlay(whereJson);
     });
     psrv.on('setActive', function(whereJson) {
-      if (!_.isEqual(q.get('where'), whereJson)) 
-        qv.renderWhereOverlay(whereJson);
+      qv.renderWhereOverlay(whereJson);
     });
+    */
 
 
     q.on('change:db change:table', function() {
@@ -208,9 +201,11 @@ requirejs([
 
   var tv = new TupleView({query: q, el: $("#tuples").get()[0]});
 
+  /*
   srv.on('setActive', function(whereJSON) {
     tv.model.set('where', whereJSON);
   });
+  */
   where.on('change:selection', function() {
     tv.model.set('where', where.toJSON());
     tv.model.trigger('change:where')

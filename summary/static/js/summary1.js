@@ -347,7 +347,7 @@ requirejs([
     tour.addStep('facets', {
       attachTo: "#facets right",
       title: "Faceting Panel",
-      text: "The Facetting panel lists count distribution information for every attribute in the dataset.",
+      text: "The Facetting panel shows value distributions as histograms for every attribute in the dataset.",
       showCancelLink: true,
       classes: "shepherd-theme-arrows",
       highlight: true,

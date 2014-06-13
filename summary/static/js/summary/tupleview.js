@@ -24,7 +24,13 @@ define(function(require) {
     },
 
     initialize: function() {
+      this.prev_json = null;
       this.on('change:where', (function() {
+        if (_.isEqual(this.prev_json, this.toJSON())) {
+          //console.log(['tupleview.fetch', 'cached']);
+          return;
+        }
+        this.prev_json = _.clone(this.toJSON());
         console.log(['tupleview.fetch', this.toJSON()])
         this.fetch({ 
           data: {

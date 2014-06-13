@@ -241,7 +241,6 @@ def api_query():
 
   o, params = scorpionutil.create_sql_obj(g.db, args)
   query = str(o)
-  print args
   print query
   print params
 

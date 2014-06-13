@@ -187,8 +187,6 @@ define(function(require) {
       } else {
         var val2s = function(v) { return +v };
       }
-      console.log(vals)
-
       if (vals.length == 1) {
         SQL = col + " = " + val2s(vals[0]);
       } else {

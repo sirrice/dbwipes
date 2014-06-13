@@ -44,7 +44,7 @@ define(function(require) {
         var col = model.get('col');
         model.trigger('setSelection', col2clause[col]);
       });
-      console.log("manual trigger change:selection")
+      console.log(['where.setselection', 'trigger change:selection']);
       this.trigger('change:selection');
       this.bTriggerModelSelection = true;
 

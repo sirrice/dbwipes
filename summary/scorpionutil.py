@@ -114,12 +114,9 @@ def create_sql_obj(db, qjson):
   basewheres_json = qjson.get('basewheres', []) or []
 
   where, args = foo_where(where_json, negate)
-  print where
   basewheres, baseargs = foo_where(basewheres_json, False)
-  print basewheres
   where = ' and '.join(filter(bool, [where, basewheres]))
   args.extend(baseargs)
-  print where
   
   select = Select()
   nonagg = SelectExpr(x['alias'], [x['col']], x['expr'], x['col'])
@@ -209,7 +206,6 @@ def scorpion_run(db, requestdata, requestid):
       errors.append(err)
 
     obj.errors = errors
-    print obj.errors[0]
 
     obj.status = Status(requestid)
     print "status requid = ", requestid

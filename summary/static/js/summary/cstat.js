@@ -73,9 +73,8 @@ define(function(require) {
         if (util.isStr(type)) {
           vals = vals.map(function(v) { return _.flatten([v])[0]; });
         } else {
-          console.log(vals)
           vals = [d3.min(_.pluck(vals, 0)), d3.max(_.pluck(vals,1))];
-          console.log(vals)
+          console.log(['cstat.json', vals])
           if (util.isTime(type)) {
             if (type == 'time') 
               vals = vals.map(function(v) { 

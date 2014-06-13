@@ -6,6 +6,23 @@ define(function(require) {
       Where = require('summary/where'),
       util = require('summary/util');
 
+  var queryCache = {};
+  function checkQueryCache(json) {
+    var key = JSON.stringify(json);
+    return queryCache[key];
+  }
+
+  function addToCache(json, data) {
+    var key = JSON.stringify(json);
+    var n = _.size(queryCache);
+    if (!_.contains(queryCache, key) && n > 10) {
+      _.each(_.last(_.keys(queryCache), n - 10), function(k) {
+        delete queryCache[k];
+      });
+    }
+    queryCache[key] = data;
+    return;
+  }
 
   var Query = Backbone.Model.extend({
     url: '/api/query',
@@ -69,10 +86,13 @@ define(function(require) {
     },
 
     fetch: function(options) {
-      if (_.isEqual(window.prev_fetched_json, this.toJSON())) {
-        return;
+      var json = this.toJSON();
+      var resp = checkQueryCache(json);
+      if (resp) {
+        //console.log(['q.fetch', 'cache hit', json, resp])
+        //if (options.complete) options.complete(this, resp, options);
+        //return;
       }
-      window.prev_fetched_json = this.toJSON();
 
       $("#q_loading").show();
       var model = this;
@@ -81,6 +101,7 @@ define(function(require) {
       var complete = options.complete;
       var f = function(resp) {
         $("#q_loading").hide();
+        //addToCache(json, resp.responseJSON);
         if (complete) complete(model, resp, options);
       };
       options.complete = f;

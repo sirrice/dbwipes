@@ -192,6 +192,8 @@ define(function(require) {
     },
 
     // programatically set the selection
+    // the expectation is that the model.set calls in the method
+    // will not trigger "change" events
     setSelection: function(clause) {
       function withinClause(clause, val) {
         if (clause == null) return false;
@@ -230,14 +232,13 @@ define(function(require) {
           .classed('faded', function(d) {
             return !withinClause(clause, d.val);
           })
-          console.log(selected)
       } else {
         this.d3svg.selectAll('.mark')
           .classed('selected', false)
           .classed('highlighted', false)
           .classed('faded', false)
       }
-      this.model.set('selection', selected);
+      this.model.set('selection', selected, {silent: true});
 
     },
 
