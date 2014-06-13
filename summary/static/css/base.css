@@ -148,6 +148,9 @@ body table.tuples tr th {
   vertical-align: middle;
   padding-top: .4em;
 }
+#q input[name=q-where] {
+  padding-right: 2em;
+}
 #right .legend {
   margin-top: 10px;
 }
