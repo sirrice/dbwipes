@@ -124,9 +124,12 @@ requirejs([
       reset: true
     });
   })
-  where.on('change:selection', function(opts) {
-    opts || (opts = {noUnlock: false});
+  where.on('change:selection', function() {
+    var opts = { noUnlock: false };
+    arguments.length && (opts = _.last(arguments))
+    opts || (opts = {noUnlock:false});
     if (srv && !opts.noUnlock) {
+      console.log(['summary.js', 'unlockall', arguments])
       srv.unlockAll();
       psrv.unlockAll();
     }
