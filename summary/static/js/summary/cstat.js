@@ -7,27 +7,54 @@ define(function(require) {
   require('date');
 
   var CStat = Backbone.Model.extend({
+    url: '/api/column_distribution/',
+
     defaults: function() {
       return {
         col: null,
-        type: null,   // time | timestamp | date | num | str
-        stats: [],    // { val:, count:, range:}
-        xdomain: [],   // (min, max) or [list of discrete vals]
+        type: null,      // time | timestamp | date | num | str
+        stats: [],       // { val:, count:, range:}
+        xdomain: [],     // (min, max) or [list of discrete vals]
         ydomain: [],
-        selection: [] // subset of domain
+        selection: [],   // subset of domain
+        ready: false,
+        scorpion: false  // is the selection based on scorpion predicates
+                         // or manually selected?
       }
     },
 
     initialize: function(attrs) {
-      var type = attrs.type,
-          stats = attrs.stats,
+      this.set('id', CStat.id_++);
+    },
+
+
+    fetch:  function(options) {
+      var _this = this;
+      this.trigger('fetch:start');
+      this.attributes.ready = false;
+      options || (options = { data: {} });
+      var complete = options.complete;
+      var f = function(resp) {
+        _this.trigger('fetch:end');
+        if (complete) complete(model, resp, options);
+      };
+      options.complete = f;
+      return Backbone.Model.prototype.fetch.call(this, options);
+    },
+
+
+
+    parse: function(resp) {
+      var data = resp.data;
+      var type = data.type,
+          stats = data.stats,
           _this = this;
 
       if (util.isNum(type)) {
-        type = attrs.type = 'num';
+        type = data.type = 'num';
       }
       if (util.isStr(type)) {
-        type = attrs.type = 'str';
+        type = data.type = 'str';
       }
       if (util.isTime(type)){
         // ensure vals and ranges are date objects
@@ -40,6 +67,7 @@ define(function(require) {
           d.range = _.map(d.range, function(v) {return new Date(v);})
         })
       }
+      stats = _.sortBy(stats, 'val');
 
       var getx = function(d) { return d.val; },
           gety = function(d) { return d.count },
@@ -49,12 +77,14 @@ define(function(require) {
       if (ydomain[0] == ydomain[1] || ydomain[0] > 0) 
         ydomain[0] = 0;
 
-      this.set('type', type);
-      this.set('xdomain', xdomain);
-      this.set('ydomain', ydomain);
-      this.set('id', CStat.id_++);
-
-      return this;
+      return {
+        stats: stats,
+        type: type,
+        xdomain: xdomain,
+        ydomain: ydomain,
+        selection: [],
+        ready: true
+      };
     },
 
 

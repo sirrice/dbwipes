@@ -44,7 +44,7 @@ def json_handler(o):
 
 class Summary(object):
 
-  def __init__(self, dbname, tablename, nbuckets=50, CACHELOC='.summary.cache'):
+  def __init__(self, dbname, tablename, nbuckets=50, CACHELOC='.summary.cache', where=''):
     self.dbtype = 'pg'
     if 'monetdb' in str(dbname):
       self.engine = None
@@ -63,14 +63,13 @@ class Summary(object):
     self.tablename = tablename
     self.nbuckets = nbuckets
     self.where = ''
-
-    self._engine, self._cache = get_cache(CACHELOC)
-
-  def __call__(self, where=''):
     where = where.strip()
     if where:
       self.where = 'WHERE %s' % where
 
+    self._engine, self._cache = get_cache(CACHELOC)
+
+  def __call__(self):
     stats = []
     self.nrows = self.get_num_rows()
     self.col_types = self.get_columns_and_types()
@@ -236,7 +235,10 @@ class Summary(object):
 
 
   @make_cache
-  def get_col_stats(self, col_name, col_type):
+  def get_col_stats(self, col_name, col_type=None):
+    if col_type is None:
+      col_type = self.get_type(col_name)
+
     if col_type.startswith('_'):
       return None
 
@@ -277,7 +279,7 @@ class Summary(object):
         args = (c, self.tablename, c)
       val = self.query(q % args)[0][0]
       return [{'val': val, 'count': self.nrows, 'range': [val, val]}]
-
+    
     q = """
     with bound as (
       SELECT min(%s) as min, max(%s) as max, avg(%s) as avg, stddev(%s) as std FROM %s %s
@@ -291,6 +293,24 @@ class Summary(object):
     GROUP BY bucket
     """
     q = q % (c, c, c, c, self.tablename, self.where, c, self.nbuckets, c, c, self.tablename, self.where)
+
+
+    q = """
+    with TMP as (
+      SELECT 2.5 * stddev(%s) / %d as block FROM %s %s
+    )
+    SELECT (%s/block)::int*block as bucket, 
+           min(%s) as min, 
+           max(%s) as max, 
+           count(*) as count
+    FROM %s,  TMP
+    %s
+    GROUP BY bucket
+    ORDER BY bucket
+    """
+    q = q % (c, self.nbuckets, self.tablename, self.where, c, c, c, self.tablename, self.where)
+
+
     stats = []
     for (val, minv, maxv, count) in self.query(q):
       if val is None:

@@ -65,6 +65,7 @@ requirejs([
   ScorpionResults, ScorpionResultsView,
   TupleView,
   DrawingView, util, _, Shepherd) {
+    console.log(Shepherd);
 
   $ = require('bootstrap');
 
@@ -84,11 +85,7 @@ requirejs([
   });
   $("#selection-type")
     .attr('title', st_on_text)
-    .tooltip('fixTitle')
-    .tooltip('show');
-  _.delay(function() {
-    $("#selection-type").tooltip('hide');
-  }, 5000);
+    .tooltip('fixTitle');
 
 
 
@@ -119,7 +116,7 @@ requirejs([
   $("#right").prepend(qv.render().$el);
 
 
-  var where = new Where;
+  var where = new Where({ query: q, nbuckets: 200 });
   var whereview = new WhereView({collection: where, el: $("#where")});
   var csv = new CStatsView({collection: where, el: $("#facets")});
   q.on('change:db change:table change:basewheres', function() {
@@ -128,7 +125,6 @@ requirejs([
       data: {
         db: q.get('db'),
         table: q.get('table'),
-        nbuckets: 500,
         where: _.compact(_.pluck(_.flatten(q.get('basewheres')), 'sql')).join(' AND ')
       },
       reset: true
@@ -280,7 +276,7 @@ requirejs([
       classes: "shepherd-theme-arrows",
       highlight: true,
       buttons: { next: false },
-      tetherOptions: { offset: '-10px 0px' },
+      tetherOptions: { offset: '-15px 0px' },
       style: { width: "400px" },
       advanceOn: "#q-add-select-expr click"
     });
@@ -386,6 +382,7 @@ requirejs([
       classes: "shepherd-theme-arrows",
       highlight: true,
       buttons: btns,
+      tetherOptions: { offset: '0px -10px' },
       style: { width: '400px' }
     });
     step.on("show", function() {
@@ -396,9 +393,8 @@ requirejs([
     });
 
 
-
     tour.addStep('cstat-plot', {
-      attachTo: ".cstat-plot .cstat-container right",
+      attachTo: ".cstat-plot right",
       title: "Faceting Distribution",
       text: "This is the distribution for the date attribute.  The y-axis shows the count of records within a particular value range.</p>"+
             "<p>You can use this to filter the visualization.</p>",
@@ -409,6 +405,8 @@ requirejs([
       highlight: true,
       buttons: btns,
     });
+
+
     step = tour.addStep('dist-select', {
       attachTo: ".cstat-plot .xaxis right",
       title: "Zoomable and Pannable Axes",
@@ -468,7 +466,7 @@ requirejs([
       buttons: btns,
     });
     step.on('show', function() {
-      where.setSelection( [ {col:'date', type:'date', vals: [new Date('2004-03-03 12:00:00'), new Date('2004-03-07 12:00:00')]}])
+      where.setSelection( [ {col:'date', type:'date', vals: [new Date('2004-03-03T12:00:00'), new Date('2004-03-07T12:00:00')]}])
     })
     step.on('hide', function() {
       $(".cstat-plot:first .plot-background").attr("stroke", "none");
@@ -504,8 +502,8 @@ requirejs([
 
     tour.addStep('seltype', {
       attachTo: "#selection-type",
-      title: "Filtering (<b style='color:#6ADE85; '>select</b> vs <b style='color:#D46F6F;'>reject</b>)",
-      text: "<p>So far, the facets <b>select</b> subsets of data that match your filters. </p>"+
+      title: "Filtering (<b style='color:rgb(26, 189, 64); '>select</b> vs <b style='color:#D46F6F;'>reject</b>)",
+      text: "<p>So far, the facets <b style='color: rgb(26, 189, 64)'>select</b> subsets of data that match your filters. </p>"+
             "<p>Sometimes it helps to see what happens if the data you selected were <i>removed</i></p>"+
             "<p>Toggle this switch to show data that <i>doesn't</i> match the filter.</p>"+
             "<p>Go ahead and click on the green <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> switch to the left.</p>",
@@ -525,8 +523,8 @@ requirejs([
       attachTo: "#apply-btn right",
       title: "Updating the Facets",
       text: "<p>The distributions in the facets are can be expensive to recompute, so we only recompute it for a new query.</p>"+
-            "<p>One way to do so is to modify the WHERE clauses in the query form directly.</p>"+
-            "<p>You can also apply your current <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> or <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>reject</b><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> filters by pressing the button to the left.</p>"+
+//            "<p>One way to do so is to modify the WHERE clauses in the query form directly.</p>"+
+            "<p>You can apply your current <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> or <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>reject</b><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> filters by pressing the button to the left.  This will copy the <span style='background: grey; color: white; border-radius: 5px; padding-left: 1em; padding-right: 1em;'>filters</span> into the WHERE clauses in the Query Form.</p>"+
             "<p>Go ahead and click it!</p>",
       showCancelLink: true,
       classes: "shepherd-theme-arrows",
@@ -563,9 +561,9 @@ requirejs([
     step = tour.addStep('qform-2', {
       attachTo: "#q input[name=q-where]:first left",
       title: "Updating the Facets",
-      text: "<p>Scorpion added your filters to the WHERE clause of the query and re-submitted the query.</p>"+
-            "<p>It is also recomputing the distributions based on the records that match the WHERE clause (which may take some time)</p>"+
-            "<p>Note that instead of clicking <span class='btn btn-primary btn-xs' style='font-size:9pt'>Add Filters to Query</span>, you can always edit this field directly</p>",
+      text: "<p>Scorpion added your <span style='background: grey; color: white; border-radius: 5px; padding-left: 1em; padding-right: 1em;'>filters</span> to the WHERE clause of the query and re-submitted the query.</p>"+
+            "<p>Scorpion is also recomputing the facet distributions based on the records that match the WHERE clause (which may take some time)</p>"+
+            "<p>You can always directly edit this field in addition to clicking on <span class='btn btn-primary btn-xs' style='font-size:9pt'>Add Filters to Query</span>.</p>",
       showCancelLink: true,
       classes: "shepherd-theme-arrows",
       tetherOptions: { offset: '0px 10px' },
@@ -600,7 +598,7 @@ requirejs([
 
 
     tour.start();
-    //_.delay(function(){ tour.show('dist-filter-2'); }, 1000)
+    window.tour = tour;
   }
 
 

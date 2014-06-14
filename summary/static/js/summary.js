@@ -74,11 +74,7 @@ requirejs([
   });
   $("#selection-type")
     .attr('title', st_on_text)
-    .tooltip('fixTitle')
-    .tooltip('show');
-  _.delay(function() {
-    $("#selection-type").tooltip('hide');
-  }, 5000);
+    .tooltip('fixTitle');
 
 
   $("#apply-btn").click(function() {
@@ -114,7 +110,7 @@ requirejs([
   $("#right").prepend(qv.render().$el);
 
 
-  var where = new Where;
+  var where = new Where({query: q, nbuckets: 200});
   var whereview = new WhereView({collection: where, el: $("#where")});
   var csv = new CStatsView({collection: where, el: $("#facets")});
   q.on('change:db change:table change:basewheres', function() {
@@ -123,14 +119,14 @@ requirejs([
       data: {
         db: q.get('db'),
         table: q.get('table'),
-        nbuckets: 500,
         where: _.compact(_.pluck(_.flatten(q.get('basewheres')), 'sql')).join(' AND ')
       },
       reset: true
     });
   })
-  where.on('change:selection', function() {
-    if (srv) {
+  where.on('change:selection', function(opts) {
+    opts || (opts = {noUnlock: false});
+    if (srv && !opts.noUnlock) {
       srv.unlockAll();
       psrv.unlockAll();
     }
@@ -168,14 +164,12 @@ requirejs([
     });
     $("body").append(sqv.render().$el.hide());
 
-    /*
     srv.on('setActive', function(whereJson) {
       qv.renderWhereOverlay(whereJson);
     });
     psrv.on('setActive', function(whereJson) {
       qv.renderWhereOverlay(whereJson);
     });
-    */
 
 
     q.on('change:db change:table', function() {
@@ -201,11 +195,9 @@ requirejs([
 
   var tv = new TupleView({query: q, el: $("#tuples").get()[0]});
 
-  /*
   srv.on('setActive', function(whereJSON) {
     tv.model.set('where', whereJSON);
   });
-  */
   where.on('change:selection', function() {
     tv.model.set('where', where.toJSON());
     tv.model.trigger('change:where')

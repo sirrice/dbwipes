@@ -8,10 +8,12 @@ define(function(require) {
 
   var Where = Backbone.Collection.extend({
     model: CStat,
-    url: '/api/column_distributions/',
+    url: '/api/schema/',
 
-    initialize: function() {
+    initialize: function(attrs) {
       var _this = this;
+      this.q = attrs.query;
+      this.nbuckets = attrs.nbuckets || 200;
       this.id = Where.id_++;
       this.bTriggerModelSelection = true;
       this.on('add', function(model) {
@@ -32,7 +34,7 @@ define(function(require) {
 
     // Sets each cstat to the corresponding selection clause
     // @param clauses list of { col:, type:, vals: } objects
-    setSelection: function(clauses) {
+    setSelection: function(clauses, opts) {
       this.bTriggerModelSelection = false;
 
       var col2clause = {};
@@ -44,8 +46,10 @@ define(function(require) {
         var col = model.get('col');
         model.trigger('setSelection', col2clause[col]);
       });
-      console.log(['where.setselection', 'trigger change:selection']);
-      this.trigger('change:selection');
+
+      console.log(['where.setselection', 'change:selection', clauses]);
+      this.trigger('change:selection', opts);
+
       this.bTriggerModelSelection = true;
 
     },
@@ -53,8 +57,10 @@ define(function(require) {
     clearScorpionSelections: function() {
       this.bTriggerModelSelection = false;
       this.each(function(model) {
-        model.set('selection', [])
-        model.trigger('clearScorpionSelection');
+        if (model.get('scorpion')) {
+          model.set('selection', [])
+          model.trigger('clearScorpionSelection');
+        }
       });
       this.trigger('change:selection');
       this.bTriggerModelSelection = true;
@@ -62,8 +68,29 @@ define(function(require) {
 
 
     parse: function(resp) {
-      var data = resp.data;
-      var newstats = _.map(data, function(tup) { return new CStat(tup); })
+      var schema = resp.schema;
+      var cols = _.keys(schema);
+      cols.sort();
+      var newstats = _.map(cols, function(col) { 
+        var cs = new CStat({
+          col: col,
+          type: schema[col]
+        }); 
+        cs.fetch({
+          data: {
+            db: this.q.get('db'),
+            table: this.q.get('table'),
+            col: col,
+            where: _.chain(this.q.get('basewheres'))
+              .flatten()
+              .pluck('sql')
+              .compact()
+              .value().join(' AND '),
+            nbuckets: this.nbuckets
+          }
+        });
+        return cs;
+      }, this)
       return newstats;
     },
 

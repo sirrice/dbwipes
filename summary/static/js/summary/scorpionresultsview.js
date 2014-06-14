@@ -37,26 +37,25 @@ define(function(require) {
     },
 
     setActive: function(model) {
-      var where = null,
-          clauses = [],
+      var clauses = [],
           _this = this;
       if (model != null) {
-        where = model.get('clauses');
         clauses = model.get('clauses');
       } else if (model == null) {
-        if (this.state.locked != null) {
-          where = this.state.locked.get('clauses')
+        if (this.state.locked != null) 
           clauses = this.state.locked.get('clauses');
-        } else {
-          //where = this.state.where.toJSON();
-          where = []; 
-          clauses = [];
-        }
       }
 
-      console.log(['setactive', model, this.state.locked, JSON.stringify(where)]);
-      this.state.where.setSelection(clauses);
-      this.trigger('setActive', where);
+      clauses = _.map(clauses, function(c) {
+        c = _.clone(c);
+        c.scorpion = true;
+        return c;
+      });
+
+
+      console.log(['setactive', model, this.state.locked, JSON.stringify(clauses)]);
+      this.state.where.setSelection(clauses, { noUnlock: true });
+      this.trigger('setActive', clauses);
       return this;
     },
 
@@ -82,6 +81,7 @@ define(function(require) {
 
     unlockAll: function() {
       if (this.state.locked) {
+        console.log(['srv.unlockAll'])
         this.$list.find('.filter-clause').removeClass('locked');
         this.state.locked = null;
         this.trigger('modifiedData', null);
@@ -92,6 +92,7 @@ define(function(require) {
     },
 
     clear: function() {
+      console.log(['srv.clear'])
       this.unlockAll();
       this.setActive();
       this.collection.reset();
@@ -99,6 +100,7 @@ define(function(require) {
     },
 
     reset: function() {
+      console.log(['srv.reset'])
       this.unlockAll();
       this.setActive();
       this.$list.empty();

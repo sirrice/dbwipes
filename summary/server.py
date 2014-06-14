@@ -240,6 +240,7 @@ def api_query():
   table = args.get('table')
 
   o, params = scorpionutil.create_sql_obj(g.db, args)
+  o.limit = 10000;
   query = str(o)
   print query
   print params
@@ -266,6 +267,36 @@ def api_query():
   return ret
 
 
+
+@app.route('/api/column_distribution/', methods=['POST', 'GET'])
+@returns_json
+def column_distribution():
+  dbname = request.args.get('db', 'intel')
+  tablename = request.args.get('table', 'readings')
+  where = request.args.get('where', '')
+  col = request.args.get('col')
+  try:
+    nbuckets = int(request.args.get('nbuckets', 100))
+  except Exception as e:
+    print e
+    nbuckets = 100
+
+
+  summary = Summary(dbname, tablename, nbuckets=nbuckets, CACHELOC=SUMMARYCACHE, where=where)
+  typ = summary.get_type(col)
+  stats = summary.get_col_stats(col, typ)
+  summary.close()
+
+  data = {
+    'col': col,
+    'type': typ,
+    'stats': stats
+  }
+  context = { "data": data }
+  return context
+
+
+
 @app.route('/api/column_distributions/', methods=['POST', 'GET'])
 @returns_json
 def column_distributions():
@@ -281,9 +312,9 @@ def column_distributions():
   #  #from monetdb import sql as msql
   #  #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
 
-  summary = Summary(dbname, tablename, nbuckets=nbuckets, CACHELOC=SUMMARYCACHE)
+  summary = Summary(dbname, tablename, nbuckets=nbuckets, CACHELOC=SUMMARYCACHE, where=where)
   print 'where: %s' % where
-  stats = summary(where=where)
+  stats = summary()
   summary.close()
 
   data = []

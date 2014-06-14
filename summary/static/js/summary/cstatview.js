@@ -25,15 +25,36 @@ define(function(require) {
         rectwidth: 1,
         marktype: 'rect'
       }
+      this.listenTo(this.model, 'setSelection', this.setSelection);
+      this.listenTo(this.model, 'clearScorpionSelection', this.clearScorpionSelection);
+      this.listenTo(this.model, 'change:selection', this.setCount)
+      this.listenTo(this.model, 'change:stats', this.render)
+      //this.listenTo(this.model, 'fetch:start', this.showLoading);
+      //this.listenTo(this.model, 'fetch:stop', this.hideLoading);
     },
 
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
       if (!window.enableScorpion) this.$('.errcol').hide();
-      this.renderPlot(this.$('svg'));
-      this.listenTo(this.model, 'setSelection', this.setSelection);
-      this.listenTo(this.model, 'clearScorpionSelection', this.clearScorpionSelection);
-      this.listenTo(this.model, 'change:selection', this.setCount)
+      if (this.model.get('ready')) {
+        this.$('.cstat-loading').hide();
+        this.renderPlot(this.$('svg'));
+      } else {
+        this.$('.cstat-loading').show();
+        this.$('svg').hide();
+      }
+      return this;
+    },
+
+    showLoading: function() {
+      this.$("svg").hide();
+      this.$('.cstat-loading').show();
+      return this;
+    },
+
+    hideLoading: function() {
+      this.$("svg").show();
+      this.$('.cstat-loading').hide();
       return this;
     },
 
@@ -128,10 +149,8 @@ define(function(require) {
               class: 'mark',
               width: d3.max([1,xscales.rangeBand()]),
               x: function(d) { return xscales(d.val) },
-              //height: function(d) {return yscales(d.count)},
-              //y: function(d) { return h-yscales(d.count)}
-              height: function(d) {return yscales(0)-yscales(d.count)},
-              y: function(d) { return yscales(d.count)}
+              height: function(d) {return Math.max(2, yscales(0)-yscales(d.count));},
+              y: function(d) { return Math.min(h-2, yscales(d.count));}
             })
       } else {
         var xs =_.pluck(stats, 'val');
@@ -173,9 +192,9 @@ define(function(require) {
             .attr({
               class: 'mark',
               width: function(d) { return d3.max([width, xscales(d.range[1]) - xscales(d.range[0])]) },
-              height: function(d) {return h-yscales(d.count)},
+              height: function(d) {return Math.max(2, h-yscales(d.count))},
               x: function(d) {return xscales(d.range[0]);},
-              y: function(d) { return yscales(d.count)}
+              y: function(d) { return Math.min(h-2, yscales(d.count)); }
             })
       } 
 
@@ -240,7 +259,12 @@ define(function(require) {
           .classed('highlighted', false)
           .classed('faded', false)
       }
-      this.model.set('selection', selected, {silent: true});
+
+      if (clause) 
+        this.model.set('scorpion', true);
+      else
+        this.model.set('scorpion', false);
+      this.model.set('selection', selected, {noUnlock: true});
 
     },
 
@@ -280,6 +304,7 @@ define(function(require) {
           .classed('selected', function(d){ return within(d, e); })
           .each(function(d) { if (within(d, e)) selected.push(d); })
         if (d3.event.type == 'brushend') {
+          _this.model.set('scorpion', false);
           _this.model.set('selection', selected);
         }
       }
@@ -314,12 +339,12 @@ define(function(require) {
         el.select('.axis.y').call(yaxis);
         el.selectAll('.mark')
           .attr('y', function(d) {
-            return Math.max(0, Math.min(h, yscales(d.count)));
+            return Math.max(0, Math.min(h, yscales(d.count)-2));
           })
           .attr('height', function(d) {
-            var bot = Math.max(0, Math.min(h, yscales(d.count)));
+            var bot = Math.max(0, Math.min(h, yscales(d.count)-2));
             var height = yscales(0) - bot;
-            return Math.min(h, Math.max(0, height));
+            return Math.min(h-bot, Math.max(2, height));
           })
       };
 
@@ -346,8 +371,9 @@ define(function(require) {
             yStart = d3.event.y;
             curYScale = yzoom.scale();
             yzoom.on('zoom', null);
-            el.select('.yaxis rect').style('pointer-events', 'none');
-            console.log('disabled things');
+            el.select('.yaxis rect')
+              .style('pointer-events', 'none')
+              
             d3.select('body')
               .on('mousemove.cstaty', function() {
                 var diff = ((yStart - d3.event.y) / 5);
