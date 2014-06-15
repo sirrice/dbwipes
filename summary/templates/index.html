@@ -179,14 +179,13 @@
     <div class="col-md-4">where</div>
     <div class="col-md-8 input-x">
       {{#each basewheres}}
-      <div>
-        <input class="form-control" name="q-where" 
-               value="{{this.sql}}" placeholder="expression">
+			<div>
+				<a data-idx="{{this.idx}}" class="q-where-close" style="">x</a>
+				<input data-idx="{{this.idx}}" class="form-control" name="q-where" value="{{this.sql}}" placeholder="expression">
       </div>
       {{/each}}
-      <div>
-        <input class="form-control" name="q-where" 
-               value="" placeholder="expression">
+			<div>
+				<input data-idx="new" class="form-control" name="q-where" value="" placeholder="expression">
       </div>
     </div>
   </div>

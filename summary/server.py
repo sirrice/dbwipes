@@ -11,6 +11,7 @@ from functools import wraps
 from collections import *
 from datetime import datetime
 from sqlalchemy import *
+from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
 from flask.ext.compress import Compress
 
@@ -35,7 +36,7 @@ def returns_json(f):
   return json_returner
 
 def cache_result(key, value):
-  engine = create_engine('postgresql://localhost/cache')
+  engine = create_engine('postgresql://localhost/cache', poolclass=NullPool)
   db = engine.connect()
   q = "insert into requests values(%s, %s)"
   db.execute(q, key, value)
@@ -56,7 +57,7 @@ def before_request():
     g.db = None
 
     if dbname:
-      g.engine = create_engine('postgresql://localhost/%s' % dbname)
+      g.engine = create_engine('postgresql://localhost/%s' % dbname, poolclass=NullPool)
       g.db = g.engine.connect()
   except:
     traceback.print_exc()
@@ -113,7 +114,7 @@ def tables():
 
 def get_schema(db_or_name, table):
   try:
-    summary = Summary(db_or_name, table, CACHELOC=SUMMARYCACHE)
+    summary = Summary(db_or_name, table)
     cols_and_types = summary.get_columns_and_types()
     schema = dict(cols_and_types)
     summary.close()
@@ -282,7 +283,7 @@ def column_distribution():
     nbuckets = 100
 
 
-  summary = Summary(dbname, tablename, nbuckets=nbuckets, CACHELOC=SUMMARYCACHE, where=where)
+  summary = Summary(g.db, tablename, nbuckets=nbuckets, where=where)
   typ = summary.get_type(col)
   stats = summary.get_col_stats(col, typ)
   summary.close()
@@ -312,7 +313,7 @@ def column_distributions():
   #  #from monetdb import sql as msql
   #  #db = msql.connect(user='monetdb', password='monetdb', database=dbname)
 
-  summary = Summary(dbname, tablename, nbuckets=nbuckets, CACHELOC=SUMMARYCACHE, where=where)
+  summary = Summary(g.db, tablename, nbuckets=nbuckets, where=where)
   print 'where: %s' % where
   stats = summary()
   summary.close()

@@ -221,12 +221,12 @@ def scorpion_run(db, requestdata, requestid):
       c=obj.c,
       complexity_multiplier=4.5,
       l=0.6,
-      c_range=[0, 1.5],
+      c_range=[0.1, 2],
       max_wait=20,
       use_cache=False,
       granularity=20,
       ignore_attrs=obj.ignore_attrs,
-      DEBUG=False
+      DEBUG=True
     )
     cost = time.time() - start
     print "end to end took %.4f" % cost

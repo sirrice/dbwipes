@@ -125,15 +125,17 @@ requirejs([
     });
   })
   where.on('change:selection', function() {
-    var opts = { noUnlock: false };
+    var opts = {silent: false};
     arguments.length && (opts = _.last(arguments))
-    opts || (opts = {noUnlock:false});
-    if (srv && !opts.noUnlock) {
-      console.log(['summary.js', 'unlockall', arguments])
-      srv.unlockAll();
-      psrv.unlockAll();
+    opts || (opts = {silent: false});
+    console.log(['summary.js', 'where.onselection', opts]);
+    if (!opts.silent) {
+      if (srv) {
+        srv.unlockAll();
+        psrv.unlockAll();
+      }
+      qv.renderWhereOverlay(where.toJSON());
     }
-    qv.renderWhereOverlay(where.toJSON());
   });
 
 
@@ -168,6 +170,7 @@ requirejs([
     $("body").append(sqv.render().$el.hide());
 
     srv.on('setActive', function(whereJson) {
+      console.log(['summary.js', 'setactive', whereJson])
       qv.renderWhereOverlay(whereJson);
     });
     psrv.on('setActive', function(whereJson) {

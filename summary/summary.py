@@ -3,10 +3,12 @@ import bsddb
 import json
 import pdb
 from sqlalchemy import create_engine, engine
+from sqlalchemy.pool import NullPool
 
 
-def get_cache(fname, new=False, fsync=False, recover=False):
-  eng = create_engine('postgresql://localhost/cache')
+
+def get_cache():
+  eng = create_engine('postgresql://localhost/cache', poolclass=NullPool)
   db = eng.connect()
 
   try:
@@ -44,7 +46,7 @@ def json_handler(o):
 
 class Summary(object):
 
-  def __init__(self, dbname, tablename, nbuckets=50, CACHELOC='.summary.cache', where=''):
+  def __init__(self, dbname, tablename, nbuckets=50, where=''):
     self.dbtype = 'pg'
     if 'monetdb' in str(dbname):
       self.engine = None
@@ -57,7 +59,7 @@ class Summary(object):
       self.engine = dbname.engine
       self.db = dbname
     else:
-      self.engine = create_engine("postgresql://localhost/%s" % dbname)
+      self.engine = create_engine("postgresql://localhost/%s" % dbname, poolclass=NullPool)
       self.db = self.engine.connect()
 
     self.tablename = tablename
@@ -67,12 +69,13 @@ class Summary(object):
     if where:
       self.where = 'WHERE %s' % where
 
-    self._engine, self._cache = get_cache(CACHELOC)
+    self._engine, self._cache = get_cache()
+
+    self.nrows = self.get_num_rows()
+    self.col_types = self.get_columns_and_types()
 
   def __call__(self):
     stats = []
-    self.nrows = self.get_num_rows()
-    self.col_types = self.get_columns_and_types()
     for col, typ in self.col_types:
       #print "stats for: %s\t%s" % (col, typ)
       col_stats = self.get_col_stats(col, typ)

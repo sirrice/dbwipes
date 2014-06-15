@@ -264,7 +264,7 @@ define(function(require) {
         this.model.set('scorpion', true);
       else
         this.model.set('scorpion', false);
-      this.model.set('selection', selected, {noUnlock: true});
+      this.model.set('selection', selected, {silent: true});
 
     },
 

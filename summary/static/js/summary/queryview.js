@@ -244,7 +244,7 @@ define(function(require) {
 
       this.overlayquery = query = new Query(this.model.toJSON());
       query.set('where', where);
-      console.log(['qv.renderoverlay', JSON.stringify(where), query])
+      console.log(['qv.renderoverlay', JSON.stringify(where), where, query])
 
       query.fetch({
         data: {
@@ -461,7 +461,6 @@ define(function(require) {
             curYScale = yzoom.scale();
             yzoom.on('zoom', null);
             el.select('.yaxis rect').style('pointer-events', 'none');
-            console.log('disabled things');
             d3.select('body')
               .on('mousemove.qvy', function() {
                 var diff = ((yStart - d3.event.y) / 100);
@@ -568,7 +567,6 @@ define(function(require) {
       }
       this.$svg.show();
       this.queryform.$el.hide();
-      console.log("rendering " + this.model.get('where'))
 
 
       if (!this.state.xaxis) {
