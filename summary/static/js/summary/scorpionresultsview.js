@@ -54,7 +54,7 @@ define(function(require) {
 
 
       console.log(['setactive', model, this.state.locked, JSON.stringify(clauses)]);
-      this.state.where.setSelection(clauses, { noUnlock: true, noRender: true });
+      this.state.where.setSelection(clauses, { silent: true});
       this.trigger('setActive', clauses);
       return this;
     },
