@@ -113,14 +113,15 @@ def tables():
 
 
 def get_schema(db_or_name, table):
+  summary = Summary(db_or_name, table)
   try:
-    summary = Summary(db_or_name, table)
     cols_and_types = summary.get_columns_and_types()
     schema = dict(cols_and_types)
-    summary.close()
     return schema
   except Exception as e:
     traceback.print_exc()
+  finally:
+    summary.close()
   return {}
 
 
@@ -284,9 +285,13 @@ def column_distribution():
 
 
   summary = Summary(g.db, tablename, nbuckets=nbuckets, where=where)
-  typ = summary.get_type(col)
-  stats = summary.get_col_stats(col, typ)
-  summary.close()
+  try:
+    typ = summary.get_type(col)
+    stats = summary.get_col_stats(col, typ)
+  except Exception as e:
+    traceback.print_exc()
+  finally:
+    summary.close()
 
   data = {
     'col': col,
@@ -315,8 +320,13 @@ def column_distributions():
 
   summary = Summary(g.db, tablename, nbuckets=nbuckets, where=where)
   print 'where: %s' % where
-  stats = summary()
-  summary.close()
+  try:
+    stats = summary()
+  except Exception as e:
+    traceback.print_exc()
+  finally:
+    summary.close()
+
 
   data = []
   for col, typ, col_stats in stats:

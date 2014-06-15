@@ -40,14 +40,21 @@ def parse_agg(s):
   parse an aggregation SELECT clause e.g., avg(temp) as foo
   into dictionary of function name, column, and alias components
   """
-  p = re.compile('(?P<func>\w+)\(\s*(?P<col>\w+)\s*\)\s*(as\s+(?P<alias>\w+))?')
+  print s
+  p = re.compile('(?P<func>\w+)\(\s*(?P<col>[\w\,\s]+)\s*\)\s*(as\s+(?P<alias>\w+))?')
   d = p.match(s).groupdict()
   klass = __agg2f__[d['func'].strip()]
-  func = klass([Var(str(d['col']))])
+  expr = str(d['col'])
+  cols = [col.strip() for col in expr.split(',')]
+  varlist = [Var(col) for col in cols]
+  print klass
+  print cols
+  print varlist
+  func = klass(varlist)
   return {
     'fname': d['func'],
     'func': func,
-    'col': d['col'],
+    'cols': cols,
     'alias': d.get('alias', '') or d['func']
   }
 
@@ -123,7 +130,7 @@ def create_sql_obj(db, qjson):
   select.append(nonagg)
   for y in ys:
     d = parse_agg(y['expr'])
-    agg = SelectAgg(y['alias'], d['func'], [y['col']], y['expr'], y['col'])
+    agg = SelectAgg(y['alias'], d['func'], d['cols'], y['expr'], d['cols'][0])
     select.append(agg)
 
   parsed = Query(
@@ -222,11 +229,11 @@ def scorpion_run(db, requestdata, requestid):
       complexity_multiplier=4.5,
       l=0.6,
       c_range=[0.1, 2],
-      max_wait=20,
+      max_wait=10,
       use_cache=False,
       granularity=20,
       ignore_attrs=obj.ignore_attrs,
-      DEBUG=True
+      DEBUG=False
     )
     cost = time.time() - start
     print "end to end took %.4f" % cost

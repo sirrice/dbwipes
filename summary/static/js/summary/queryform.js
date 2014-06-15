@@ -13,13 +13,14 @@ define(function(require) {
 
   var QueryForm = Backbone.View.extend({
     errtemplate: Handlebars.compile($("#q-err-template").html()),
+    wheretemplate: Handlebars.compile($("#q-where-template").html()),
     yexprhtml: "<div><input class='form-control' name='q-y-expr' placeholder='expression'/></div>",
     ycolhtml: "<div><input class='form-control' name='q-y-col' placeholder='attribute'/></div>",
 
     events: {
       'click .q-add':         "onAggAdd",
       'click .q-submit':      "onSubmit",
-      'click .q-where-close': 'onWhereClose'
+      'click .q-where-close': "onWhereClick"
     },
 
     defaults: function() {
@@ -85,16 +86,22 @@ define(function(require) {
       this.model.set(q);
     },
 
-    onWhereClose: function(el) {
-      var idx = $(el).data('idx'),
-          basewheres = this.model.get('basewheres');
-      basewheres.splice(idx, 1);
+
+    onWhereClick: function(ev) {
+      var el = $(ev.target),
+          idx = el.data('idx');
+      this.model.get('basewheres').splice(+idx, 1);
+      el.remove();
       this.model.trigger('change:basewheres');
+
     },
 
     render: function(errText) {
       var json = this.model.toJSON(),
           _this = this;
+      _.each(json.basewheres, function(clause, idx) {
+        clause.idx = idx;
+      });
       json['error'] = errText;
       this.$el.attr('id', 'q');
       this.$el.html(this.errtemplate(json));
