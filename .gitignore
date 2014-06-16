@@ -1,7 +1,10 @@
+*.oldcache
 *.cache
-dist
 *.dump
 *.err
 *.log
 *.egg-info
 *.pyc
+
+dist
+build
