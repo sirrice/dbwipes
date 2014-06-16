@@ -82,7 +82,6 @@ define(function(require) {
 
     resetState: function() {
       this.state = this.defaults();
-      this.yscale = null;
       this.trigger("resetState");
     },
 
@@ -408,16 +407,6 @@ define(function(require) {
 
 
     renderZoom: function(el) {
-      if (this.yscale) {
-        if (el.select('.axis.y').size()) {
-          this.yzoom.event(el);
-          this.yzoom.scale(this.yscale);
-          this.yzoom.event(el);
-        }
-
-        return;
-      }
-
       var _this = this
           yscales = this.state.yscales,
           yaxis = this.state.yaxis,
@@ -436,7 +425,6 @@ define(function(require) {
               return 1;
             return 0;
           })
-        _this.yscale = d3.event.scale;
       };
 
       function xzoomf() {
@@ -462,41 +450,6 @@ define(function(require) {
 
       el.select('.axis.y').call(yzoom)
         .style('cursor', 'ns-resize')
-
-      var yStart = null;
-      var curYScale = null;
-      /*
-      el.select('.yaxis')
-        .on('mousedown.qvy', function() {
-          if (d3.event.shiftKey) {
-            yStart = d3.event.y;
-            curYScale = yzoom.scale();
-            yzoom.on('zoom', null);
-            el.select('.yaxis rect').style('pointer-events', 'none');
-            d3.select('body')
-              .on('mousemove.qvy', function() {
-                var diff = ((yStart - d3.event.y) / 100);
-                if (diff >= 0) { 
-                  diff += 1.0; 
-                } else if (diff < 0) { 
-                  diff = 1.0 / (Math.abs(diff)+1);
-                }
-                yzoom.scale(diff*curYScale);
-                yzoomf();
-              })
-              .on('mouseup.qvy', function() {
-                d3.select('body')
-                  .on('mousemove.qvy', null)
-                  .on('mouseup.qvy', null);
-                yzoom.on('zoom', yzoomf);
-                el.select('.yaxis rect').style('pointer-events', 'all');
-              });
-          }
-        })
-        */
-
-
-
 
           
       var type = this.model.get('schema')[this.model.get('x').col];
