@@ -264,13 +264,19 @@ define(function(require) {
       this.c.selectAll('g.data-container')
         .classed('background', false)
 
-      var ydomain = this.state.ydomain;
-      if (data) {
-        ydomain = util.getYDomain(data, this.model.get('ys'))
-        ydomain = util.mergeDomain(this.state.yscales.domain(), ydomain, 'num')
+
+      // expand the y-axis domain if necessary
+      // relying on setupScales/renderAxes is too extreme because
+      // it computes the union of all domains seen so far
+      if (this.yzoom) {
+        var ydomain = this.state.ydomain;
+        if (data) {
+          ydomain = util.getYDomain(data, this.model.get('ys'))
+          ydomain = util.mergeDomain(this.state.yscales.domain(), ydomain, 'num')
+        }
+        this.yzoom.y(this.state.yscales.domain(ydomain));
+        this.yzoom.event(this.c);
       }
-      this.yzoom.y(this.state.yscales.domain(ydomain));
-      this.yzoom.event(this.c);
 
       if (!data) {
         return;

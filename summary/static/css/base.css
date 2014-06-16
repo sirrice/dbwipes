@@ -163,6 +163,17 @@ body table.tuples tr th {
   border: none;
   color: white;
 }
+#scorpion-results-container,
+#scorpion-partialresults-container {
+  height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+#scorpion-results-container > div,
+#scorpion-partialresults-container > div {
+  width: 85%;
+}
 .scorpion-results {
   padding: 0px;
   /* /.scorpion-result */

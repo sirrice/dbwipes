@@ -1,0 +1,23 @@
+{%raw%}
+<script id="task-template" type="text/x-underscore-template">
+{{#if title}}
+<h3>{{title}}</h3>
+{{/if}}
+<div>{{{text}}}</div>
+{{#each options}}
+<div class="radio">
+	<label>
+		<input type="radio" name="opt" value="{{this.idx}}">
+		{{this.text}}
+	</label>
+</div>
+{{/each}}
+{{#if textbox}}
+<input name="text" class="form-control" placeholder="type in the answer"/>
+{{/if}}
+<div class="submit btn btn-primary">Submit</div>
+<div class="error bs-callout bs-callout-danger" style="display:none">
+</div>
+</script>
+
+{%endraw%}

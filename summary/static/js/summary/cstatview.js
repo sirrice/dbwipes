@@ -9,7 +9,7 @@ define(function(require) {
 
   return Backbone.View.extend({
 
-    template: Handlebars.compile($("#foo-template").html()),
+    template: Handlebars.compile($("#cstat-template").html()),
 
     initialize: function() {
       this.state = {
