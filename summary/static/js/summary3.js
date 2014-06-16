@@ -153,6 +153,10 @@ requirejs([
       text: 'Next',
       action: tour.next
     }];
+  var backbtn = [{
+    text: 'Back',
+    action: tour.back
+  }];
   var step;
 
 
@@ -164,7 +168,7 @@ requirejs([
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
   });
-  step.on("show", function() { $("div.row").css("opacity", 0.3); });
+  step.on("show", function() { $("div.row").css("opacity", 0.6); });
   step.on("hide", function() { $("div.row").css("opacity", 1); });
 
   step = tour.addStep('intro', {
@@ -179,8 +183,8 @@ requirejs([
     buttons: [{
       text: "Next",
       action: function() {
-        qv.c.call(qv.d3brush.extent([[5.5, 230000],[9.5, 245501]]))
-        qv.d3brush.event(qv.c);
+        qv.gbrush.call(qv.d3brush.extent([[5.5, 230000],[9.5, 245501]]))
+        qv.d3brush.event(qv.gbrush);
         _.delay(tour.show.bind(tour), 50, 'sq');
       }
     }]
@@ -218,19 +222,26 @@ requirejs([
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
-    buttons: { next: false },
+    buttons: backbtn,
     advanceOn: "#addbad click"
   });
 
   step = tour.addStep('sq-brush', {
     title: "Scorpion Query",
     text: "<p>Now select some examples of good points whose values seem normal.</p>" +
-          "<p>Go ahead and select days 0 and 1 and click Next when you are done.</p>",
+          "<p>Select days 0 to 2 and click Next when you are done.</p>",
     attachTo: "#viz left",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
-    buttons: btns,
+    buttons: backbtn,
     style: { width: "500px" },
+  });
+  step.on('show', function() {
+    var f = function() { 
+      tour.show('sq-good'); 
+      window.qv.off('change:selection', f);
+    };
+    window.qv.on('change:selection', f);
   });
 
   step = tour.addStep('sq-good', {
@@ -242,14 +253,23 @@ requirejs([
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
-    buttons: btns,
+    buttons: backbtn,
     advanceOn: "#addgood click"
   });
 
   step = tour.addStep('sq-submit', {
     title: "Scorpion Query",
     text: "<p>Great!  That's all Scorpion needs from you!</p>"+
-          "<p>Click submit to let Scorpion do your work!</p>",
+          "<p>Click submit to let Scorpion do your work!</p>"+
+          "<p><a onclick=\"$('#sq-helptext').toggle();\"><small>click me to see what Scorpion will do?</small></a>"+
+            "<blockquote id='sq-helptext' style='display: none'>"+
+              "<p>When you click submit, Scorpion will look for subsets of the records that can be removed to:"+
+                "<ol><li>Drive the bad points you selected as far in the direction of the normal examples as possible.</li>"+
+                "<li>Minimize the number of records that need to be deleted</li>"+
+                "<li>Minimize how much the normal examples change</li></ol></p>"+
+              "<p>Scorpion tries to describe the subsets of records as WHERE clause filtering rules, the same as the ones you create when using the Facets.</p>"+
+            "</blockquote>"+
+          "</p>",
     attachTo: "#scorpion_submit right",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -261,12 +281,21 @@ requirejs([
     title: "Scorpion Partial Results",
     text: "<p>While Scorpion runs, this section lists the best filters found in the search so far.</p>"+
           "<p>Hovering over any of the rules will apply it to the Facets on the left and also update the visualization above.</p>"+
-          "<p>When Scorpion is done, the buttons will turn blue.  Until then, the list may change at any time.</p>",
-    attachTo: "#scorpion-partialresults-container left",
+          "<p>When Scorpion is done, the buttons will turn blue and the next dialog box will appear.</p>"+
+          "<p>Until then, feel free to hover and click on these results.  <small>(the list may change at any time.</small></p>",
+    attachTo: "#all-scorpion-results-container left",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    tetherOptions: {
+      attachment: 'top left',
+      targetAttachment: 'top right',
+      offset: '10px 10px'
+    },
     style: { width: "500px" },
-    buttons: { next: false }
+    buttons: [{ 
+      text: 'Back',
+      action: tour.back
+    }]
   });
   step.on("show", function() {
     window.sqv.on('scorpionquery:done', function() {
@@ -274,14 +303,23 @@ requirejs([
       window.sqv.off('scorpionquery:done');
     });
   });
+  step.on('hide', function() {
+    window.sqv.off('scorpionquery:done');
+  });
+
 
   step = tour.addStep('srs', {
     title: "Scorpion Final Results",
     text: "<p>This is the list of final scorpion results.  Feel free to hover over any of the results.</p>"+
           "<p>Clicking on a result will lock it in place so that moving your cursor away from the result will not reset the filters.  This lets you lock one result in place, and hover over another result for comparison purposes</p>",
-    attachTo: "#scorpion-results-container left",
+    attachTo: "#all-scorpion-results-container left",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    tetherOptions: {
+      attachment: 'top left',
+      targetAttachment: 'top right',
+      offset: '10px 10px'
+    },
     style: { width: "500px" }
   });
 
@@ -357,13 +395,12 @@ requirejs([
     }],
     style: { width: "500px" }
   });
-  step.on("show", function() { $("div.row").css("opacity", 0.3); });
+  step.on("show", function() { $("div.row").css("opacity", 0.6); });
   step.on("hide", function() { $("div.row").css("opacity", 1); });
 
 
 
   tour.start();
-  tour.show('srs-remove')
   window.tour = tour;
 
 });
