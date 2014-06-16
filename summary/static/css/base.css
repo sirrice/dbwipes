@@ -115,7 +115,7 @@ body rect.extent {
   shape-rendering: crispEdges;
 }
 body .background .mark {
-  fill-opacity: 0.18;
+  fill-opacity: 0.48;
   stroke-opacity: 0.05;
   fill: grey;
 }

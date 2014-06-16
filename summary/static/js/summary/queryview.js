@@ -29,7 +29,7 @@ define(function(require) {
         series: null,
         w: 500,
         h: 400,
-        lp: 60,
+        lp: 70,
         tp: 20,
         bp: 15,
         ip: 5,  // data-container inner padding
@@ -218,6 +218,18 @@ define(function(require) {
           .data([1])
           .text(this.model.get('x')['expr'])
       }
+
+      if (el.select('.yaxis-label').size() == 0) {
+        var txt = _.pluck(this.model.get('ys'), 'alias').join(', ');
+        el.append('g')
+          .classed('yaxis-label', true)
+          .attr('text-anchor', 'middle')
+          .attr('transform', 'translate(-'+(this.state.lp-15)+','+(this.state.h/2)+') rotate(-90)')
+          .append('text')
+          .data([1])
+          .text(txt);
+      }
+
     },
 
     // set base plot to background and render
@@ -317,6 +329,11 @@ define(function(require) {
         .attr('class', 'data-container')
 
       if (this.state.marktype == 'circle') {
+        var r = 4.5;
+        if (data.length > 50) 
+          r = 3.5;
+        if (data.length > 100)
+          r = 2;
         dc.selectAll('circle')
             .data(data)
           .enter().append('circle')
@@ -324,7 +341,7 @@ define(function(require) {
             .attr({
               cx: function(d) { return d.px },
               cy: function(d) { return d.py },
-              r: 2,
+              r: r,
               fill: this.state.cscales(yalias),
               stroke: this.state.cscales(yalias),
               opacity: function(d) {
@@ -338,7 +355,10 @@ define(function(require) {
     },
 
     renderBrush: function(el) {
-      if (el.select('.brush').size() > 0) return;
+      if (el.select('.brush').size() > 0) {
+        console.log(['qv.renderBrush', 'exists, skip']);
+        return;
+      }
       var type = this.model.get('schema')[this.model.get('x').col],
           _this = this,
           xscales = this.state.xscales,

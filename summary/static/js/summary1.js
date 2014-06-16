@@ -159,7 +159,7 @@ requirejs(['jquery',
     attachTo: "#q-toggle",
     title: "Query Form Toggle Button",
     text: "<p>You can see and edit the query that generated this visualization by clicking on this button.</p>"+
-          "<p>Go ahead and click on it to continue!</p>",
+          "<p>Click on it to continue!</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
     tetherOptions: {
@@ -332,7 +332,8 @@ requirejs(['jquery',
   step = tour.addStep('dist-select', {
     attachTo: "#cstat-day .cstat-plot .xaxis right",
     title: "Zoomable and Pannable Axes",
-    text: "<p>You can use the axes to zoom and scroll.</p>  <p>Go ahead and hover over the x-axis and scroll-up using your mouse wheel or touch pad.</p>",
+    text: "<p>You can use the axes to zoom and scroll.</p>  "
+          "<p>Hover over the x-axis and scroll-up using your mouse wheel or touch pad.</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '0px -5px' },
@@ -412,7 +413,7 @@ requirejs(['jquery',
     attachTo: "#facets right",
     title: "Filtering (conjunctions)",
     text: "<p>If you filter multiple attributes, it will use the conjunction (AND) of your selections.</p>" +
-          "<p>Go ahead and try adding some more filters.  Click Next when you are done.</p>",
+          "<p>Try adding some more filters.  Click Next when you are done.</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '-28px 0px' },
@@ -427,7 +428,8 @@ requirejs(['jquery',
     text: "<p>So far, the facets <b style='color: rgb(26, 189, 64)'>select</b> subsets of data that match your filters. </p>"+
           "<p>Sometimes it helps to see what happens if the data you selected were <i>removed</i></p>"+
           "<p>Toggle this switch to show data that <i>doesn't</i> match the filter.</p>"+
-          "<p>Go ahead and click on the green <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> switch to the left.</p>",
+          "<p>Click on the green <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> "+
+          "switch to the left.</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
     tetherOptions: {
@@ -461,9 +463,7 @@ requirejs(['jquery',
     highlight: true,
     buttons: btns,
     style: { width: 500 },
-    //advanceOn: "#apply-btn click"
   });
-
   step.on('hide', function() {
     qv.showQueryForm();
   });

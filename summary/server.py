@@ -95,6 +95,10 @@ def index2():
 def index3():
   return render_template("index3.html")
 
+@app.route('/4/', methods=["POST", "GET"])
+def index4():
+  return render_template("index4.html")
+
 @app.route('/dir/', methods=["POST", "GET"])
 def dirpage():
   return render_template("dir.html")

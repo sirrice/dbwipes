@@ -13,7 +13,7 @@ define(function(require) {
         text: "",
         options: [],      // [ "text", "text",... ]
         textbox: false,   // setting this to True overrides .options
-        truth: -1,
+        truth: -1,        // a value or a function(answer, Task)
         answer: -1,
         successText: "Nice!  You'll see the next task in 2...1..."
       }
@@ -22,6 +22,9 @@ define(function(require) {
     validate: function() {
       var truth = this.get('truth'),
           answer = this.get('answer');
+      if (_.isFunction(truth)) {
+        return truth(answer, this);
+      }
       if (this.get('textbox')) {
         return _.isEqual(
           String(truth).trim().toLowerCase(),
@@ -73,7 +76,7 @@ define(function(require) {
           .addClass('bs-callout-info')
           .text(this.model.get('successText'))
           .show()
-        _.delay(this.trigger.bind(this), 2000, 'submit');
+        this.trigger('submit');
       } else {
         this.$(".error").text("That answer doesn't seem right").show();
       }
