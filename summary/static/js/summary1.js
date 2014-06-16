@@ -52,7 +52,9 @@ requirejs([
   'summary/scorpionquery', 'summary/scorpionview',
   'summary/scorpionresults', 'summary/scorpionresultsview',
   'summary/tupleview',
-  'summary/drawingview', 'summary/util',
+  'summary/drawingview', 
+  'summary/util',
+  'summary/setup',
   'underscore',
   'shepherd',
   'bootstrap'
@@ -64,98 +66,17 @@ requirejs([
   ScorpionQuery, ScorpionQueryView, 
   ScorpionResults, ScorpionResultsView,
   TupleView,
-  DrawingView, util, _, Shepherd) {
+  DrawingView, util, setup, _, Shepherd) {
     console.log(Shepherd);
 
   $ = require('bootstrap');
 
 
 
-  $("[data-toggle=tooltip]").tooltip();
-
-  var st_on_text = "Query only what you highlight below" ,
-      st_off_text = "Queries will ignore what you highlight below";
-  $("#selection-type > input[type=checkbox]").click(function() {
-    where.trigger("change:selection");
-    var txt = (this.checked)? st_on_text : st_off_text;
-    $("#selection-type")
-      .attr('title', txt)
-      .tooltip('fixTitle')
-      .tooltip('show');
-  });
-  $("#selection-type")
-    .attr('title', st_on_text)
-    .tooltip('fixTitle');
-
-
-
-  $("#apply-btn").click(function() {
-    if (qv.overlayquery && qv.overlayquery.get('where')) {
-      var ws = _.chain(qv.overlayquery.get('where'))
-        .filter(function(w) { return w.vals && w.vals.length; })
-        .compact()
-        .map(function(w) { return util.toWhereClause(w.col, w.type, w.vals);})
-        .map(function(w) { return util.negateClause(w); })
-        .map(function(w, idx) { return {id: idx, col: null, sql: w}; })
-        .each(function(w) { q.get('basewheres').push(w); })
-        .value();
-      console.log(ws)
-      q.trigger('change:basewheres');
-    }
-  });
-
-  // to avoid fetching same queries repeatedly
-  window.prev_fetched_json = null;
-
   var enableScorpion = window.enableScorpion = false;
-  // define all scorpion related variables so 
-  // they can be checked for null
-
-  var q = new Query();
-  var qv = new QueryView({ model: q })
-  $("#right").prepend(qv.render().$el);
-
-
-  var where = new Where({ query: q, nbuckets: 200 });
-  var whereview = new WhereView({collection: where, el: $("#where")});
-  var csv = new CStatsView({collection: where, el: $("#facets")});
-  q.on('change:db change:table change:basewheres', function() {
-    where.reset()
-    where.fetch({
-      data: {
-        db: q.get('db'),
-        table: q.get('table'),
-        where: _.compact(_.pluck(_.flatten(q.get('basewheres')), 'sql')).join(' AND ')
-      },
-      reset: true
-    });
-  })
-  where.on('change:selection', function() {
-    var whereJson = where.toJSON();
-    if (!_.isEqual(q.get('where'), whereJson)) {
-      console.log(["where.change:selection", q.get('where'), whereJson])
-      qv.renderWhereOverlay(whereJson);
-    } else {
-      console.log(["where.canceloverlay", q.get('where'), whereJson])
-      qv.cancelWhereOverlay();
-    }
-
-  });
-
-
-  var tv = new TupleView({query: q, el: $("#tuples").get()[0]});
-
-  where.on('change:selection', function() {
-    tv.model.set('where', where.toJSON());
-    tv.model.trigger('change:where')
-  });
-  q.on('change', function() {
-    tv.model.set('where', 
-      _.compact(_.flatten(_.union(q.get('basewheres'), q.get('where')))));
-    tv.model.trigger('change:where');
-  });
-  window.tv = tv;
-
+  setup.setupBasic();
+  setup.setupButtons(window.q, window.qv);
+  setup.setupTuples(window.q, null, window.where);
 
 
 
@@ -502,7 +423,7 @@ requirejs([
 
     tour.addStep('seltype', {
       attachTo: "#selection-type",
-      title: "Filtering (<b style='color:rgb(26, 189, 64); '>select</b> vs <b style='color:#D46F6F;'>reject</b>)",
+      title: "Filtering (<b style='color:rgb(26, 189, 64); '>select</b> vs <b style='color:#D46F6F;'>remove</b>)",
       text: "<p>So far, the facets <b style='color: rgb(26, 189, 64)'>select</b> subsets of data that match your filters. </p>"+
             "<p>Sometimes it helps to see what happens if the data you selected were <i>removed</i></p>"+
             "<p>Toggle this switch to show data that <i>doesn't</i> match the filter.</p>"+
@@ -524,7 +445,7 @@ requirejs([
       title: "Updating the Facets",
       text: "<p>The distributions in the facets are can be expensive to recompute, so we only recompute it for a new query.</p>"+
 //            "<p>One way to do so is to modify the WHERE clauses in the query form directly.</p>"+
-            "<p>You can apply your current <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> or <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>reject</b><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> filters by pressing the button to the left.  This will copy the <span style='background: grey; color: white; border-radius: 5px; padding-left: 1em; padding-right: 1em;'>filters</span> into the WHERE clauses in the Query Form.</p>"+
+            "<p>You can apply your current <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> or <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> filters by pressing the button to the left.  This will copy the <span style='background: grey; color: white; border-radius: 5px; padding-left: 1em; padding-right: 1em;'>filters</span> into the WHERE clauses in the Query Form.</p>"+
             "<p>Go ahead and click it!</p>",
       showCancelLink: true,
       classes: "shepherd-theme-arrows",
@@ -604,10 +525,4 @@ requirejs([
   }
 
 
-
-
-  window.q = q;
-  window.qv = qv;
-  window.where = where;
-  window.csv = csv;
 });

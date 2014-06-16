@@ -9,7 +9,8 @@
 
 .shepherd-element {
   position: absolute;
-  display: none; }
+  display: none; 
+  z-index: 500;}
   .shepherd-element.shepherd-open {
     display: block; }
 

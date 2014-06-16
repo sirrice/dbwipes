@@ -1,5 +1,6 @@
 define(function(require) {
   var Backbone = require('backbone'),
+      Handlebars = require('handlebars'),
       $ = require('jquery'),
       d3 = require('d3'),
       _ = require('underscore'),
@@ -8,6 +9,7 @@ define(function(require) {
 
   // View to render the selected stuff for debugging
   var SelectionView = Backbone.View.extend({
+    errtemplate: Handlebars.compile($("#wherelabel-template").html()),
     events: {
       "click .clause a": 'onClose'
     },
@@ -25,9 +27,8 @@ define(function(require) {
         this.clear();
         return this;
       }
-
-      var s = util.negateClause(this.model.toSQLWhere());
-      this.$el.html("<div class='clause'><a>x</a>" + s + "</div>");
+      var sql = util.negateClause(this.model.toSQLWhere());
+      this.$el.html(this.errtemplate({sql: sql}));
       this.$el.show()
       return this;
     },

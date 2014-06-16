@@ -47,7 +47,8 @@
     <div class="col-md-8 input-x">
       {{#each basewheres}}
 			<div>
-				<a data-idx="{{this.idx}}" class="q-where-close" style="">x</a>
+        <!--<a data-idx="{{this.idx}}" class="q-where-close" style="">x</a>-->
+        <button data-idx="{{this.idx}}" type="button" class="q-where-close close" aria-hidden="true">&times;</button>
 				<input data-idx="{{this.idx}}" class="form-control" name="q-where" value="{{this.sql}}" placeholder="expression">
       </div>
       {{/each}}

@@ -79,8 +79,6 @@
     <div class="row">
       <div class="col-md-12">
         <span id="q-toggle" class="btn-sm"  data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
-        <span id="q-load-intel" class='btn'>load yy</span>
-        <span id="q-load-fec" class='btn'>load fec</span>
       </div>
     </div>
 
@@ -112,6 +110,7 @@
 </div>
 
 
+{% include 'wherelabel.html' %}
 {% include 'cstat.html' %}
 {% include 'qform.html' %}
 {% include 'scorpionresults.html' %}

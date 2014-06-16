@@ -1,0 +1,7 @@
+*.cache
+dist
+*.dump
+*.err
+*.log
+*.egg-info
+*.pyc

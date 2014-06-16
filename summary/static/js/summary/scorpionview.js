@@ -56,7 +56,9 @@ define(function(require) {
       } else {
         this.$el.fadeOut();
         this.$("#errmsg").text("");
+        this.trigger('scorpionquery:done');
       }
+
     },
 
 

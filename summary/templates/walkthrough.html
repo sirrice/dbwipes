@@ -3,17 +3,15 @@
 <script id="scorpion-template" type="text/x-underscore-template">
 <div class="walkthrough row" >
 	<div class="col-md-12">
-    <h4><button class="close" style="">x</button></h4>
+    <h4>
+      <span id="selectionmsg">
+        Scorpion Query <small>{{nselected}} points selected</small> 
+      </span>
+      <button type="button" class="close" aria-hidden="true">&times;</button>
+    </h4>
+
     <fieldset>
 
-      <div class="row">
-        <div class="col-sm-12">
-          <span id="selectionmsg">
-            {{nselected}} points selected
-          </span>
-        </div>
-      </div>
- 
       <div class="row">
         <div class="col-sm-10">
           <span id="addbad" class="form-control btn btn-danger" >

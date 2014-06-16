@@ -352,11 +352,7 @@ define(function(require) {
         el.selectAll('.data-container:not(.background)')
             .selectAll('.mark')
           .classed('selected', function(d){
-            if (util.isNum(type)) {
-              var minx = xscales(e[0][0]),
-                  maxx = xscales(e[1][0]),
-                  x    = d.px;
-            } else if (util.isTime(type)) {
+            if (util.isNum(type) || util.isTime(type)) {
               var minx = xscales(e[0][0]),
                   maxx = xscales(e[1][0]),
                   x    = d.px;
@@ -368,29 +364,28 @@ define(function(require) {
 
             var y = d.y,
                 bx = minx <= x+xr && maxx >= x-xr,
-                by = e[0][1] <= y+yr && e[1][1] >= y-yr,
-                b = bx && by;
+                by = e[0][1] <= y+yr && e[1][1] >= y-yr;
 
-            if (b) {
-              //console.log([minx, maxx, x, xr, d.x, d.px]);
+            if (bx && by) {
               var yalias = d.yalias;
               if (!selected[yalias]) selected[yalias] = [];
               selected[yalias].push(d);
+              return true;
             }
-            return b;
+            return false;
           })
         if (d3.event.type == 'brushend') {
           _this.trigger('change:selection', selected);
         }
       }
 
-      var brush = d3.svg.brush()
+      this.d3brush = brush = d3.svg.brush()
           .x(this.state.xscales)
           .y(this.state.yscales)
           .on('brush', brushf)
           .on('brushend', brushf)
           .on('brushstart', brushf)
-      var gbrush = this.gbrush = el.append('g')
+      this.gbrush = gbrush = el.append('g')
           .attr('class', 'brush')
           .call(brush)
       gbrush.selectAll('rect')
@@ -557,7 +552,9 @@ define(function(require) {
           ycol.alias
         );
       }, this);
-      this.renderBrush(this.c);
+      if (window.enableScorpion) {
+        this.renderBrush(this.c);
+      }
       this.renderLabels(this.c);
       this.renderZoom(this.c);
 

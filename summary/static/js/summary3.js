@@ -52,7 +52,9 @@ requirejs([
   'summary/scorpionquery', 'summary/scorpionview',
   'summary/scorpionresults', 'summary/scorpionresultsview',
   'summary/tupleview',
-  'summary/drawingview', 'summary/util',
+  'summary/drawingview', 
+  'summary/util',
+  'summary/setup',
   'summary/task',
   'underscore',
   'shepherd',
@@ -65,184 +67,20 @@ requirejs([
   ScorpionQuery, ScorpionQueryView, 
   ScorpionResults, ScorpionResultsView,
   TupleView,
-  DrawingView, util, TaskView, _, Shepherd) {
+  DrawingView, util, setup, TaskView, _, Shepherd) {
 
   $ = require('bootstrap');
 
 
-  $("[data-toggle=tooltip]").tooltip();
-
-  var st_on_text = "Query only what you highlight below" ,
-      st_off_text = "Queries will ignore what you highlight below";
-  $("#selection-type > input[type=checkbox]").click(function() {
-    where.trigger("change:selection");
-    var txt = (this.checked)? st_on_text : st_off_text;
-    $("#selection-type")
-      .attr('title', txt)
-      .tooltip('fixTitle')
-      .tooltip('show');
-  });
-  $("#selection-type")
-    .attr('title', st_on_text)
-    .tooltip('fixTitle');
-
-
-  $("#apply-btn").click(function() {
-    if (qv.overlayquery && qv.overlayquery.get('where')) {
-      var ws = _.chain(qv.overlayquery.get('where'))
-        .filter(function(w) { return w.vals && w.vals.length; })
-        .compact()
-        .map(function(w) { return util.toWhereClause(w.col, w.type, w.vals);})
-        .map(function(w) { return util.negateClause(w); })
-        .map(function(w) { return {col: null, sql: w}; })
-        .each(function(w) { q.get('basewheres').push(w); })
-        .value();
-      q.trigger('change:basewheres');
-    }
-  });
-
-  // to avoid fetching same queries repeatedly
-  window.prev_fetched_json = null;
 
   var enableScorpion = window.enableScorpion = true;
-  // define all scorpion related variables so 
-  // they can be checked for null
-  var srs = null,
-      srv = null,
-      sq = null,
-      sqv = null,
-      psrs = null,
-      psrv = null;
-
-
-  var q = new Query();
-  var qv = new QueryView({ model: q })
-  $("#right").prepend(qv.render().$el);
-
-
-  var where = new Where({query: q, nbuckets: 200});
-  var whereview = new WhereView({collection: where, el: $("#where")});
-  var csv = new CStatsView({collection: where, el: $("#facets")});
-  q.on('change:db change:table change:basewheres', function() {
-    where.reset()
-    where.fetch({
-      data: {
-        db: q.get('db'),
-        table: q.get('table'),
-        where: _.compact(_.pluck(_.flatten(q.get('basewheres')), 'sql')).join(' AND ')
-      },
-      reset: true
-    });
-  })
-  where.on('change:selection', function() {
-    var opts = {silent: false};
-    arguments.length && (opts = _.last(arguments))
-    opts || (opts = {silent: false});
-    console.log(['summary.js', 'where.onselection', opts]);
-    if (!opts.silent) {
-      if (srv) {
-        srv.unlockAll();
-        psrv.unlockAll();
-      }
-      qv.renderWhereOverlay(where.toJSON());
-    }
-  });
+  setup.setupBasic();
+  setup.setupButtons(window.q, window.qv);
+  setup.setupScorpion(enableScorpion, window.q, window.qv, window.where);
+  setup.setupTuples(window.q, window.srv, window.where);
 
 
 
-  if (enableScorpion) {
-    srs = new ScorpionResults()
-    srv = new ScorpionResultsView({
-      collection: srs, 
-      where: where, 
-      query: q
-    });
-    psrs = new ScorpionResults()
-    psrv = new ScorpionResultsView({
-      collection: psrs, 
-      where: where, 
-      query: q
-    });
-    $("#scorpion-results-container").append(srv.render().el);
-    $("#scorpion-partialresults-container").append(psrv.render().el);
-
-
-
-    sq = new ScorpionQuery({
-      query: q, 
-      results: srs, 
-      partialresults: psrs
-    });
-    sqv = new ScorpionQueryView({
-      model: sq, 
-      queryview: qv
-    });
-    $("body").append(sqv.render().$el.hide());
-
-    srv.on('setActive', function(whereJson) {
-      console.log(['summary.js', 'setactive', whereJson])
-      qv.renderWhereOverlay(whereJson);
-    });
-    psrv.on('setActive', function(whereJson) {
-      qv.renderWhereOverlay(whereJson);
-    });
-
-
-    q.on('change:db change:table', function() {
-      sq.set('badselection', {});
-      sq.set('goodselection', {});
-    });
-    qv.on('resetState', function() {
-      sq.set('badselection', {});
-      sq.set('goodselection', {});
-      sq.set('selection', {});
-    });
-    qv.on('change:selection', function(selection) {
-      sq.set('selection', selection);
-    });
-    qv.on('change:drawing', function(drawingmodel) {
-      sq.set('drawing', drawingmodel);
-    });
-
-  } else {
-    $("#facet-togglecheckall").css("opacity", 0)
-  }
-
-
-  var tv = new TupleView({query: q, el: $("#tuples").get()[0]});
-
-  srv.on('setActive', function(whereJSON) {
-    tv.model.set('where', whereJSON);
-  });
-  where.on('change:selection', function() {
-    tv.model.set('where', where.toJSON());
-    tv.model.trigger('change:where')
-  });
-  q.on('change', function() {
-    tv.model.set('where', 
-      _.compact(_.flatten(_.union(q.get('basewheres'), q.get('where')))));
-    tv.model.trigger('change:where');
-  });
-  window.tv = tv;
-
-
-
-
-
-  var intelq = {
-    x: 'hr',
-    ys: [
-      {col: 'temp', expr: "avg(temp)", alias: 'avg'},
-      {col: 'temp', expr: "stddev(temp)", alias: 'std'}
-    ],
-    schema: {
-      hr: 'timestamp',
-      temp: 'num'
-    },
-    where: '',
-    table: 'readings' ,
-    db: 'intel'
-  };
 
   var testq = {
     x: 'day',
@@ -255,144 +93,277 @@ requirejs([
     db: 'test'
   };
 
-  var fecq = {
-    x: 'disb_dt',
-    ys: [{col: 'disb_amt', expr: 'sum(disb_amt)'}],
-    schema: {
-      disb_dt: 'timestamp',
-      disb_amt: 'num'
-    },
-    table: 'expenses',
-    db: 'fec12'
-  };
-
-
-  $("#q-load-intel").click(function() { 
-    q.set(intelq);
-  });
-  $("#q-load-fec").click(function() { 
-    q.set(fecq);
-  });
-
-
   q.set(testq);
 
 
 
 
-  if (true) {
 
-    var tasks = [
-      new TaskView({
-        text: "<p>Which gender has higher total sum of sales on day 0?</p>",
-        options: [ 'Male', 'Female', 'They are equal'],
-        truth: 0,
-        attachTo: '#tasks'
-      }),
-      new TaskView({
-        text: "<p>Which gender has higher total sum of sales on day 9?</p>",
-        options: [ 'Male', 'Female', 'They are roughly equal'],
-        truth: 1,
-        attachTo: '#tasks'
-      }),
-      new TaskView({
-        text: "<p>Which state most contributes to the rising sales?</p>",
-        textbox: true,
-        truth: 'CA',
-        attachTo: '#tasks',
-        successText: "Nice!  You're all done!"
-      }),
-      new TaskView({
-        text: "<p>Which gender has a higher number (count) of California sales overall?</p>",
-        options: [ 'Male', 'Female', 'They are roughly equal'],
-        truth: 0,
-        attachTo: '#tasks',
-        successText: "Nice!  You're all done!"
-      })
-
-    ];
-    _.each(tasks, function(task, idx) {
-      var prefix = (idx+1) + " of " + tasks.length;
-      var title = task.model.get('title') || "";
-      task.model.set('title', prefix + " " + title);
-      task.on('submit', function() {
-        task.hide();
-        if (tasks[idx+1]) {
-          tasks[idx+1].show();
-        } else {
-          tour.show('end');
-        }
-      });
+  var tasks = [
+    new TaskView({
+      text: "<p>Which gender has higher total sum of sales on day 0?</p>",
+      options: [ 'Male', 'Female', 'They are equal'],
+      truth: 0,
+      attachTo: '#tasks'
+    }),
+    new TaskView({
+      text: "<p>Which gender has higher total sum of sales on day 9?</p>",
+      options: [ 'Male', 'Female', 'They are roughly equal'],
+      truth: 1,
+      attachTo: '#tasks'
+    }),
+    new TaskView({
+      text: "<p>Which state most contributes to the rising sales?</p>",
+      textbox: true,
+      truth: 'CA',
+      attachTo: '#tasks',
+      successText: "Nice!  You're all done!"
+    }),
+    new TaskView({
+      text: "<p>Which gender has a higher number (count) of California sales overall?</p>",
+      options: [ 'Male', 'Female', 'They are roughly equal'],
+      truth: 0,
+      attachTo: '#tasks',
+      successText: "Nice!  You're all done!"
     })
 
-    var tour = new Shepherd.Tour({
-      defaults: { classes: "shepherd-element shepherd-open shepherd-theme-arrows"}
+  ];
+  _.each(tasks, function(task, idx) {
+    var prefix = (idx+1) + " of " + tasks.length;
+    var title = task.model.get('title') || "";
+    task.model.set('title', prefix + " " + title);
+    task.on('submit', function() {
+      task.hide();
+      if (tasks[idx+1]) {
+        tasks[idx+1].show();
+      } else {
+        tour.show('end');
+      }
     });
+  })
 
-    var btns = [{
-        text: 'Back',
-        action: tour.back
-      },{
-        text: 'Next',
-        action: tour.next
-      }];
-    var step;
+  var tour = new Shepherd.Tour({
+    defaults: { classes: "shepherd-element shepherd-open shepherd-theme-arrows"}
+  });
+
+  var btns = [{
+      text: 'Back',
+      action: tour.back
+    },{
+      text: 'Next',
+      action: tour.next
+    }];
+  var step;
 
 
-    step = tour.addStep('start', {
-      title: "Validation",
-      text: "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
-            "<p>We will ask you to answer a few questions about this dataset using the baseline scorpion tool.</p>"+
-            "<p>When you are ready, click Next.</p>",
-      classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
-      style: { width: "500px" },
-      buttons: [{
-        text: "Next",
-        action: function() {
-          $("div.row").css("opacity", 1); 
-          tour.cancel();
-        }
-      }]
+  step = tour.addStep('start', {
+    title: "Validation",
+    text: "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
+          "<p>We will ask you to answer a few questions about this dataset using the baseline scorpion tool.</p>"+
+          "<p>When you are ready, click Next.</p>",
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" },
+  });
+  step.on("show", function() { $("div.row").css("opacity", 0.3); });
+  step.on("hide", function() { $("div.row").css("opacity", 1); });
+
+  step = tour.addStep('intro', {
+    title: "Introduction",
+    text: "<p>Rather than manually searching the data ourselves, Scorpion lets you directly ask questions about result values</p>"+
+          "<p>The visualization has been augmented with the ability to select results</p>" +
+          "<p>Click Next for an example selection.</p>",
+    highlight: true,
+    attachTo: "#viz left",
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" },
+    buttons: [{
+      text: "Next",
+      action: function() {
+        qv.c.call(qv.d3brush.extent([[5.5, 230000],[9.5, 245501]]))
+        qv.d3brush.event(qv.c);
+        _.delay(tour.show.bind(tour), 50, 'sq');
+      }
+    }]
+
+
+  });
+
+  step = tour.addStep('sq', {
+    title: "Scorpion Query",
+    text: "<p>Whenever you select something in the visualization, this dialog will pop up.</p>"+
+          "<p>It asks you to specify something about the points you just selected.</p>",
+    attachTo: "div.walkthrough right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" },
+  });
+
+  step = tour.addStep('sq-npoints', {
+    title: "Scorpion Query",
+    text: "<p>At the top, it always tells you how many points you have selected.</p>",
+    attachTo: "#selectionmsg right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    buttons: btns,
+    style: { width: "500px" },
+  });
+
+
+
+  step = tour.addStep('sq-bad', {
+    title: "Scorpion Query",
+    text: "<p>This button will add your selected points as examples of results whose values are wrong (either too high or too low)</p>" +
+          "<p>Since we are interested in why the sales have gone up, go ahead and click on this button</p>",
+    attachTo: "div.walkthrough #addbad right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" },
+    buttons: { next: false },
+    advanceOn: "#addbad click"
+  });
+
+  step = tour.addStep('sq-brush', {
+    title: "Scorpion Query",
+    text: "<p>Now select some examples of good points whose values seem normal.</p>" +
+          "<p>Go ahead and select days 0 and 1 and click Next when you are done.</p>",
+    attachTo: "#viz left",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    buttons: btns,
+    style: { width: "500px" },
+  });
+
+  step = tour.addStep('sq-good', {
+    title: "Scorpion Query",
+    text: "<p>This button will add your selected points as examples of results whose values are OK</p>" +
+          "<p>Scorpion will compute the values of the average bad point and the average good point to decide if the bad points' values are too high or too low.</p>" +
+          "<p>Go ahead and click on it</p>",
+    attachTo: "div.walkthrough #addgood right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" },
+    buttons: btns,
+    advanceOn: "#addgood click"
+  });
+
+  step = tour.addStep('sq-submit', {
+    title: "Scorpion Query",
+    text: "<p>Great!  That's all Scorpion needs from you!</p>"+
+          "<p>Click submit to let Scorpion do your work!</p>",
+    attachTo: "#scorpion_submit right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" },
+    buttons: btns
+  });
+
+  step = tour.addStep('psrs', {
+    title: "Scorpion Partial Results",
+    text: "<p>While Scorpion runs, this section lists the best filters found in the search so far.</p>"+
+          "<p>Hovering over any of the rules will apply it to the Facets on the left and also update the visualization above.</p>"+
+          "<p>When Scorpion is done, the buttons will turn blue.  Until then, the list may change at any time.</p>",
+    attachTo: "#scorpion-partialresults-container left",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" },
+    buttons: { next: false }
+  });
+  step.on("show", function() {
+    window.sqv.on('scorpionquery:done', function() {
+      _.delay(tour.show.bind(tour), 50, 'srs');
+      window.sqv.off('scorpionquery:done');
     });
-    step.on("show", function() { $("div.row").css("opacity", 0.3); });
+  });
 
-    
-    step = tour.addStep('end', {
-      title: "Validation Done!",
-      text: "<p>Great job!  You will notice that many of these questions involved understanding why the total sales rose over the 10 days.</p>"+
-            "<p>Scorpion's automated tools are designed for answering these types of questions.  The next section will introduce you to the Scorpion automated explanation tool.</p>",
-      classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
-      style: { width: "500px" }
-    });
-    step.on("show", function() { $("div.row").css("opacity", 0.3); });
-    step.on("hide", function() { 
-      window.location = '/dir/';
-    });
+  step = tour.addStep('srs', {
+    title: "Scorpion Final Results",
+    text: "<p>This is the list of final scorpion results.  Feel free to hover over any of the results.</p>"+
+          "<p>Clicking on a result will lock it in place so that moving your cursor away from the result will not reset the filters.  This lets you lock one result in place, and hover over another result for comparison purposes</p>",
+    attachTo: "#scorpion-results-container left",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    style: { width: "500px" }
+  });
+
+  step = tour.addStep('srs-remove', {
+    title: "How Much Influence?",
+    text: "<p>Try switching this to <span style='font-family: arial; font-weight: bold;'><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b></span>.</p>"+
+          "<p>Hovering over a result will then suggest how much those records 'influenced' the final result.</p>",
+    attachTo: "#selection-type right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    tetherOptions: {
+      attachment: 'top right',
+      targetAttachment: 'top left',
+      offset: '10px -10px'
+    },
+    style: { width: "500px" }
+  });
+
+
+  step = tour.addStep('checkboxes', {
+    title: "Ignoring Attributes",
+    text: "<p>You can uncheck the checkboxes next to each attribute to remove them from consideration.</p>"+
+          "<p>This is useful if you know that certain attributes are not interesting, or if you want to restrict the results to filters over a small number of attributes.</p>",
+    attachTo: ".errcol right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    tetherOptions: { 
+      attachment: 'top right',
+       targetAttachment: 'top left',
+      offset: '19px -10px' 
+    },
+    style: { width: "500px" }
+  });
+  step.on('show', function() {
+      $(".cstat-label .type").css("box-shadow", "rgb(18, 179, 255) 0px 0px 10px 0px");
+  });
+  step.on('hide', function() {
+      $(".cstat-label .type").css("box-shadow", "none");
+  });
+
+
+  step = tour.addStep('checkboxes-all', {
+    title: "Ignoring Attributes",
+    text: "<p>For convenience, you can click this button to uncheck all of the attributes at once.</p>",
+    attachTo: "#facet-togglecheckall right",
+    highlight: true,
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    tetherOptions: {
+      attachment: 'top right',
+      targetAttachment: 'top left',
+      offset: '10px -10px'
+    },
+    style: { width: "400px" }
+  });
 
 
 
-    tour.start();
-    window.tour = tour;
-  }
+  step = tour.addStep('end', {
+    title: "Done!",
+    text: "<p>That's it for a tour of Scorpion!</p>"+
+          "<p>Now we will ask you to analyze a few datasets with and without the automated tool.</p>"+
+          "<p>Please press Exit to go back to the main directory when you are ready.</p>",
+    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
+    showCancelLink: true,
+    buttons: [{
+      text: 'Back',
+      action: tour.back
+    }, {
+      text: 'Exit',
+      action: function () {
+        window.location = '/dir/';
+      }
+    }],
+    style: { width: "500px" }
+  });
+  step.on("show", function() { $("div.row").css("opacity", 0.3); });
+  step.on("hide", function() { $("div.row").css("opacity", 1); });
 
 
 
-
-
-  window.q = q;
-  window.qv = qv;
-  window.where = where;
-  window.csv = csv;
-
-  if (enableScorpion) {
-    window.sq = sq;
-    window.sqv = sqv;
-    window.srs = srs;
-    window.srv = srv;
-    window.psrs = psrs;
-    window.psrv = psrv;
-
-  }
-
+  tour.start();
+  tour.show('srs-remove')
+  window.tour = tour;
 
 });
