@@ -45,7 +45,6 @@ define(function(require) {
       this.$el
         .css("padding", "1em")
         .css("padding-bottom", "1.5em")
-        .css("box-shadow", "grey 0px 3px 2px -1px")
         .css("background", "white")
         .attr('id', 'queryview-container');
 
