@@ -44,30 +44,15 @@ requirejs.config({
 });
 
 // Start the main app logic.
-requirejs([
-  'jquery', 'd3',
-  'summary/where', 'summary/whereview', 
-  'summary/cstat', 'summary/cstatsview', 
-  'summary/query', 'summary/queryview',
-  'summary/scorpionquery', 'summary/scorpionview',
-  'summary/scorpionresults', 'summary/scorpionresultsview',
-  'summary/tupleview',
-  'summary/drawingview', 
-  'summary/util',
-  'summary/setup',
-  'summary/task',
-  'underscore',
-  'shepherd',
-  'bootstrap'
-  ], function (
-  $, d3,
-  Where, WhereView, 
-  CStat, CStatsView, 
-  Query, QueryView, 
-  ScorpionQuery, ScorpionQueryView, 
-  ScorpionResults, ScorpionResultsView,
-  TupleView,
-  DrawingView, util, setup, TaskView, _, Shepherd) {
+requirejs(['jquery', 
+           'd3',
+           'summary/util',
+           'summary/setup',
+           'summary/task',
+           'underscore',
+           'shepherd',
+           'bootstrap'
+  ], function ($, d3, util, setup, TaskView, _, Shepherd) {
 
   $ = require('bootstrap');
 

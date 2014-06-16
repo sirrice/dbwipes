@@ -121,14 +121,16 @@ define(function(require) {
           _this = this,
           ip = this.state.ip,
           xs = _.pluck(data, xalias),
-          yss = _.map(yaliases, function(yalias) { return _.pluck(data, yalias) }), 
-          newCDomain = _.compact(_.union(this.state.cscales.domain(), yaliases)),
           prevxdomain = this.state.xdomain,
           prevydomain = this.state.ydomain,
           getx = function(d) { return d[xalias]; },
           xdomain = util.getXDomain(data, type, getx),
-          ydomain = util.getYDomain(data, ycols);
+          ydomain = util.getYDomain(data, ycols),
+          newCDomain = _.chain(this.state.cscales.domain())
+            .union(yaliases)
+            .compact().value();
 
+      this.state.cscales.domain(newCDomain);
       this.state.xdomain = util.mergeDomain(this.state.xdomain, xdomain, type);
       this.state.ydomain = util.mergeDomain(this.state.ydomain, ydomain, 'num');
 
@@ -150,7 +152,6 @@ define(function(require) {
           .range([this.state.h-ip, 0+ip])
       }
       
-      this.state.cscales.domain(newCDomain);
       this.state.xscales.domain(this.state.xdomain);
       this.state.yscales.domain(this.state.ydomain);
 

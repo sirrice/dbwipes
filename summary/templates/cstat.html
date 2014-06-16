@@ -1,7 +1,7 @@
 {%raw%}
 <script id="cstat-template" type="text/x-underscore-template">
-<div class='row'>
-  <div class="col-md-2 cstat-label">
+<div class='row' id="cstat-{{col}}">
+  <div class="col-md-2 cstat-label" >
     {{col}}
     <div class="type" >
       <label style="min-width: 50px" class="btn btn-xs" for="errcol_{{col}}"   data-toggle="tooltip" data-placement="top" title="Check to include this attribute in scorpion query" >{{type}}</label>
