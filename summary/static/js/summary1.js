@@ -513,7 +513,6 @@ requirejs(['jquery',
 
 
   tour.start();
-  tour.show('dist-filter')
   window.tour = tour;
 
 
