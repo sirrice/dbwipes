@@ -13,7 +13,6 @@ define(function(require) {
 
   var QueryForm = Backbone.View.extend({
     errtemplate: Handlebars.compile($("#q-err-template").html()),
-    wheretemplate: Handlebars.compile($("#q-where-template").html()),
     yexprhtml: "<div><input class='form-control' name='q-y-expr' placeholder='expression'/></div>",
     ycolhtml: "<div><input class='form-control' name='q-y-col' placeholder='attribute'/></div>",
 
@@ -91,7 +90,7 @@ define(function(require) {
       var el = $(ev.target),
           idx = el.data('idx');
       this.model.get('basewheres').splice(+idx, 1);
-      el.remove();
+      el.parent().remove();
       this.model.trigger('change:basewheres');
 
     },

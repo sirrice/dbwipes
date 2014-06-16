@@ -21,8 +21,13 @@ else:
   db.close()
   engine.dispose()
 
+reset = raw_input('enter Y to reset cache: ')
+reset = reset == 'Y'
+
 for table in tables:
   summary = Summary(dbname, table, nbuckets=500)
+  if reset:
+    summary.reset_cache()
   summary()
   summary.close()
 

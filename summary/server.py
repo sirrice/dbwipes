@@ -79,6 +79,7 @@ def teardown_request(exception):
     pass
 
 
+
 @app.route('/1/', methods=["POST", "GET"])
 def index1():
   return render_template("index1.html")
@@ -86,6 +87,10 @@ def index1():
 @app.route('/2/', methods=["POST", "GET"])
 def index2():
   return render_template("index2.html")
+
+@app.route('/dir/', methods=["POST", "GET"])
+def dirpage():
+  return render_template("dir.html")
 
 
 @app.route('/', methods=["POST", "GET"])

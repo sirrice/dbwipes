@@ -225,8 +225,12 @@ define(function(require) {
         }
       };
 
-      this.d3brush.extent([]);
-      this.d3brush.clear();
+      if (this.d3brush) {
+        this.d3brush.extent([]);
+        this.d3brush.clear();
+      }
+
+
       if (clause) {
         if (!util.isStr(clause.type)) {
           var extent = [

@@ -1,0 +1,346 @@
+<html>
+
+<head>
+  <script src="/static/js/lib/tether.js"></script>
+  <script data-main="/static/js/summary2" src="/static/js/require.js"></script>
+
+</head>
+<div class="row">
+	<div id="tasks" class="col-md-12">
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-12">
+
+
+		<div class="row">
+			<div class="col-md-6">
+				<h1>Scorpion Verification Test
+					<span id="q_loading" style="display:none;">loading query results...</span>
+				</h1>
+
+				<div class="row">
+					<div class="col-md-3 col-md-offset-2">
+						<span>
+							<div id="selection-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
+									<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+									<label class="onoffswitch-label" for="myonoffswitch">
+											<span class="onoffswitch-inner"></span>
+											<span class="onoffswitch-switch"></span>
+									</label>
+							</div>
+						</span>
+					</div>
+					<div class="col-md-3">
+						<span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Add Filters to Query</span>
+					</div>
+				</div>
+
+				<div class='row'>
+					<div class="col-md-10 col-md-offset-2" style='max-width:450px; padding-left: 80px;' id='where'></div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-12">
+						<div id="facets"></div>
+					</div>
+				</div>
+
+			</div><!-- close col-md-6 -->
+
+
+			<div id="" class="col-md-6" style="position: relative">
+				<h1>&nbsp;</h1>
+				<div class="row">
+					<div class="col-md-12">
+						<span id="q-toggle" class="btn-sm" data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
+					</div>
+				</div>
+
+				<div class="row"> 
+					<div class="col-md-12" id="right">
+							<div class='row'>
+								<div class="col-md-12">
+									<div id="tuples"></div>
+								</div>
+							</div>
+
+						<div style="clear:both;"></div>
+					</div>
+				</div>
+			</div> <!-- close col-md-6 -->
+		</div>
+
+	</div>
+</div>
+
+{%raw%}
+<script id="foo-template" type="text/x-underscore-template">
+<div class='row'>
+  <div class="col-md-2 cstat-label">
+    {{col}}
+    <div class="type" >
+      <label style="min-width: 50px" class="btn btn-xs" for="errcol_{{col}}"   data-toggle="tooltip" data-placement="top" title="Check to include this attribute in scorpion query" >{{type}}</label>
+      <span>
+        <input type="checkbox" class="errcol" checked id="errcol_{{col}}" value="{{col}}"/>
+      </span>
+    </div>
+    <div class="count"></div>
+  </div>
+	<div class="col-md-10 cstat-plot">
+    <svg class=""></svg>
+	</div>
+</div>
+</script>
+
+<script id="q-err-template" type="text/x-underscore-template">
+<div class='row'>
+<div class="col-md-12"  style="padding: 2em">
+  <div class='row'>
+    <div class="col-md-4"></div>
+    <div class="col-md-4 input-ys"><input class="form-control" name="q-db" value="{{db}}" placeholder="database"></div>
+    <div class="col-md-4 input-ys"><input class="form-control" name="q-table" value="{{table}}" placeholder="table"></div>
+  </div>
+  <div class='row'>
+    <div class="col-md-4"></div>
+    <div class="col-md-5 input-x">
+      Expression
+    </div>
+    <div class="col-md-3 input-x">
+      Attribute
+    </div>
+  </div>
+  <div class='row'>
+    <div class="col-md-4">GROUP BY clause</div>
+    <div class="col-md-5 input-x">
+      <input class="form-control" name="q-x-expr" value="{{x.expr}} as {{x.alias}}" placeholder="expression">
+    </div>
+    <div class="col-md-3 input-x">
+      <input class="form-control" name="q-x-col" value="{{x.col}}" placeholder="attribute">
+    </div>
+  </div>
+  <div class='row'>
+    <div class="col-md-4">SELECT clauses <span id="q-add-select-expr" class='q-add btn btn-primary btn-xs'>add</span></div>
+    <div class="col-md-5 input-ys-expr">
+      {{#each ys}}
+      <div>
+        <input  class="form-control" name="q-y-expr" value="{{this.expr}} as {{this.alias}}" placeholder="expression"/>
+      </div>
+      {{/each}}
+    </div>
+    <div class="col-md-3 input-ys-col">
+      {{#each ys}}
+      <div>
+        <input  class="form-control" name="q-y-col" value="{{this.col}}" placeholder="attribute"/>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  <div class='row'>
+    <div class="col-md-4">WHERE clauses</div>
+    <div class="col-md-8 input-x">
+      {{#each basewheres}}
+			<div>
+				<a data-idx="{{this.idx}}" class="q-where-close" style="">x</a>
+				<input data-idx="{{this.idx}}" class="form-control" name="q-where" value="{{this.sql}}" placeholder="expression">
+      </div>
+      {{/each}}
+			<div>
+				<input data-idx="new" class="form-control" name="q-where" value="" placeholder="expression">
+      </div>
+    </div>
+  </div>
+  <div class='row'>
+    <div class="col-md-4"></div>
+    <div class="col-md-8 input-ys"><button class='q-submit btn btn-primary'>Execute Query</button></div>
+  </div>
+</div>
+</div>
+</script>
+
+<script id="scorpion-result-template" type="text/x-underscore-template">
+<div class='row'>
+  <div class="col-md-12 scorpion-result">
+    <ul class="filter-clause">
+      <span class="info">
+        <span class="count">{{count}}</span>
+        <span class="score">{{score}}</span>
+        <span class="crange">{{c_range}}</span>
+      </span>
+      {{#each clauses}}
+        <li class='clause-part'>{{this}}</li>
+      {{/each}}
+    </ul>
+    {{#if alt_rules}}
+    <div class="equiv-toggle-container">
+      <div class="equiv-toggle">show rules in cluster</div>
+    </div>
+    <div class="equiv-clauses" style="display:none;">
+        {{#each alt_rules}}
+        <ul class="equiv-clause">
+          {{#each this}}
+            <li class="clause-part">{{this}}</li>
+          {{/each}}
+        </ul>
+        {{/each}}
+    </div>
+    {{/if}}
+  </div>
+</div>
+</script>
+
+<script id="scorpion-results-template" type="text/x-underscore-template">
+<div class='row'>
+  <div class="col-md-12">
+    <ul class="scorpion-results">
+    </ul>
+  </div>
+</div>
+</script>
+
+<script id="scorpion-template" type="text/x-underscore-template">
+<div class="walkthrough row" >
+	<div class="col-md-12">
+    <h4><button class="close" style="">x</button></h4>
+    <fieldset>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <span id="selectionmsg">
+            {{nselected}} points selected
+          </span>
+        </div>
+      </div>
+ 
+      <div class="row">
+        <div class="col-sm-10">
+          <span id="addbad" class="form-control btn btn-danger" >
+            Add bad examples ({{nbad}} selected)
+          </span>
+          <span id="addgood" class="form-control btn btn-success" >
+            Add good examples ({{ngood}} selected)
+          </span>
+        </div>
+        <div class="col-sm-2" style="padding-left: 0px">
+          <div><span id="clearbad" class="btn">
+            clear
+          </span></div>
+          <div><span id="cleargood" class="btn" >
+            clear
+          </span></div>
+        </div>
+      </div>			
+
+      <div class="row">
+        <div class="col-sm-12">
+          <span id="draw" class="form-control btn btn-default" >
+            click to draw expected values for selected results
+          </span>
+        </div>
+      </div>
+
+      <!--
+      <div class="form-group row" id="walkthrough-schema" >
+        <label class="col-sm-3 control-label">
+          <span class='link' id='toggle-schema'>cols</span>
+        </label>
+        <div id="schema" class="col-sm-9" style="display: none;">
+          <label class="checkbox">
+            <span class='link' id='uncheck-schema'>uncheck all</span>
+          </label>
+
+          {{#each cols}}
+          <label class="checkbox">
+            <input type="checkbox" checked class="errcol" id="" value="{{this}}"/>
+            {{this}}
+          </label>
+          {{/each}}
+        </div>
+      </div>
+      -->
+
+
+      <div class="form-group row">
+        <div class="controls col-sm-12">
+          <div>
+            <span id="scorpion_submit" class="form-control btn btn-primary">
+              Run Scorpion!
+              <span id="scorpion-wait" style="display: none;">
+                <div class="loadingspincircle"></div>
+              </span>
+            </span>
+          </div>
+          <p id="scorpion_status" class="text"></p>
+          <p id="errmsg" class="text-danger"></p>
+        </div>
+      </div>
+
+
+    </fieldset>
+	</div>
+</div>
+</script>
+
+
+<script id="tuple-template" type="text/x-underscore-template">
+<h3>A sample of {{nrows}} selected rows</h3>
+<div class="table-responsive">
+<table class="tuples table table-striped table-condensed table-hover">
+  <thead>
+  <tr>
+		{{#each cols}} <th data-col="{{this}}">{{this}}</th> {{/each}}
+  </tr>
+  </thead>
+  <tbody>
+  {{#each data}}
+    <tr>
+      {{#each this}} <td>{{this}}</td> {{/each}}
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+</div>
+</script>
+
+
+<script id="task-template" type="text/x-underscore-template">
+{{#if title}}
+<h3>{{title}}</h3>
+{{/if}}
+<div>{{{text}}}</div>
+{{#each options}}
+<div class="radio">
+	<label>
+		<input type="radio" name="opt" value="{{this.idx}}">
+		{{this.text}}
+	</label>
+</div>
+{{/each}}
+{{#if textbox}}
+<input name="text" class="form-control" placeholder="type in the answer"/>
+{{/if}}
+<div class="submit btn btn-primary">Submit</div>
+<div class="error bs-callout bs-callout-danger" style="display:none">
+</div>
+</script>
+
+
+
+{%endraw%}
+
+
+
+
+
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/base.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/docs.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/tether.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/tether-theme-arrows.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/shepherd-theme-arrows.css"/>
+	<!--
+	<link rel="stylesheet" type="text/css" href="/static/css/guiders.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/tourist.css"/>
+	-->
+</html>

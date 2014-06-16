@@ -592,7 +592,9 @@ requirejs([
       showCancelLink: true,
       buttons: [{
         text: "Exit",
-        action: tour.cancel
+        action: function() {
+          window.location = '/dir/';
+        }
       }]
     });
 

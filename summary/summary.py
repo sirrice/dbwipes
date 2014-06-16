@@ -114,6 +114,9 @@ class Summary(object):
 
     #print self._cache.closed, self.db.closed
 
+  def reset_cache(self):
+    q = """delete from cache where key like '%%%%%s%%%%%s%%%%'""" % (str(self.engine), self.tablename)
+    self._cache.execute(q)
 
   def query(self, q, *args):
     """

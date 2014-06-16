@@ -19,6 +19,24 @@ define(function(require) {
     return "not(" + SQL + ")";
   }
 
+  // points: [ { yalias:,..., xalias: } ]
+  // ycols: [ { col, alias, expr } ]
+  function getYDomain(points, ycols) {
+    var yaliases = _.pluck(ycols, 'alias'),
+        yss = _.map(yaliases, function(yalias) { 
+          return _.pluck(points, yalias) 
+        }),
+        ydomain = [Infinity, -Infinity];
+
+    _.each(yss, function(ys) {
+      ys = _.filter(ys, _.isFinite);
+      if (ys.length) {
+        ydomain[0] = Math.min(ydomain[0], d3.min(ys));
+        ydomain[1] = Math.max(ydomain[1], d3.max(ys));
+      }
+    });
+    return ydomain;
+  }
 
   // assume getx(point) and point.range contain x values
   function getXDomain(points, type, getx) {
@@ -210,6 +228,7 @@ define(function(require) {
     toWhereClause: toWhereClause,
     negateClause: negateClause,
     getXDomain: getXDomain,
+    getYDomain: getYDomain,
     mergeDomain: mergeDomain
   }
 })

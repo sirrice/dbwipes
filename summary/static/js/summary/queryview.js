@@ -126,22 +126,13 @@ define(function(require) {
           yss = _.map(yaliases, function(yalias) { return _.pluck(data, yalias) }), 
           newCDomain = _.compact(_.union(this.state.cscales.domain(), yaliases)),
           prevxdomain = this.state.xdomain,
-          prevydomain = this.state.ydomain;
+          prevydomain = this.state.ydomain,
+          getx = function(d) { return d[xalias]; },
+          xdomain = util.getXDomain(data, type, getx),
+          ydomain = util.getYDomain(data, ycols);
 
-      this.state.cscales.domain(newCDomain);
-
-      var getx = function(d) { return d[xalias]; },
-          xdomain = util.getXDomain(data, type, getx);
       this.state.xdomain = util.mergeDomain(this.state.xdomain, xdomain, type);
-
-      _.each(yss, function(ys) {
-        if (this.state.ydomain == null) this.state.ydomain = [Infinity, -Infinity];
-        ys = _.filter(ys, _.isFinite);
-        if (ys.length) {
-          this.state.ydomain[0] = Math.min(this.state.ydomain[0], d3.min(ys));
-          this.state.ydomain[1] = Math.max(this.state.ydomain[1], d3.max(ys));
-        }
-      }, this);
+      this.state.ydomain = util.mergeDomain(this.state.ydomain, ydomain, 'num');
 
       if (this.state.xscales == null) {
         var xscales = d3.scale.linear();
@@ -161,6 +152,7 @@ define(function(require) {
           .range([this.state.h-ip, 0+ip])
       }
       
+      this.state.cscales.domain(newCDomain);
       this.state.xscales.domain(this.state.xdomain);
       this.state.yscales.domain(this.state.ydomain);
 
@@ -266,16 +258,28 @@ define(function(require) {
       return this;
     },
 
+    // renders the actual overlay
     renderModifiedData: function(data) {
+      var _this = this;
       this.$(".updated").remove();
       this.c.selectAll('g.data-container')
         .classed('background', false)
+
+      var ydomain = this.state.ydomain;
+      if (data) {
+        ydomain = util.getYDomain(data, this.model.get('ys'))
+        ydomain = util.mergeDomain(this.state.yscales.domain(), ydomain, 'num')
+      }
+      this.yzoom.y(this.state.yscales.domain(ydomain));
+      this.yzoom.event(this.c);
+
       if (!data) {
         return;
       }
 
       this.setupScales(data);
       this.render();
+      
       this.c.selectAll('g.data-container')
         .classed('background', true)
       var xalias = this.model.get('x').alias;
@@ -288,7 +292,9 @@ define(function(require) {
     },
 
     renderData: function(el, data, xalias, yalias) {
-      var _this = this;
+      var _this = this,
+          h = this.state.h,
+          w = this.state.w;
       var data = _.map(data, function(d) {
         var ret = {
           x: d[xalias],
@@ -315,7 +321,13 @@ define(function(require) {
               cy: function(d) { return d.py },
               r: 2,
               fill: this.state.cscales(yalias),
-              stroke: this.state.cscales(yalias)
+              stroke: this.state.cscales(yalias),
+              opacity: function(d) {
+                if (d.px >= 0 && d.px <= w &&
+                    d.py >= 0 && d.py <= h)
+                  return 1;
+                return 0;
+              }
             })
       }
     },
@@ -397,7 +409,7 @@ define(function(require) {
 
     renderZoom: function(el) {
       if (this.yscale) {
-        if (el.select('.axis.y').size() > 0) {
+        if (el.select('.axis.y').size()) {
           this.yzoom.event(el);
           this.yzoom.scale(this.yscale);
           this.yzoom.event(el);
@@ -425,7 +437,6 @@ define(function(require) {
             return 0;
           })
         _this.yscale = d3.event.scale;
-
       };
 
       function xzoomf() {
@@ -454,6 +465,7 @@ define(function(require) {
 
       var yStart = null;
       var curYScale = null;
+      /*
       el.select('.yaxis')
         .on('mousedown.qvy', function() {
           if (d3.event.shiftKey) {
@@ -481,6 +493,7 @@ define(function(require) {
               });
           }
         })
+        */
 
 
 
