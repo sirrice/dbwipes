@@ -318,7 +318,7 @@ requirejs(['jquery',
   tour.addStep('cstat-plot', {
     attachTo: "#cstat-day .cstat-plot right",
     title: "Faceting Distribution",
-    text: "This is the distribution of values in the <b>age</b> attribute.  The y-axis shows the count of records within a particular value range.</p>"+
+    text: "This is the distribution of values in the <b>day</b> attribute.  The y-axis shows the count of records within a particular value range.</p>"+
           "<p>You can use this to filter the visualization.</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
@@ -358,7 +358,8 @@ requirejs(['jquery',
   step = tour.addStep('dist-filter', {
     attachTo: "#cstat-day .cstat-plot .plot-background right",
     title: "Filtering",
-    text: "<p>You can also select portions of this distribution to filter the query.</p><p>Click Next to see an example</p>",
+    text: "<p>You can also select portions of this distribution to filter the query.</p>"+
+          "<p>Click Next to see an example</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
     //tetherOptions: { offset: '-28px 0px' },
@@ -413,7 +414,7 @@ requirejs(['jquery',
     attachTo: "#facets right",
     title: "Filtering (conjunctions)",
     text: "<p>If you filter multiple attributes, it will use the conjunction (AND) of your selections.</p>" +
-          "<p>Try adding some more filters.  Click Next when you are done.</p>",
+          "<p>Try clicking and dragging on some of the other attributes to the left.  Click Next when you are done.</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '-28px 0px' },
@@ -492,10 +493,10 @@ requirejs(['jquery',
 
   step = tour.addStep('end', {
     id: 1,
-    title: "End of the Tutorial!",
+    title: "End of This Section!",
     text: "<p>We've just walked through the main components of the basic interface!</p>"+
           "<p>We will ask you to use this tool to analyze a few datasets</p>"+
-          "<p>Click next to continue</p>",
+          "<p>Click Exit to go back to the directory.</p>",
     showCancelLink: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },

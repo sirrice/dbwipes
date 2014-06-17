@@ -11,7 +11,7 @@ define(function(require) {
   var SelectionView = Backbone.View.extend({
     errtemplate: Handlebars.compile($("#wherelabel-template").html()),
     events: {
-      "click .clause a": 'onClose'
+      "click .clause button": 'onClose'
     },
 
     initialize: function() {

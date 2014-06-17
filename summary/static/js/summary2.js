@@ -100,13 +100,13 @@ requirejs([
     new TaskView({
       text: "<p>Which gender has higher total sum of sales on day 0?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
-      truth: 0,
+      truth: 1,
       attachTo: '#tasks div.col-md-12'
     }),
     new TaskView({
       text: "<p>Which gender has higher total sum of sales on day 9?</p>",
       options: [ 'Male', 'Female', 'They are roughly equal'],
-      truth: 1,
+      truth: 0,
       attachTo: '#tasks div.col-md-12'
     }),
     new TaskView({
