@@ -112,7 +112,15 @@ requirejs([
     new TaskView({
       text: "<p>Which state most contributes to the rising sales?</p>",
       textbox: true,
-      truth: 'CA',
+      truth: function(answer) {
+        var matches = _.filter(['CA', 'Cali', 'California'], function(truth) {
+          return _.isEqual(
+            String(truth).trim().toLowerCase(),
+            String(answer).trim().toLowerCase()
+          );
+        });
+        return matches.length > 0;
+      },
       attachTo: '#tasks div.col-md-12',
       successText: "One more question!"
     }),
@@ -130,12 +138,14 @@ requirejs([
     var title = task.model.get('title') || "";
     task.model.set('title', prefix + " " + title);
     task.on('submit', function() {
-      task.hide();
-      if (tasks[idx+1]) {
-        tasks[idx+1].show();
-      } else {
-        tour.show('end');
-      }
+      _.delay(function() {
+        task.hide();
+        if (tasks[idx+1]) {
+          tasks[idx+1].show();
+        } else {
+          tour.show('end');
+        }
+      }, 2000);
     });
   })
 

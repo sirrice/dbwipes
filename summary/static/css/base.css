@@ -14,6 +14,9 @@ body .row {
 body h4 {
   min-height: .5em;
 }
+body .disabled {
+  background: grey;
+}
 body #q_loading {
   font-size: 12pt;
   color: grey;

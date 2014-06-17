@@ -202,7 +202,7 @@ requirejs(['jquery',
   step = tour.addStep('sq-bad', {
     title: "Scorpion Query",
     text: "<p>This button will add your selected points as examples of results whose values are wrong (either too high or too low)</p>" +
-          "<p>Since we are interested in why the sales have gone up, go ahead and click on this button</p>",
+          "<p>Since we are interested in why the sales have gone up, click on <span class='btn btn-danger btn-xs'>Add bad examples</span></p>",
     attachTo: "div.walkthrough #addbad right",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -214,7 +214,8 @@ requirejs(['jquery',
   step = tour.addStep('sq-brush', {
     title: "Scorpion Query",
     text: "<p>Now select some examples of good points whose values seem normal.</p>" +
-          "<p>Select days 0 to 2 and click Next when you are done.</p>",
+          "<p>Select days 0 to 2 and click Next when you are done.</p>" +
+          "<p class='bg-danger' id='sq-brush-err' style='display: none'></p>",
     attachTo: "#viz left",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -223,8 +224,29 @@ requirejs(['jquery',
   });
   step.on('show', function() {
     var f = function() { 
-      tour.show('sq-good'); 
-      window.qv.off('change:selection', f);
+      var sel = window.sq.get('selection') || {amt:[]};
+      var selected = _.chain(sel.amt || []).pluck('day').value();
+      var missing = _.difference([0,1,2], selected);
+      var extras = _.difference(selected, [0,1,2]);
+      if (missing.length == 0 && extras.length == 0) {
+        $("#sq-brush-err")
+          .removeClass("bg-danger")
+          .addClass("bg-success")
+          .text("Great job!").show();
+        window.qv.off('change:selection', f);
+        _.delay(tour.show.bind(tour), 1000, 'sq-good'); 
+        return;
+      } else {
+        var msg = _.compact([
+          ((extras.length > 0)? "remove days " + extras.join(', ') : null),
+          ((missing.length > 0)? "select days " + missing.join(', '): null)
+        ]).join(" and ");
+        msg = "Please make sure to " + msg + ".";
+
+        $("#sq-brush-err")
+          .text(msg)
+          .show();
+      }
     };
     window.qv.on('change:selection', f);
   });
@@ -233,7 +255,7 @@ requirejs(['jquery',
     title: "Scorpion Query",
     text: "<p>This button will add your selected points as examples of results whose values are OK</p>" +
           "<p>Scorpion will compute the values of the average bad point and the average good point to decide if the bad points' values are too high or too low.</p>" +
-          "<p>Go ahead and click on it</p>",
+          "<p>Go ahead and click on <span class='btn btn-success btn-xs'>Add good examples</span></p>",
     attachTo: "div.walkthrough #addgood right",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -245,8 +267,8 @@ requirejs(['jquery',
   step = tour.addStep('sq-submit', {
     title: "Scorpion Query",
     text: "<p>Great!  That's all Scorpion needs from you!</p>"+
-          "<p>Click submit to let Scorpion do your work!</p>"+
-          "<p><a onclick=\"$('#sq-helptext').toggle();\"><small>click me to see what Scorpion will do?</small></a>"+
+          "<p>Click <span class='btn btn-primary btn-xs'>Run Scorpion!</span> to let Scorpion do your work.</p>"+
+          "<p><a onclick=\"$('#sq-helptext').toggle();\"><small>click me to see what Scorpion will do</small></a>"+
             "<blockquote id='sq-helptext' style='display: none'>"+
               "<p>When you click submit, Scorpion will look for subsets of the records that can be removed to:"+
                 "<ol><li>Drive the bad points you selected as far in the direction of the normal examples as possible.</li>"+
@@ -257,6 +279,10 @@ requirejs(['jquery',
           "</p>",
     attachTo: "#scorpion_submit right",
     highlight: true,
+    tetherOptions: {
+      targetAttachment: "middle right",
+      attachment: "top left"
+    },
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
     buttons: btns
@@ -266,8 +292,9 @@ requirejs(['jquery',
     title: "Scorpion Partial Results",
     text: "<p>While Scorpion runs, this section lists the best filters found in the search so far.</p>"+
           "<p>Hovering over any of the rules will apply it to the Facets on the left and also update the visualization above.</p>"+
-          "<p>When Scorpion is done, the buttons will turn blue and the next dialog box will appear.</p>"+
-          "<p>Until then, feel free to hover and click on these results.  <small>(the list may change at any time.</small></p>",
+          "<p>When Scorpion is done, the results will turn blue and the next dialog box will appear.</p>"+
+          "<p>Until then, feel free to hover and click on these results.  <small>(the list may change at any time.</small></p>"+
+          "<p class='bg-info' id='psrs-info' style='display: none;'>Scorpion has finished, so you can click Next!</p>",
     attachTo: "#all-scorpion-results-container left",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -277,26 +304,36 @@ requirejs(['jquery',
       offset: '10px 10px'
     },
     style: { width: "500px" },
-    buttons: [{ 
-      text: 'Back',
+    buttons: [{
+      text: "Back",
       action: tour.back
-    }]
+    }, {
+      text: "Next",
+      class: "shepherd-button-secondary psrs-next-btn",
+      action: function() {
+        if (scorpionReturned) {
+          tour.show('srs');
+        }
+      }
+    }] 
   });
+  var scorpionReturned = false;
   step.on("show", function() {
+    $(".psrs-next-btn").removeClass("shepherd-button").addClass("shepherd-button-secondary");
     window.sqv.on('scorpionquery:done', function() {
-      _.delay(tour.show.bind(tour), 50, 'srs');
       window.sqv.off('scorpionquery:done');
+      scorpionReturned = true;
+      $("#psrs-info").show();
+      $(".psrs-next-btn").removeClass("shepherd-button-secondary");
     });
-  });
-  step.on('hide', function() {
-    window.sqv.off('scorpionquery:done');
   });
 
 
   step = tour.addStep('srs', {
     title: "Scorpion Final Results",
-    text: "<p>This is the list of final scorpion results.  Feel free to hover over any of the results.</p>"+
-          "<p>Clicking on a result will lock it in place so that moving your cursor away from the result will not reset the filters.  This lets you lock one result in place, and hover over another result for comparison purposes</p>",
+    text: "<p>This is the list of final scorpion results.</p>"+
+          "<p>In addition to Male Californians, there are several other types of shoppers that are responsible for the increasing purchases to varying degrees.</p>"+
+          "<p>Clicking on a result will lock it in place so that moving your cursor away from the result will not reset the filters.  This lets you lock one result, and scroll the page or hover over another result for compare against it.</p>",
     attachTo: "#all-scorpion-results-container left",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -364,8 +401,8 @@ requirejs(['jquery',
 
   step = tour.addStep('end', {
     title: "Done!",
-    text: "<p>That's it for a tour of Scorpion!</p>"+
-          "<p>Now we will ask you to analyze a few datasets with and without the automated tool.</p>"+
+    text: "<p>You have just finished a tour of Scorpion!</p>"+
+          "<p>Now we will ask you to to participate in the user study by analyzing a few datasets with and without the automated tool.</p>"+
           "<p>Please press Exit to go back to the main directory when you are ready.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     showCancelLink: true,
