@@ -133,7 +133,7 @@ requirejs([
 
   ];
   _.each(tasks, function(task, idx) {
-    var prefix = (idx+1) + " of " + tasks.length;
+    var prefix = "Q" + (idx+1) + " of " + tasks.length;
     var title = task.model.get('title') || "";
     task.model.set('title', prefix + " " + title);
     task.on('submit', function() {

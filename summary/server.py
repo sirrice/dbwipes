@@ -103,6 +103,10 @@ def index_idx(idx):
   if idx in [0,1,2,4]:
     enable_scorpion = 0
 
+  if idx == 4:
+    title = "Scorpion User Study"
+    subtitle = "without automatic search"
+
   context = {
     'enableScorpion': enable_scorpion,
     'jsidx': jsidx,

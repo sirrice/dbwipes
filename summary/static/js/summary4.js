@@ -80,16 +80,22 @@ requirejs(['jquery',
 
   q.set(testq1);
 
+  var checkAnswer = function(answer, task) {
+    if (answer == null || answer == '' || answer.length == 0) {
+      return "Please enter an answer";
+    }
+    return true;
+  };
 
   var tasks = [
     new TaskView({
       text: $("#q1-template").html(),
       textbox: false,
-      truth: function(answer) {
-        return false;
-      },
       attachTo: '#tasks',
       truth: function(answer, task) {
+        if (answer == null || answer == '' || answer.length == 0) {
+          return "Please select a filter";
+        }
         return true;
       },
       on: {
@@ -116,13 +122,13 @@ requirejs(['jquery',
     new TaskView({
       text: $("#q2-template").html(),
       textbox: true,
-      truth: function() { return true; },
+      truth: checkAnswer,
       attachTo: '#tasks',
     }),
     new TaskView({
       text: $("#q3-template").html(),
       textbox: true,
-      truth: function() { return true; },
+      truth: checkAnswer,
       attachTo: '#tasks',
     }),
     new TaskView({
@@ -134,9 +140,8 @@ requirejs(['jquery',
         'without a doubt'
       ],
       textbox: true,
-      truth: function() { return true; },
+      truth: checkAnswer,
       attachTo: '#tasks',
-      successText: "Nice!  You're all done!",
       on: {
         'submit': function() {
           q.set(testq2);
@@ -151,6 +156,9 @@ requirejs(['jquery',
       },
       attachTo: '#tasks',
       truth: function(answer, task) {
+        if (answer == null || answer == '' || answer.length == 0) {
+          return "Please select a filter";
+        }
         return true;
       },
       on: {
@@ -183,7 +191,7 @@ requirejs(['jquery',
 
   ];
   _.each(tasks, function(task, idx) {
-    var prefix = "Q " + (idx+1) + " of " + tasks.length;
+    var prefix = "Q" + (idx+1) + " of " + tasks.length;
     var title = task.model.get('title') || "";
     task.model.set('title', prefix + " " + title);
     task.on('submit', function() {
@@ -221,7 +229,8 @@ requirejs(['jquery',
     title: "Validation",
     text: "<p>This is a more complex synthetic sales dataset.  The attributes include the day, the amount spent, and customer age range, gender, and state.</p>"+
           "<p>We will ask you to answer a few questions about this dataset <i>without</i> access to the automated Scorpion tool.</p>"+
-          "<p>When you are ready, click Next.</p>",
+          "<p>When you are ready, click Next.</p>" +
+          "<p class='bs-callout bs-callout-danger'>Once you submit an answer you cannot fix it</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: 600 },
     buttons: [{
