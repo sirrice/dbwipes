@@ -332,7 +332,7 @@ requirejs(['jquery',
   step = tour.addStep('dist-select', {
     attachTo: "#cstat-day .cstat-plot .xaxis right",
     title: "Zoomable and Pannable Axes",
-    text: "<p>You can use the axes to zoom and scroll.</p>  "
+    text: "<p>You can use the axes to zoom and scroll.</p>  "+
           "<p>Hover over the x-axis and scroll-up using your mouse wheel or touch pad.</p>",
     showCancelLink: true,
     classes: "shepherd-theme-arrows",
