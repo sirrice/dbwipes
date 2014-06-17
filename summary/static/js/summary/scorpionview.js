@@ -83,7 +83,7 @@ define(function(require) {
         var wait = $("#scorpion-wait").show();
         _this.model.fetch({
           data: {
-            fake: !$("#fake-type > input[type=checkbox]").get()[0].checked,
+            fake: util.debugMode(),
             requestid: requestid,
             json: JSON.stringify(_this.model.toJSON()) ,
             db: _this.model.get('query').get('db')

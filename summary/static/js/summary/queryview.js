@@ -133,6 +133,7 @@ define(function(require) {
       this.state.cscales.domain(newCDomain);
       this.state.xdomain = util.mergeDomain(this.state.xdomain, xdomain, type);
       this.state.ydomain = util.mergeDomain(this.state.ydomain, ydomain, 'num');
+      this.state.ydomain = util.mergeDomain(this.state.ydomain, [0, -Infinity], 'num');
 
       if (this.state.xscales == null) {
         var xscales = d3.scale.linear();

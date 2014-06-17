@@ -56,7 +56,7 @@ requirejs(['jquery',
 
   $ = require('bootstrap');
 
-  var enableScorpion = window.enableScorpion = false;
+  var enableScorpion = window.enableScorpion = true;
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
   setup.setupScorpion(enableScorpion, window.q, window.qv, window.where);
@@ -137,11 +137,11 @@ requirejs(['jquery',
 
   step = tour.addStep('start', {
     title: "Validation",
-    text: "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
-          "<p>We will ask you to answer a few questions about this dataset using the baseline scorpion tool.</p>"+
+    text: "<p>This is a slightly more complex synthetic sales dataset.  The attributes include the day, the amount spent, and customer age range, gender, and state.</p>"+
+          "<p>We will ask you to answer a few questions about this dataset <i>without</i> access to the automated Scorpion tool.</p>"+
           "<p>When you are ready, click Next.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
-    style: { width: "500px" },
+    style: { width: 600 },
     buttons: [{
       text: "Next",
       action: function() {

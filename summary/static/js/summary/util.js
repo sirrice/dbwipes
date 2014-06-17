@@ -12,6 +12,15 @@ define(function(require) {
   }
 
 
+  function debugMode() {
+    try {
+      return !$("#fake-type > input[type=checkbox]").get()[0].checked;
+    } catch(e) {
+      return false;
+    }
+  }
+
+
   function negateClause(SQL) {
     if (!SQL) return null;
     if ($("#selection-type > input[type=checkbox]").get()[0].checked) 
@@ -229,7 +238,8 @@ define(function(require) {
     negateClause: negateClause,
     getXDomain: getXDomain,
     getYDomain: getYDomain,
-    mergeDomain: mergeDomain
+    mergeDomain: mergeDomain,
+    debugMode: debugMode
   }
 })
 
