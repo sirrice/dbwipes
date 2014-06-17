@@ -26,7 +26,7 @@ body #q_loading {
 body #facet-togglecheckall {
   float: right;
 }
-body .footer {
+body #footer {
   text-align: center;
   margin-top: 1em;
 }
