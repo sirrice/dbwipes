@@ -22,6 +22,7 @@ define(function(require) {
     validate: function() {
       var truth = this.get('truth'),
           answer = this.get('answer');
+
       if (_.isFunction(truth)) {
         return truth(answer, this);
       }
@@ -50,6 +51,7 @@ define(function(require) {
 
     events: {
       'click .submit':              'onSubmit',
+      'mousedown input[name=text]': 'onMouseDown',
       'click input[type=radio]':    'onOption'
     },
 
@@ -57,6 +59,9 @@ define(function(require) {
 
     initialize: function(attrs) {
       this.model = new Task(attrs);
+      _.each((attrs.on || {}), function(f, name) {
+        this.on(name, f);
+      }, this);
     },
 
     onOption: function(ev) {
@@ -65,20 +70,23 @@ define(function(require) {
       this.model.set('answer', idx);
     },
 
-    onSubmit: function() {
-      if (this.model.get('textbox')) {
-        this.model.set('answer', $("input[name=text]").val());
-      }
+    onMouseDown: function(ev) {
+      this.model.set('answer', this.$("input[name=text]").val());
+    },
 
-      if (this.model.validate()) {
+
+    onSubmit: function() {
+      var isvalid = this.model.validate();
+      if (isvalid == true) {
         this.$(".error")
           .removeClass("bs-callout-danger")
           .addClass('bs-callout-info')
           .text(this.model.get('successText'))
           .show()
-        this.trigger('submit');
+        this.trigger('submit', this);
       } else {
-        this.$(".error").text("That answer doesn't seem right").show();
+        var text = (isvalid == false)? "That answer doesn't seem right": isvalid;
+        this.$(".error").text(text).show();
       }
     },
 
@@ -90,10 +98,12 @@ define(function(require) {
     show: function() {
       $(this.model.get('attachTo')).append(this.render().el);
       this.$el.show();
+      this.trigger('show', this);
     },
 
     hide: function() {
       this.$el.hide().remove();
+      this.trigger('hide', this);
     }
 
   });

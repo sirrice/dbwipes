@@ -43,8 +43,6 @@ define(function(require) {
       this.state = this.defaults();
 
       this.$el
-        .css("padding", "1em")
-        .css("padding-bottom", "1.5em")
         .css("background", "white")
         .attr('id', 'queryview-container');
 
@@ -133,7 +131,9 @@ define(function(require) {
       this.state.cscales.domain(newCDomain);
       this.state.xdomain = util.mergeDomain(this.state.xdomain, xdomain, type);
       this.state.ydomain = util.mergeDomain(this.state.ydomain, ydomain, 'num');
-      this.state.ydomain = util.mergeDomain(this.state.ydomain, [0, -Infinity], 'num');
+
+      if (!this.state.yscales)
+        this.state.ydomain = util.mergeDomain(this.state.ydomain, [0, -Infinity], 'num');
 
       if (this.state.xscales == null) {
         var xscales = d3.scale.linear();
@@ -282,21 +282,25 @@ define(function(require) {
       // relying on setupScales/renderAxes is too extreme because
       // it computes the union of all domains seen so far
       if (this.yzoom) {
-        var ydomain = this.state.ydomain;
+        var ydomain = this.state.yscales.domain(); //this.state.ydomain;
         if (data) {
           ydomain = util.getYDomain(data, this.model.get('ys'))
+            console.log(ydomain);
           ydomain = util.mergeDomain(this.state.yscales.domain(), ydomain, 'num')
+            console.log(ydomain)
         }
         this.yzoom.y(this.state.yscales.domain(ydomain));
         this.yzoom.event(this.c);
-      }
+      } 
+      if (this.state.yaxis)
+        this.c.select('.yaxis').call(this.state.yaxis);
 
       if (!data) {
         return;
       }
 
-      this.setupScales(data);
-      this.render();
+      //this.setupScales(data);
+      //this.render();
       
       this.c.selectAll('g.data-container')
         .classed('background', true)

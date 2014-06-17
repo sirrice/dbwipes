@@ -24,8 +24,8 @@
           <div id="selection-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
               <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
               <label class="onoffswitch-label" for="myonoffswitch">
-                  <span class="onoffswitch-inner"></span>
-                  <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
               </label>
           </div>
         </span>
@@ -35,8 +35,8 @@
           <div id="fake-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
               <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="fakeswitch" checked>
               <label class="onoffswitch-label" for="fakeswitch">
-                  <span class="onoffswitch-inner"></span>
-                  <span class="onoffswitch-switch"></span>
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
               </label>
           </div>
         </span>
@@ -70,7 +70,24 @@
 
   <div class="col-md-6" style="padding-left:5em;">
     <div class="row">
-      <div class="col-md-10" style="margin-top: 600px; padding-top: 1em">
+      <div class="col-md-12">
+        <span id="q-toggle" class="btn-sm"  data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
+        <span id="q-load-bt" class="btn">load xx</span>
+        <span id="q-load-intel" class='btn'>load yy</span>
+        <span id="q-load-med" class='btn'>load ii</span>
+        <span id="q-load-pp" class='btn'>load zz</span>
+        <span id="q-load-fec" class='btn'>load fec</span>
+      </div>
+    </div>
+
+    <div class="row"> 
+      <div class="col-md-12" id="right">
+        <div style="clear:both;"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-10" style="padding-top: 1em">
         <div id="scorpion-results-container" style="display:none">
           <h3>Final Scorpion Results</h3>
         </div>
@@ -86,26 +103,6 @@
           </h3>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<div id="query-container">
-  <h1>&nbsp;</h1>
-  <div class="row">
-    <div class="col-md-12">
-      <span id="q-toggle" class="btn-sm"  data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
-      <span id="q-load-bt" class="btn">load xx</span>
-      <span id="q-load-intel" class='btn'>load yy</span>
-      <span id="q-load-med" class='btn'>load ii</span>
-      <span id="q-load-pp" class='btn'>load zz</span>
-      <span id="q-load-fec" class='btn'>load fec</span>
-    </div>
-  </div>
-
-  <div class="row"> 
-    <div class="col-md-12" id="right">
-      <div style="clear:both;"></div>
     </div>
   </div>
 </div>

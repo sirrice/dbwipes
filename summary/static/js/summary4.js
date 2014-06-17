@@ -59,7 +59,7 @@ requirejs(['jquery',
   var enableScorpion = window.enableScorpion = true;
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
-  setup.setupScorpion(enableScorpion, window.q, window.qv, window.where);
+  setup.setupScorpion(window.enableScorpion, window.q, window.qv, window.where);
   setup.setupTuples(window.q, window.srv, window.where);
 
 
@@ -84,24 +84,107 @@ requirejs(['jquery',
 
   var tasks = [
     new TaskView({
-      text: "<p>What subset of the data is most responsible for the increase in sales?</p>",
-      textbox: true,
+      text: $("#q1-template").html(),
+      textbox: false,
       truth: function(answer) {
         return false;
       },
-      attachTo: '#tasks'
+      attachTo: '#tasks',
+      truth: function(answer, task) {
+        return true;
+      },
+      on: {
+        'show': function(task) {
+          function onChange() {
+            var models = _.compact(window.where.map(function(model) {
+              var sel = model.get('selection'),
+                  vals = _.keys(sel);
+              if (vals.length) return model;
+            }));
+            var clauses = _.map(models, function(model) { 
+              return util.negateClause(model.toSQLWhere())
+            });
+            $("#q1-answer").html(clauses.join('<br/>')).show();
+            task.model.set('answer', models);
+          }
+          window.where.on('change:selection', onChange);
+          task.on('submit', function() {
+            window.where.off('change:selection', onChange);
+          });
+        }
+      }
     }),
     new TaskView({
-      text: "<p>Which gender has a higher number (count) of California sales overall?</p>",
-      options: [ 'Male', 'Female', 'They are roughly equal'],
-      truth: 0,
+      text: $("#q2-template").html(),
+      textbox: true,
+      truth: function() { return true; },
       attachTo: '#tasks',
-      successText: "Nice!  You're all done!"
-    })
+    }),
+    new TaskView({
+      text: $("#q3-template").html(),
+      textbox: true,
+      truth: function() { return true; },
+      attachTo: '#tasks',
+    }),
+    new TaskView({
+      text: $("#q4-template").html(),
+      options: [ 
+        'not confident', 
+        'somwhat confident',
+        'very confident',
+        'without a doubt'
+      ],
+      textbox: true,
+      truth: function() { return true; },
+      attachTo: '#tasks',
+      successText: "Nice!  You're all done!",
+      on: {
+        'submit': function() {
+          q.set(testq2);
+        }
+      }
+    }),
+    new TaskView({
+      text: $("#q5-template").html(),
+      textbox: false,
+      truth: function(answer) {
+        return false;
+      },
+      attachTo: '#tasks',
+      truth: function(answer, task) {
+        return true;
+      },
+      on: {
+        'show': function(task) {
+          qv.state.yscales.domain([75, 100]);
+          qv.yzoom.y(qv.state.yscales);
+          qv.yzoom.event(qv.c);
+          qv.c.select('.yaxis').call(qv.state.yaxis);
+
+          function onChange() {
+            var models = _.compact(window.where.map(function(model) {
+              var sel = model.get('selection'),
+                  vals = _.keys(sel);
+              if (vals.length) return model;
+            }));
+            var clauses = _.map(models, function(model) { 
+              return util.negateClause(model.toSQLWhere())
+            });
+            $("#q5-answer").html(clauses.join('<br/>')).show();
+            task.model.set('answer', models);
+          }
+          window.where.on('change:selection', onChange);
+          task.on('submit', function() {
+            window.where.off('change:selection', onChange);
+          });
+        }
+      }
+    }),
+
 
   ];
   _.each(tasks, function(task, idx) {
-    var prefix = (idx+1) + " of " + tasks.length;
+    var prefix = "Q " + (idx+1) + " of " + tasks.length;
     var title = task.model.get('title') || "";
     task.model.set('title', prefix + " " + title);
     task.on('submit', function() {
@@ -112,7 +195,7 @@ requirejs(['jquery',
         } else {
           tour.show('end');
         }
-      }, 2000);
+      }, 1500);
     });
   })
 
@@ -137,7 +220,7 @@ requirejs(['jquery',
 
   step = tour.addStep('start', {
     title: "Validation",
-    text: "<p>This is a slightly more complex synthetic sales dataset.  The attributes include the day, the amount spent, and customer age range, gender, and state.</p>"+
+    text: "<p>This is a more complex synthetic sales dataset.  The attributes include the day, the amount spent, and customer age range, gender, and state.</p>"+
           "<p>We will ask you to answer a few questions about this dataset <i>without</i> access to the automated Scorpion tool.</p>"+
           "<p>When you are ready, click Next.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -157,21 +240,17 @@ requirejs(['jquery',
 
   step = tour.addStep('end', {
     title: "Done!",
-    text: "<p>That's it for a tour of Scorpion!</p>"+
-          "<p>Now we will ask you to analyze a few datasets with and without the automated tool.</p>"+
+    text: "<p>Thank You!</p>"+
           "<p>Please press Exit to go back to the main directory when you are ready.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     showCancelLink: true,
     buttons: [{
-      text: 'Back',
-      action: tour.back
-    }, {
       text: 'Exit',
       action: function () {
         window.location = '/dir/';
       }
     }],
-    style: { width: "500px" }
+    style: { width: 500 }
   });
   step.on("show", function() { $("div.row").css("opacity", 0.6); });
   step.on("hide", function() { $("div.row").css("opacity", 1); });

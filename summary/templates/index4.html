@@ -100,8 +100,42 @@
 
 {%raw%}
 <script id="q1-template" type="text/x-underscore-template">
-
+  <div style='margin-bottom: 1em'>
+    <p> What subset of the data is most responsible for the increase in sales?</p>
+    <small class='text-muted'>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.  Click submit when you are satisfied.</small>
+    <p class='bs-callout' id='q1-answer' style='padding: 10px;height: 6em; overflow: scroll'>Nothing Selected Yet</p>
+  </div>
 </script>
+
+<script id="q2-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>What were other filters that you tried?</p>
+    <small class='text-muted'>We are interested in knowing how you picked your answer.</small>
+  </div>
+</script>
+
+<script id="q3-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>How did you decide what filters to try?</p>
+  </div>
+</script>
+
+<script id="q4-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>How confident are you in your answer and why?</p>
+  </div>
+</script>
+
+<script id="q5-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>We updated the query to compute the <b>average</b> sales amount per day.</p>
+    <p>What subset of the data is most responsible for the increase in average sales?</p>
+    <small class='text-muted'>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.  Click submit when you are satisfied.</small>
+    <p class='bs-callout' id='q5-answer' style='padding: 10px;height: 6em; overflow: scroll'>Nothing Selected Yet</p>
+  </div>
+</script>
+
+
 {%endraw%}
 
 {% include 'wherelabel.html' %}

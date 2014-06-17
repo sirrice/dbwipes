@@ -311,21 +311,23 @@ requirejs(['jquery',
       text: "Next",
       class: "shepherd-button-secondary psrs-next-btn",
       action: function() {
-        if (scorpionReturned) {
+        if (window.scorpionReturned) {
           tour.show('srs');
         }
       }
     }] 
   });
+
+  window.sqv.on('scorpionquery:done', function() {
+    window.sqv.off('scorpionquery:done');
+    window.scorpionReturned = true;
+    $("#psrs-info").show();
+    $(".psrs-next-btn").removeClass("shepherd-button-secondary").addClass('shepherd-button');
+  });
+
   var scorpionReturned = false;
   step.on("show", function() {
     $(".psrs-next-btn").removeClass("shepherd-button").addClass("shepherd-button-secondary");
-    window.sqv.on('scorpionquery:done', function() {
-      window.sqv.off('scorpionquery:done');
-      scorpionReturned = true;
-      $("#psrs-info").show();
-      $(".psrs-next-btn").removeClass("shepherd-button-secondary");
-    });
   });
 
 

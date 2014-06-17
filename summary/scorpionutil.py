@@ -220,7 +220,7 @@ def scorpion_run(db, requestdata, requestid):
     start = time.time()
     parallel_debug(
       obj,
-      parallel=True,
+      parallel=False,
       nstds=0,
       errperc=0.001,
       epsilon=0.008,
@@ -228,9 +228,9 @@ def scorpion_run(db, requestdata, requestid):
       tau=[0.001, 0.05],
       c=obj.c,
       complexity_multiplier=4.5,
-      l=0.6,
-      c_range=[0.05, 1],
-      max_wait=10,
+      l=0.7,
+      c_range=[0.1, 1.],
+      max_wait=20,
       use_cache=False,
       granularity=20,
       ignore_attrs=obj.ignore_attrs,

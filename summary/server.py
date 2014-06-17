@@ -79,26 +79,15 @@ def teardown_request(exception):
     pass
 
 
-@app.route('/', methods=["POST", "GET"])
+@app.route('/hidden/', methods=["POST", "GET"])
 def index():
   return render_template("index.html")
 
-@app.route('/1/', methods=["POST", "GET"])
-def index1():
-  return render_template("index1.html")
+@app.route('/<int:idx>/', methods=["POST", "GET"])
+def index_idx(idx):
+  return render_template("index%d.html" % idx)
 
-@app.route('/2/', methods=["POST", "GET"])
-def index2():
-  return render_template("index2.html")
-
-@app.route('/3/', methods=["POST", "GET"])
-def index3():
-  return render_template("index3.html")
-
-@app.route('/4/', methods=["POST", "GET"])
-def index4():
-  return render_template("index4.html")
-
+@app.route('/', methods=["POST", "GET"])
 @app.route('/dir/', methods=["POST", "GET"])
 def dirpage():
   return render_template("dir.html")

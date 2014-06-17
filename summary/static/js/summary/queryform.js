@@ -9,6 +9,14 @@ define(function(require) {
 
 
 
+  var DBModel = Backbone.Model.extend({
+    url: '/api/databases',
+    defaults: function() {
+      return {
+        dbs: {}   // dbname -> [ tablename,... ]
+      };
+    }
+  });
 
 
   var QueryForm = Backbone.View.extend({
@@ -22,7 +30,9 @@ define(function(require) {
       'click .q-where-close': "onWhereClick"
     },
 
-    defaults: function() {
+    initialize: function(opts) {
+      //this.dbmodel = new DBModel();
+      //this.listenTo(opts.dbmodel, 'change', this.renderDatabases);
     },
 
     onAggAdd: function() {
@@ -85,6 +95,7 @@ define(function(require) {
       this.model.set(q);
     },
 
+    
 
     onWhereClick: function(ev) {
       var el = $(ev.target),
