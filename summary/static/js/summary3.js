@@ -58,10 +58,9 @@ requirejs(['jquery',
 
 
 
-  var enableScorpion = window.enableScorpion = true;
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
-  setup.setupScorpion(enableScorpion, window.q, window.qv, window.where);
+  setup.setupScorpion(window.enableScorpion, window.q, window.qv, window.where);
   setup.setupTuples(window.q, window.srv, window.where);
 
 
@@ -333,9 +332,10 @@ requirejs(['jquery',
 
   step = tour.addStep('srs', {
     title: "Scorpion Final Results",
-    text: "<p>This is the list of final scorpion results.</p>"+
-          "<p>In addition to Male Californians, there are several other types of shoppers that are responsible for the increasing purchases to varying degrees.</p>"+
-          "<p>Clicking on a result will lock it in place so that moving your cursor away from the result will not reset the filters.  This lets you lock one result, and scroll the page or hover over another result for compare against it.</p>",
+    text: "<p>This is the list of final scorpion results ordered from the biggest overall impact on the bad examples but may require deleting many records, to those that have the most impact <i>per removed record.</i></p>"+
+          "<p>In addition to the Male Californians from the previous verification test, there are several other types of shoppers that are responsible for the increasing purchases to varying degrees.</p>"+
+          "<p>It can be jarring to see the display jump to the base query when you hover on and off of results. Click on a result to lock it so that the filters will not reset when your cursor moves away from the result. You can lock a result, then scroll the page or hover over another result for compare against it."+
+          "<p>Click on a result to turn it black and lock it in place.</p>",
     attachTo: "#all-scorpion-results-container left",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -350,7 +350,7 @@ requirejs(['jquery',
   step = tour.addStep('srs-remove', {
     title: "How Much Influence?",
     text: "<p>Try switching this to <span style='font-family: arial; font-weight: bold;'><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b></span>.</p>"+
-          "<p>Hovering over a result will then suggest how much those records 'influenced' the final result.</p>",
+          "<p>Hovering over a result will show what the query would look like if the records matching the result did not exist.  This is a proxy for how much those records <i>influenced</i> the final result.</p>",
     attachTo: "#selection-type right",
     highlight: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",

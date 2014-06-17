@@ -2,12 +2,15 @@
 
 <head>
   <script src="/static/js/lib/tether.js"></script>
-  <script data-main="/static/js/summary3" src="/static/js/require.js"></script>
+  <script>
+    window.enableScorpion = {{enableScorpion|string}};
+  </script>
+  <script data-main="/static/js/summary{{jsidx}}" src="/static/js/require.js"></script>
 
 </head>
 
 
-<h1>Scorpion Tutorial
+<h1>{{title}} <small>{{subtitle}}</small>
   <span id="q_loading" style="display:none;">loading query results...</span>
 </h1>
 
@@ -37,17 +40,6 @@
         </span>
       </div>
       <div class="col-md-3">
-        <span>
-          <div id="fake-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
-              <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="fakeswitch" checked>
-              <label class="onoffswitch-label" for="fakeswitch">
-                  <span class="onoffswitch-inner"></span>
-                  <span class="onoffswitch-switch"></span>
-              </label>
-          </div>
-        </span>
-      </div>
-      <div class="col-md-3">
         <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Add Filter to Query</span>
       </div>
     </div>
@@ -55,7 +47,6 @@
     <div class='row'>
       <div class="col-md-10 col-md-offset-2" style='max-width:450px; padding-left: 80px;' id='where'></div>
     </div>
-
 
 
     <div class="row">
@@ -75,7 +66,6 @@
 
 
   <div class="col-md-6" style="padding-left:5em;">
-    <h1>&nbsp;</h1>
     <div class="row">
       <div class="col-md-12">
         <span id="q-toggle" class="btn-sm"  data-toggle="tooltip" data-placement="top" title="Toggle between query builder form and visualization" >Show Query Form</span>
@@ -109,7 +99,6 @@
   </div>
 </div>
 
-
 {% include 'wherelabel.html' %}
 {% include 'cstat.html' %}
 {% include 'qform.html' %}
@@ -117,6 +106,7 @@
 {% include 'walkthrough.html' %}
 {% include 'tuples.html' %}
 {% include 'tasks.html' %}
+{% block includes %}{% endblock %}
 
 
 	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>

@@ -39,42 +39,17 @@ requirejs.config({
 // Start the main app logic.
 requirejs([
   'jquery', 'd3',
-  'summary/where', 
-  'summary/whereview', 
-  'summary/cstat', 
-  'summary/cstatsview', 
-  'summary/query', 
-  'summary/queryview',
-  'summary/scorpionquery', 
-  'summary/scorpionview',
-  'summary/scorpionresults',
-  'summary/scorpionresultsview',
-  'summary/tupleview',
-  'summary/drawingview', 
   'summary/util',
   'summary/setup',
   'bootstrap'
-  ], function (
-    $, d3,
-    Where, WhereView, 
-    CStat, CStatsView, 
-    Query, QueryView, 
-    ScorpionQuery, ScorpionQueryView, 
-    ScorpionResults, ScorpionResultsView,
-    TupleView,
-    DrawingView, util,
-    setup
-  ) {
+  ], function ( $, d3, util, setup) {
 
   $ = require('bootstrap');
 
-
-  var enableScorpion = window.enableScorpion = true;
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
-  setup.setupScorpion(enableScorpion, window.q, window.qv, window.where);
+  setup.setupScorpion(window.enableScorpion, window.q, window.qv, window.where);
   setup.setupTuples(window.q, window.srv, window.where);
-
 
 
   var intelq = {
@@ -170,14 +145,4 @@ requirejs([
 
 
   q.set(intelq);
-
-
-
-
-  window.q = q;
-  window.qv = qv;
-  window.where = where;
-  window.csv = csv;
-
-
 });

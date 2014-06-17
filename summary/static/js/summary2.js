@@ -56,7 +56,6 @@ requirejs([
 
   $ = require('bootstrap');
 
-  var enableScorpion = window.enableScorpion = false;
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
   setup.setupTuples(window.q, null, window.where);
@@ -101,13 +100,13 @@ requirejs([
       text: "<p>Which gender has higher total sum of sales on day 0?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 1,
-      attachTo: '#tasks div.col-md-12'
+      attachTo: '#tasks'
     }),
     new TaskView({
       text: "<p>Which gender has higher total sum of sales on day 9?</p>",
       options: [ 'Male', 'Female', 'They are roughly equal'],
       truth: 0,
-      attachTo: '#tasks div.col-md-12'
+      attachTo: '#tasks'
     }),
     new TaskView({
       text: "<p>Which state most contributes to the rising sales?</p>",
@@ -121,14 +120,14 @@ requirejs([
         });
         return matches.length > 0;
       },
-      attachTo: '#tasks div.col-md-12',
+      attachTo: '#tasks',
       successText: "One more question!"
     }),
     new TaskView({
       text: "<p>Which gender has a higher number (count) of California sales overall?</p>",
       options: [ 'Male', 'Female', 'They are roughly equal'],
       truth: 0,
-      attachTo: '#tasks div.col-md-12',
+      attachTo: '#tasks',
       successText: "Nice!  You're all done!"
     })
 
@@ -145,9 +144,10 @@ requirejs([
         } else {
           tour.show('end');
         }
-      }, 2000);
+      }, 200);
     });
   })
+  window.tasks = tasks;
 
   var tour = new Shepherd.Tour({
     defaults: { classes: "shepherd-element shepherd-open shepherd-theme-arrows"}

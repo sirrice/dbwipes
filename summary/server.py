@@ -81,11 +81,36 @@ def teardown_request(exception):
 
 @app.route('/hidden/', methods=["POST", "GET"])
 def index():
-  return render_template("index.html")
+  context = {
+    'enableScorpion': 1,
+    'jsidx': '',
+    'title': 'Scorpion!'
+  }
+  return render_template("index_tuplesleft.html", **context)
 
 @app.route('/<int:idx>/', methods=["POST", "GET"])
 def index_idx(idx):
-  return render_template("index%d.html" % idx)
+  if idx <= 2:
+    template = "index_tuplesright.html"
+  else:
+    template = "index_tuplesleft.html"
+
+  jsidx = idx
+  title = "Scorpion Tutorial"
+  subtitle = ""
+  enable_scorpion = 1
+
+  if idx in [0,1,2,4]:
+    enable_scorpion = 0
+
+  context = {
+    'enableScorpion': enable_scorpion,
+    'jsidx': jsidx,
+    'title': title,
+    'subtitle': subtitle
+  }
+
+  return render_template(["index%d.html" % idx, template], **context)
 
 @app.route('/', methods=["POST", "GET"])
 @app.route('/dir/', methods=["POST", "GET"])

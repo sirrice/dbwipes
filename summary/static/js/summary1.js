@@ -57,7 +57,6 @@ requirejs(['jquery',
 
 
 
-  var enableScorpion = window.enableScorpion = false;
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
   setup.setupTuples(window.q, null, window.where);
@@ -119,7 +118,8 @@ requirejs(['jquery',
     title: "Welcome to Scorpion!",
     text: "<p>This tutorial will walk you through the main parts of the manual interface. </p>"+
           "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
-          "<p>When you are ready, click Next.</p>",
+          "<p>When you are ready, click Next.</p>"+
+          "<p class='bs-callout bs-callout-info'>For this study, it may help to zoom your browser window out <kbd>ctrl-(minus) or &#8984;-(minus)</kbd> so the whole page fits on one screen comfortably.</p>",
           //"<p>The dataset we will use is a sensor dataset containing voltage, light, and humidity readings from 54 different sensors installed around a building</p> ",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
@@ -137,7 +137,7 @@ requirejs(['jquery',
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '10px 0' },
     highlight: true,
-    style: { width: "400px" },
+    style: { width: "500px" },
     buttons: btns,
   });
 
@@ -152,7 +152,7 @@ requirejs(['jquery',
           "of sales in the dataset.</p>",
     classes: "shepherd-theme-arrows",
     highlight: true,
-    style: { width: "400px" },
+    style: { width: "500px" },
     buttons: btns,
   });
   tour.addStep('qformbtn', {

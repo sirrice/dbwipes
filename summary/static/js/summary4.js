@@ -56,7 +56,6 @@ requirejs(['jquery',
 
   $ = require('bootstrap');
 
-  var enableScorpion = window.enableScorpion = true;
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
   setup.setupScorpion(window.enableScorpion, window.q, window.qv, window.where);

@@ -51,7 +51,7 @@ define(function(require) {
 
     events: {
       'click .submit':              'onSubmit',
-      'mousedown input[name=text]': 'onMouseDown',
+      'keydown input[name=text]': 'onMouseDown',
       'click input[type=radio]':    'onOption'
     },
 
@@ -76,6 +76,10 @@ define(function(require) {
 
 
     onSubmit: function() {
+      if (this.model.get('textbox')) {
+        this.onMouseDown();
+      }
+
       var isvalid = this.model.validate();
       if (isvalid == true) {
         this.$(".error")
