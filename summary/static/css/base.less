@@ -232,15 +232,17 @@ body {
       font-family: "Gill Sans";
       font-size: 12pt;
       line-height: 15pt;
-      color: white;
+      color: black;
       clear: both;
       background: steelblue;
+      background: #f4f8fa; 
+      background: rgb(237, 244, 248);
+      border-left: 2px solid #5bc0de;
       width: 100%;
       padding: .5em;
       padding-left: 1em;
       padding-top: 1.5em;
       list-style-type: none;
-      border-radius: 2px;
       cursor: pointer;
       position: relative;
       margin: 0;
@@ -257,7 +259,8 @@ body {
         top: .25em;
         position: absolute;
         font-weight: 100;
-        font-size: 10pt;
+        font-size: 10px;
+        color: grey;
         
         .score, .crange {
           margin-left: 2em;
@@ -269,8 +272,18 @@ body {
 
     }
     .filter-clause.locked {
-      background: black;
+      background: rgb(17, 78, 102);
+      color: white;
     }
+    .filter-clause:hover, .equiv-toggle:hover {
+      color: white;
+      background: rgb(53, 159, 219);
+    }
+    .filter-clause.locked:hover {
+      background: rgb(17, 78, 102);
+      color: white;
+    }
+
 
 
     .equiv-clauses {
@@ -290,9 +303,8 @@ body {
       margin: 0;
       margin-bottom: 5px;
       list-style-type: none;
-      color: white;
-      background: rgb(60, 79, 95);
-      border-radius: 2px;
+      color: black;
+      background: rgb(237, 244, 248);
       clear: both;
     }
 
@@ -300,13 +312,6 @@ body {
       cursor: pointer;
       padding: 5px;
       padding-left: 1em;
-    }
-
-    .filter-clause:hover, .equiv-toggle:hover {
-      background: rgb(53, 159, 219);
-    }
-    .filter-clause.locked:hover {
-      background: black;
     }
 
 
@@ -317,7 +322,9 @@ body {
 #scorpion-partialresults-container {
   .scorpion-result {
     .filter-clause {
-      background: rgb(151, 151, 151);
+      border-left: 2px solid grey;
+      background: #efefef;
+      color: black;
     }
     
     .equiv-clause, .equiv-toggle {
@@ -325,8 +332,14 @@ body {
     }
       
     .filter-clause:hover, .equiv-toggle:hover {
-      background: rgb(123, 128, 133);
+      background: #bfbfbf;
     }
+    .filter-clause.locked:hover {
+      background: grey;
+      color: white;
+    }
+
+
   }
 }
 

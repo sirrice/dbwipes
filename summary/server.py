@@ -90,10 +90,13 @@ def index():
 
 @app.route('/<int:idx>/', methods=["POST", "GET"])
 def index_idx(idx):
+  templates = []
+  templates.append("index%d.html" % idx)
+
   if idx <= 2:
-    template = "index_tuplesright.html"
+    templates.append("index_tuplesright.html")
   else:
-    template = "index_tuplesleft.html"
+    templates.append("index_tuplesleft.html")
 
   jsidx = idx
   title = "DBWipes Tutorial"
@@ -106,9 +109,16 @@ def index_idx(idx):
   if idx == 3:
     title = "DBWipes + Scorpion Tutorial"
 
-  if idx == 4:
+  if idx >= 4:
     title = "DBWipes User Study"
     subtitle = "without Scorpion"
+
+  if idx == 5:
+    subtitle = "with Scorpion"
+    jsidx = 4
+    enable_scorpion = 1
+    templates[0] = "index4.html"
+
 
   context = {
     'enableScorpion': enable_scorpion,
@@ -116,8 +126,9 @@ def index_idx(idx):
     'title': title,
     'subtitle': subtitle
   }
+  print context
 
-  return render_template(["index%d.html" % idx, template], **context)
+  return render_template(templates, **context)
 
 @app.route('/', methods=["POST", "GET"])
 @app.route('/dir/', methods=["POST", "GET"])

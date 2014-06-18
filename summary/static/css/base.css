@@ -191,15 +191,17 @@ body table.tuples tr th {
   font-family: "Gill Sans";
   font-size: 12pt;
   line-height: 15pt;
-  color: white;
+  color: black;
   clear: both;
   background: steelblue;
+  background: #f4f8fa;
+  background: #edf4f8;
+  border-left: 2px solid #5bc0de;
   width: 100%;
   padding: .5em;
   padding-left: 1em;
   padding-top: 1.5em;
   list-style-type: none;
-  border-radius: 2px;
   cursor: pointer;
   position: relative;
   margin: 0;
@@ -214,14 +216,25 @@ body table.tuples tr th {
   top: .25em;
   position: absolute;
   font-weight: 100;
-  font-size: 10pt;
+  font-size: 10px;
+  color: grey;
 }
 .scorpion-results .scorpion-result .filter-clause .info .score,
 .scorpion-results .scorpion-result .filter-clause .info .crange {
   margin-left: 2em;
 }
 .scorpion-results .scorpion-result .filter-clause.locked {
-  background: black;
+  background: #114e66;
+  color: white;
+}
+.scorpion-results .scorpion-result .filter-clause:hover,
+.scorpion-results .scorpion-result .equiv-toggle:hover {
+  color: white;
+  background: #359fdb;
+}
+.scorpion-results .scorpion-result .filter-clause.locked:hover {
+  background: #114e66;
+  color: white;
 }
 .scorpion-results .scorpion-result .equiv-clauses {
   margin-left: 1em;
@@ -240,9 +253,8 @@ body table.tuples tr th {
   margin: 0;
   margin-bottom: 5px;
   list-style-type: none;
-  color: white;
-  background: #3c4f5f;
-  border-radius: 2px;
+  color: black;
+  background: #edf4f8;
   clear: both;
 }
 .scorpion-results .scorpion-result .equiv-toggle {
@@ -250,15 +262,10 @@ body table.tuples tr th {
   padding: 5px;
   padding-left: 1em;
 }
-.scorpion-results .scorpion-result .filter-clause:hover,
-.scorpion-results .scorpion-result .equiv-toggle:hover {
-  background: #359fdb;
-}
-.scorpion-results .scorpion-result .filter-clause.locked:hover {
-  background: black;
-}
 #scorpion-partialresults-container .scorpion-result .filter-clause {
-  background: #979797;
+  border-left: 2px solid grey;
+  background: #efefef;
+  color: black;
 }
 #scorpion-partialresults-container .scorpion-result .equiv-clause,
 #scorpion-partialresults-container .scorpion-result .equiv-toggle {
@@ -266,7 +273,11 @@ body table.tuples tr th {
 }
 #scorpion-partialresults-container .scorpion-result .filter-clause:hover,
 #scorpion-partialresults-container .scorpion-result .equiv-toggle:hover {
-  background: #7b8085;
+  background: #bfbfbf;
+}
+#scorpion-partialresults-container .scorpion-result .filter-clause.locked:hover {
+  background: grey;
+  color: white;
 }
 #walkthrough-container {
   position: absolute;

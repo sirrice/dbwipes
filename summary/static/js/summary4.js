@@ -227,10 +227,7 @@ requirejs(['jquery',
 
   step = tour.addStep('start', {
     title: "Validation",
-    text: "<p>This is a more complex synthetic sales dataset.  The attributes include the day, the amount spent, and customer age range, gender, and state.</p>"+
-          "<p>We will ask you to answer a few questions about this dataset <i>without</i> access to the automated Scorpion tool.</p>"+
-          "<p>When you are ready, click Next.</p>" +
-          "<p class='bs-callout bs-callout-danger'>Once you submit an answer you cannot fix it</p>",
+    text: $("#start-template").html(),
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: 600 },
     buttons: [{
