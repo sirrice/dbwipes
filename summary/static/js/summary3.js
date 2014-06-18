@@ -83,49 +83,6 @@ requirejs(['jquery',
 
 
 
-  var tasks = [
-    new TaskView({
-      text: "<p>Which gender has higher total sum of sales on day 0?</p>",
-      options: [ 'Male', 'Female', 'They are equal'],
-      truth: 0,
-      attachTo: '#tasks'
-    }),
-    new TaskView({
-      text: "<p>Which gender has higher total sum of sales on day 9?</p>",
-      options: [ 'Male', 'Female', 'They are roughly equal'],
-      truth: 1,
-      attachTo: '#tasks'
-    }),
-    new TaskView({
-      text: "<p>Which state most contributes to the rising sales?</p>",
-      textbox: true,
-      truth: 'CA',
-      attachTo: '#tasks',
-      successText: "Nice!  You're all done!"
-    }),
-    new TaskView({
-      text: "<p>Which gender has a higher number (count) of California sales overall?</p>",
-      options: [ 'Male', 'Female', 'They are roughly equal'],
-      truth: 0,
-      attachTo: '#tasks',
-      successText: "Nice!  You're all done!"
-    })
-
-  ];
-  _.each(tasks, function(task, idx) {
-    var prefix = (idx+1) + " of " + tasks.length;
-    var title = task.model.get('title') || "";
-    task.model.set('title', prefix + " " + title);
-    task.on('submit', function() {
-      task.hide();
-      if (tasks[idx+1]) {
-        tasks[idx+1].show();
-      } else {
-        tour.show('end');
-      }
-    });
-  })
-
   var tour = new Shepherd.Tour({
     defaults: { classes: "shepherd-element shepherd-open shepherd-theme-arrows"}
   });
@@ -146,8 +103,9 @@ requirejs(['jquery',
 
   step = tour.addStep('start', {
     title: "Validation",
-    text: "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
-          "<p>We will ask you to answer a few questions about this dataset using the baseline scorpion tool.</p>"+
+    text: "<p>This tutorial will introduce you to <b style='color:rgb(218, 115, 4);'>Scorpion</b>, the automated tool that help explain outliers in your query results.</p>"+
+          "<p>Rather than manually searching the data ourselves, Scorpion lets you directly ask questions about result values</p>"+ 
+          "<p>We will use the same randomly generated sales data as the previous tutorial.</p>"+
           "<p>When you are ready, click Next.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
@@ -157,8 +115,7 @@ requirejs(['jquery',
 
   step = tour.addStep('intro', {
     title: "Introduction",
-    text: "<p>Rather than manually searching the data ourselves, Scorpion lets you directly ask questions about result values</p>"+
-          "<p>The visualization has been augmented with the ability to select results</p>" +
+    text: "<p>The visualization has been augmented with the ability to select results by clicking and dragging regions that you want to select.</p>" +
           "<p>Click Next for an example selection.</p>",
     highlight: true,
     attachTo: "#viz left",
@@ -213,7 +170,7 @@ requirejs(['jquery',
   step = tour.addStep('sq-brush', {
     title: "Scorpion Query",
     text: "<p>Now select some examples of good points whose values seem normal.</p>" +
-          "<p>Select days 0 to 2 and click Next when you are done.</p>" +
+          "<p><emph>Select days 0 to 2</emph> and click Next when you are done.</p>" +
           "<p class='bg-danger' id='sq-brush-err' style='display: none'></p>",
     attachTo: "#viz left",
     highlight: true,

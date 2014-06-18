@@ -166,7 +166,7 @@ requirejs([
   step = tour.addStep('start', {
     title: "Validation",
     text: "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
-          "<p>We will ask you to answer a few questions about this dataset using the baseline scorpion tool.</p>"+
+          "<p>We will ask you to answer a few questions about this dataset using the baseline DBWipes tool.</p>"+
           "<p>When you are ready, click Next.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
@@ -185,8 +185,8 @@ requirejs([
   step = tour.addStep('end', {
     title: "Great Job!",
     text: "<p>You will notice that many of these questions involved understanding why the total sales rose over the 10 days.</p>"+
-          "<p>Scorpion's automated tools are designed for answering these types of questions.</p>"+
-          "<p>The next section will introduce you to the Scorpion automated explanation tool.</p>",
+          "<p>Scorpion is an extension to DBWipes that automates the task of answering these types of questions.</p>"+
+          "<p>The next section will introduce you to the Scorpion extension.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
     buttons: [{

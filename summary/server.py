@@ -84,7 +84,7 @@ def index():
   context = {
     'enableScorpion': 1,
     'jsidx': '',
-    'title': 'Scorpion!'
+    'title': 'DBWipes + Scorpion!'
   }
   return render_template("index_tuplesleft.html", **context)
 
@@ -96,16 +96,19 @@ def index_idx(idx):
     template = "index_tuplesleft.html"
 
   jsidx = idx
-  title = "Scorpion Tutorial"
+  title = "DBWipes Tutorial"
   subtitle = ""
   enable_scorpion = 1
 
   if idx in [0,1,2,4]:
     enable_scorpion = 0
 
+  if idx == 3:
+    title = "DBWipes + Scorpion Tutorial"
+
   if idx == 4:
-    title = "Scorpion User Study"
-    subtitle = "without automatic search"
+    title = "DBWipes User Study"
+    subtitle = "without Scorpion"
 
   context = {
     'enableScorpion': enable_scorpion,
