@@ -4,10 +4,10 @@
 <div class="walkthrough row" >
 	<div class="col-md-12">
     <h4>
-      <span id="selectionmsg">
-        Scorpion Query <small>{{nselected}} points selected</small> 
-      </span>
-      <button type="button" class="close" aria-hidden="true">&times;</button>
+      <h4 id="selectionmsg">
+        Scorpion Query <small>selected <span class="badge">{{nselected}}</span> </small>
+        <button type="button" class="close pull-right" aria-hidden="true">&times;</button>
+      </h4>
     </h4>
 
     <fieldset>
@@ -15,10 +15,10 @@
       <div class="row">
         <div class="col-sm-10">
           <span id="addbad" class="form-control btn btn-danger" >
-            Add bad examples ({{nbad}} selected)
+            Add bad examples <span class="badge pull-right">{{nbad}}</span>
           </span>
           <span id="addgood" class="form-control btn btn-success" >
-            Add good examples ({{ngood}} selected)
+            Add good examples <span class="badge pull-right">{{ngood}}</span>
           </span>
         </div>
         <div class="col-sm-2" style="padding-left: 0px">
