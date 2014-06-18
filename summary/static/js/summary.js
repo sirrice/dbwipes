@@ -50,6 +50,7 @@ requirejs([
   setup.setupButtons(window.q, window.qv);
   setup.setupScorpion(window.enableScorpion, window.q, window.qv, window.where);
   setup.setupTuples(window.q, window.srv, window.where);
+  var q = window.q;
 
 
   var intelq = {

@@ -78,6 +78,16 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
+@app.route('/drspott/', methods=["POST", "GET"])
+def drspott():
+  context = {
+    'enableScorpion': 1,
+    'jsidx': 'drspott',
+    'title': 'DBWipes + Scorpion!'
+  }
+  return render_template("index_tuplesleft.html", **context)
+
+
 
 @app.route('/hidden/', methods=["POST", "GET"])
 def index():
