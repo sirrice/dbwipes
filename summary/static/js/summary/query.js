@@ -6,7 +6,7 @@ define(function(require) {
       Where = require('summary/where'),
       util = require('summary/util');
 
-  var queryCache = {};
+  window.queryCache = queryCache = {};
   function checkQueryCache(json) {
     var key = JSON.stringify(json);
     return queryCache[key];
@@ -89,9 +89,11 @@ define(function(require) {
       var json = this.toJSON();
       var resp = checkQueryCache(json);
       if (resp) {
-        //console.log(['q.fetch', 'cache hit', json, resp])
-        //if (options.complete) options.complete(this, resp, options);
-        //return;
+        console.log(['q.fetch', 'cache hit', json, resp])
+        if (options.complete) options.complete(this, resp, options);
+        if (options.success) options.success(this, resp, options);
+        if (options.error) options.error(this, resp, options);
+        return;
       }
 
       $("#q_loading").show();
@@ -101,7 +103,7 @@ define(function(require) {
       var complete = options.complete;
       var f = function(resp) {
         $("#q_loading").hide();
-        //addToCache(json, resp.responseJSON);
+        addToCache(json, resp.responseJSON);
         if (complete) complete(model, resp, options);
       };
       options.complete = f;
