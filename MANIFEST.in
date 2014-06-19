@@ -1,2 +1,2 @@
-recursive-include summary/templates *
-recursive-include summary/static *
+recursive-include dbwipes/templates *
+recursive-include dbwipes/static *

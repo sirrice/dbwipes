@@ -14,8 +14,12 @@ setup(name="dbwipes",
       author="Eugene Wu",
       author_email="eugenewu@mit.edu",
       url="http://github.com/sirrice/summary",
-      include_package_data = True,      
       packages = find_packages(),
+      include_package_data = True,      
+      package_data = {
+        'static': 'dbwipes/static',
+        'templates': 'dbwipes/templates'
+      },
       package_dir = {'dbwipes' : 'dbwipes'},
       scripts = [
         'bin/dbwipesserver.py',

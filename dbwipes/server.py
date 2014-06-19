@@ -20,7 +20,9 @@ from summary import Summary
 from util import *
 from db import *
 
-app = Flask(__name__)
+tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+print tmpl_dir
+app = Flask(__name__, template_folder=tmpl_dir)
 Compress(app)
 
 
