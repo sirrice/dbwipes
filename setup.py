@@ -22,5 +22,5 @@ setup(name="summary",
         'bin/summarizedb.py'
       ],
       #zip_safe = False,
-      install_requires = ['flask', 'psycopg2', 'sqlalchemy', 'flask-compress'],
+      install_requires = ['flask', 'psycopg2', 'sqlalchemy', 'flask-compress', 'scorpionsql'],
       keywords= "")

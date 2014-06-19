@@ -3,6 +3,9 @@
 #
 import json
 
+from scorpionsql.errfunc import *
+from scorpionsql.sql import *
+
 
 # JSON Encoder
 class SummaryEncoder(json.JSONEncoder):
@@ -64,5 +67,86 @@ def where_to_sql(where_json, negate=False):
     q = "not(%s)" % q
   return q, args
 
+
+__agg2f__ = {
+  'avg' : AvgErrFunc,
+  'std' : StdErrFunc,
+  'stddev' : StdErrFunc,
+  'stddev_samp': StdErrFunc,
+  'stddev_pop': StdErrFunc,
+  'min' : MinErrFunc,
+  'max' : MaxErrFunc,
+  'sum' : SumErrFunc,
+  'corr' : CorrErrFunc,
+  'count' : CountErrFunc,
+  'abs' : AbsErrFunc
+}
+
+
+def parse_agg(s):
+  """
+  parse an aggregation SELECT clause e.g., avg(temp) as foo
+  into dictionary of function name, column, and alias components
+  """
+  print s
+  p = re.compile('(?P<func>\w+)\(\s*(?P<col>[\w\,\s]+)\s*\)\s*(as\s+(?P<alias>\w+))?')
+  d = p.match(s).groupdict()
+  klass = __agg2f__[d['func'].strip()]
+  expr = str(d['col'])
+  cols = [col.strip() for col in expr.split(',')]
+  varlist = [Var(col) for col in cols]
+  print klass
+  print cols
+  print varlist
+  func = klass(varlist)
+  return {
+    'fname': d['func'],
+    'func': func,
+    'cols': cols,
+    'alias': d.get('alias', '') or d['func']
+  }
+
+def expr_from_nonagg(s):
+  """
+  remove alias component of a nonaggregation SELECT clause
+  """
+  if ' as ' in s: 
+    return ' as '.join(s.split(' as ')[:-1])
+  return s
+
+
+def create_sql_obj(db, qjson):
+  x = qjson['x']
+  ys = qjson['ys']
+  #sql = qjson['query']
+  dbname = qjson['db']
+  table = qjson['table']
+  negate = qjson.get('negate', False)
+  where_json = qjson.get('where', []) or []
+  basewheres_json = qjson.get('basewheres', []) or []
+
+  where, args = where_to_sql(where_json, negate)
+  basewheres, baseargs = where_to_sql(basewheres_json, False)
+  where = ' and '.join(filter(bool, [where, basewheres]))
+  args.extend(baseargs)
+  
+  select = Select()
+  nonagg = SelectExpr(x['alias'], [x['col']], x['expr'], x['col'])
+  select.append(nonagg)
+  for y in ys:
+    d = parse_agg(y['expr'])
+    agg = SelectAgg(y['alias'], d['func'], d['cols'], y['expr'], d['cols'][0])
+    select.append(agg)
+
+  parsed = Query(
+    db, 
+    select, 
+    [table], 
+    [where],
+    [x['expr']], 
+    [expr_from_nonagg(x['expr'])]
+  )
+
+  return parsed, args
 
 

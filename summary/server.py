@@ -281,7 +281,12 @@ def api_tuples():
 @app.route('/api/query/', methods=['POST', 'GET'])
 @returns_json
 def api_query():
-  import scorpionutil
+  try:
+    import scorpionutil
+  except:
+    print >>sys.stderr, "Could not load scorpionutil.  Maybe scorpion has not been installed?"
+    return {}
+
   ret = { }
   jsonstr = request.args.get('json')
   if not jsonstr:
@@ -397,7 +402,11 @@ def column_distributions():
 def scorpion():
   try:
     import scorpionutil
+  except:
+    print >>sys.stderr, "Could not load scorpionutil.  Maybe scorpion has not been installed?"
+    return {}
 
+  try:
     data =  json.loads(str(request.form['json']))
     fake = request.form.get('fake', False)
     requestid = request.form.get('requestid')
