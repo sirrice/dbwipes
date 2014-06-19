@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 import dbwipes
 
 setup(name="dbwipes",
-      version=summary.__version__,
+      version=dbwipes.__version__,
       description="dbwipes a database",
       license="MIT",
       author="Eugene Wu",
