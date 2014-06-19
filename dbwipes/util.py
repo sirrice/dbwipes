@@ -1,7 +1,18 @@
 #
 # this file has no deps on Scorpion
 #
+import os
+import re
+import time
 import json
+import md5
+import pdb
+import psycopg2
+import traceback
+
+from collections import *
+from datetime import datetime
+
 
 from scorpionsql.errfunc import *
 from scorpionsql.sql import *
