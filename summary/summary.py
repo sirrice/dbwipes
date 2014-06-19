@@ -3,12 +3,13 @@ import bsddb
 import json
 import pdb
 from sqlalchemy import create_engine, engine
-from sqlalchemy.pool import NullPool
+
+from db import *
 
 
 
 def get_cache():
-  eng = create_engine('postgresql://localhost/cache', poolclass=NullPool)
+  eng = db_connect('cache')
   db = eng.connect()
 
   try:
@@ -59,7 +60,7 @@ class Summary(object):
       self.engine = dbname.engine
       self.db = dbname
     else:
-      self.engine = create_engine("postgresql://localhost/%s" % dbname, poolclass=NullPool)
+      self.engine = db_connect(dbname)
       self.db = self.engine.connect()
 
     self.tablename = tablename

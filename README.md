@@ -15,14 +15,14 @@ Setup
 DBSetup -- pre-compute attribute value distributions
 
     summarizedb.py <dbname>
-
+    vi settings.py           # specify your own dburl prefix.
 
 Add new dataset:
 
     pip install dbtruck
     importmydata.py <table> <db> <file>
-    python fixnulls <db> <tablename>
-    python summarizedb.py dbname
+    python fixnulls <db> <tablename>     # scorpion doesn't deal with nulls well, otherwise don't worry about this
+    python summarizedb.py dbname         # precompute attribute value distributions
 
 
 

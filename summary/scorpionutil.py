@@ -18,6 +18,7 @@ from scorpion.parallel import parallel_debug
 from scorpion.errfunc import *
 from scorpion.util import Status
 
+from util import *
 
 
 __agg2f__ = {
@@ -66,49 +67,6 @@ def expr_from_nonagg(s):
     return ' as '.join(s.split(' as ')[:-1])
   return s
 
-def foo_where(where_json, negate=False):
-  is_type = lambda s, types: any([t in s for t in types])
-  l = []
-  args = []
-  for clause_json in where_json:
-    if 'sql' in clause_json:
-      l.append(clause_json['sql'])
-      continue
-
-    ctype = clause_json['type']
-    col = clause_json['col']
-    vals = clause_json['vals']
-
-
-    if not vals: continue
-
-    if is_type(ctype, ['num', 'int', 'float', 'double', 'date', 'time']):
-      q = "%%s <= %s and %s < %%s" % (col, col)
-      args.extend(vals)
-    else:
-      tmp = []
-      vals = list(vals)
-      if None in vals:
-        tmp.append("(%s is null)" % col)
-
-      realvals = list(filter(lambda v: v is not None, vals))
-      if len(realvals) == 1:
-        tmp.append("(%s = %%s)" % col)
-        args.append(realvals[0])
-      elif len(realvals):
-        tmp.append("(%s in %%s)" % col)
-        args.append(tuple(list(realvals)))
-      q = ' or '.join(tmp)
-
-    l.append(q)
-
-  q = ' and '.join(filter(bool, l))
-  if negate and q:
-    q = "not(%s)" % q
-  return q, args
-
-
-
 
 def create_sql_obj(db, qjson):
   x = qjson['x']
@@ -120,8 +78,8 @@ def create_sql_obj(db, qjson):
   where_json = qjson.get('where', []) or []
   basewheres_json = qjson.get('basewheres', []) or []
 
-  where, args = foo_where(where_json, negate)
-  basewheres, baseargs = foo_where(basewheres_json, False)
+  where, args = where_to_sql(where_json, negate)
+  basewheres, baseargs = where_to_sql(basewheres_json, False)
   where = ' and '.join(filter(bool, [where, basewheres]))
   args.extend(baseargs)
   

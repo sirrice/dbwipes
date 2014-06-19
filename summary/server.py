@@ -17,13 +17,11 @@ from flask.ext.compress import Compress
 
 
 from summary import Summary
-from scorpion.util import ScorpionEncoder
-import scorpionutil
+from util import *
+from db import *
 
 app = Flask(__name__)
 Compress(app)
-SUMMARYCACHE = '.summary.cache'
-
 
 
 def returns_json(f):
@@ -31,12 +29,12 @@ def returns_json(f):
   def json_returner(*args, **kwargs):
     r = f(*args, **kwargs)
     if not isinstance(r, basestring):
-      r = json.dumps(r, cls=ScorpionEncoder)
+      r = json.dumps(r, cls=SummaryEncoder)
     return Response(r, content_type='application/json')
   return json_returner
 
 def cache_result(key, value):
-  engine = create_engine('postgresql://localhost/cache', poolclass=NullPool)
+  engine = db_connect('cache')
   db = engine.connect()
   q = "insert into requests values(%s, %s)"
   db.execute(q, key, value)
@@ -57,7 +55,7 @@ def before_request():
     g.db = None
 
     if dbname:
-      g.engine = create_engine('postgresql://localhost/%s' % dbname, poolclass=NullPool)
+      g.engine = db_connect(dbname)
       g.db = g.engine.connect()
   except:
     traceback.print_exc()
@@ -86,7 +84,6 @@ def drspott():
     'title': 'DBWipes + Scorpion!'
   }
   return render_template("index_tuplesleft.html", **context)
-
 
 
 @app.route('/hidden/', methods=["POST", "GET"])
@@ -239,7 +236,6 @@ def api_status():
 @app.route('/api/tuples/', methods=['POST', 'GET'])
 @returns_json
 def api_tuples():
-  from scorpionutil import foo_where
   ret = { }
   jsonstr = request.args.get('json')
   if not jsonstr:
@@ -251,7 +247,7 @@ def api_tuples():
   table = args.get('table')
   where = args.get('where', []) or []
 
-  where, params = foo_where(where)
+  where, params = where_to_sql(where)
   if where:
     where = 'AND %s' % where
   print where
@@ -285,6 +281,7 @@ def api_tuples():
 @app.route('/api/query/', methods=['POST', 'GET'])
 @returns_json
 def api_query():
+  import scorpionutil
   ret = { }
   jsonstr = request.args.get('json')
   if not jsonstr:
@@ -398,13 +395,17 @@ def column_distributions():
 @app.route('/api/scorpion/', methods=['POST', 'GET'])
 @returns_json
 def scorpion():
-  data =  json.loads(str(request.form['json']))
-  fake = request.form.get('fake', False)
-  requestid = request.form.get('requestid')
-  if not fake or fake == 'false':
-    results = scorpionutil.scorpion_run(g.db, data, requestid)
-    print json.dumps(results, cls=ScorpionEncoder)
-    return results
+  try:
+    import scorpionutil
+
+    data =  json.loads(str(request.form['json']))
+    fake = request.form.get('fake', False)
+    requestid = request.form.get('requestid')
+    if not fake or fake == 'false':
+      results = scorpionutil.scorpion_run(g.db, data, requestid)
+      return results
+  except:
+    return {}
 
   ret = {}
   results = [
