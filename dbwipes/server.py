@@ -283,12 +283,6 @@ def api_tuples():
 @app.route('/api/query/', methods=['POST', 'GET'])
 @returns_json
 def api_query():
-  try:
-    import scorpionutil
-  except:
-    print >>sys.stderr, "Could not load scorpionutil.  Maybe scorpion has not been installed?"
-    return {}
-
   ret = { }
   jsonstr = request.args.get('json')
   if not jsonstr:
@@ -299,7 +293,7 @@ def api_query():
   dbname = args.get('db')
   table = args.get('table')
 
-  o, params = scorpionutil.create_sql_obj(g.db, args)
+  o, params = create_sql_obj(g.db, args)
   o.limit = 10000;
   query = str(o)
   print query
