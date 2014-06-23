@@ -90,9 +90,13 @@ define(function(require) {
       var resp = checkQueryCache(json);
       if (resp) {
         console.log(['q.fetch', 'cache hit', json, resp])
+        resp = this.parse(resp, options);
+        this.set(resp, options);
+
         if (options.complete) options.complete(this, resp, options);
         if (options.success) options.success(this, resp, options);
         if (options.error) options.error(this, resp, options);
+
         return;
       }
 
