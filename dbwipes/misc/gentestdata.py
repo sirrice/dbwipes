@@ -41,6 +41,9 @@ state2gender = {state: random.random() for state in states}
 print "day,state,age,gender,amt"
 for date in range(10):
 
+  if SIMPLE:
+    states = ["AR", "CA", "CO", "IL",  "PA", "TN", "VT", "WA", "WI" ]
+
   # 5k sales per date
   for sidx, state in enumerate(states):
 

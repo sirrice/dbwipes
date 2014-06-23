@@ -70,6 +70,7 @@ define(function(require) {
     toDataJSON: function() {
       var cols = this.get('cols'),
           data = this.get('data');
+      cols.sort();
       data = _.map(data, function(d) {
         return _.map(cols, function(col) { return String(d[col]).substr(0, 10); });
       });

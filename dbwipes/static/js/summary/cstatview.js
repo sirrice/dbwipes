@@ -142,6 +142,7 @@ define(function(require) {
           h = this.state.h
 
       if (util.isStr(type)) {
+        this.state.rectwidth = width = xscales.rangeBand();
         el.selectAll('rect')
             .data(stats)
           .enter().append('rect')
@@ -287,6 +288,7 @@ define(function(require) {
           h = this.state.h,
           type = this.model.get('type'),
           _this = this;
+
       var within = function(d, e) {
         if (e[0] == e[1]) return false;
         if (type == 'str') {
@@ -294,7 +296,10 @@ define(function(require) {
               bmax = xscales(d.val) + 3*xscales.rangeBand()/4;
           var b = !(e[1] < bmin || bmax < e[0]);
         } else {
-          var b = e[0] <= d.val && e[1] >= d.val;
+          var width = xscales(d.range[1]) - xscales(d.range[0]),
+              bmin = xscales(d.val)+width/4.0,
+              bmax = xscales(d.val)+3.0*width/4.0;
+          var b = !(xscales(e[1]) < bmin || bmax < xscales(e[0]));
         }
         return b;
       };
@@ -433,10 +438,20 @@ define(function(require) {
 
         var xStart = null;
         var curXScale = null;
+
+        d3.select('body')
+          .on('keydown', function() {
+            
+          })
+
         el.select('.xaxis')
           .on('mousedown.cstatx', function() {
             if (d3.event.shiftKey) {
               xStart = d3.event.x;
+              el.select('.xaxis')
+                .on('mousedown.zoom', null)
+                .on('mousemove.zoom', null)
+                .on('mouseup.zoom', null);
               curXScale = zoom.scale();
               d3.select('body')
                 .on('mousemove.cstatx', function() {
@@ -446,7 +461,7 @@ define(function(require) {
                   } else if (diff < 0) { 
                     diff = 1.0 / (Math.abs(diff)+1);
                   }
-                  console.log(diff)
+                  //console.log(diff)
                   zoom.scale(diff*curXScale);
 
                 })

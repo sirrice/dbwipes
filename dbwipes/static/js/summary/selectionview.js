@@ -29,6 +29,7 @@ define(function(require) {
       }
       var sql = util.negateClause(this.model.toSQLWhere());
       this.$el.html(this.errtemplate({sql: sql}));
+      this.$(".clause").addClass("temporary");
       this.$el.show()
       return this;
     },

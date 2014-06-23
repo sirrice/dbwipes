@@ -54,7 +54,7 @@ def where_to_sql(where_json, negate=False):
     if not vals: continue
 
     if is_type(ctype, ['num', 'int', 'float', 'double', 'date', 'time']):
-      q = "%%s <= %s and %s < %%s" % (col, col)
+      q = "%%s <= %s and %s <= %%s" % (col, col)
       args.extend(vals)
     else:
       tmp = []

@@ -18,7 +18,9 @@ define(function(require) {
       CStatView = require('summary/cstatview'),
       CStatsView = require('summary/cstatsview'),
       Query = require('summary/query'),
+      QueryForm = require('summary/queryform'),
       QueryView = require('summary/queryview'),
+      QueryWhereView = require('summary/querywhereview'),
       util = require('summary/util');
 
   var setupButtons = function(q, qv) {
@@ -44,11 +46,15 @@ define(function(require) {
         var ws = _.chain(qv.overlayquery.get('where'))
           .filter(function(w) { return w.vals && w.vals.length; })
           .compact()
+          .uniq()
           .map(function(w) { return util.toWhereClause(w.col, w.type, w.vals);})
           .map(function(w) { return util.negateClause(w); })
           .map(function(w) { return {col: null, sql: w}; })
-          .each(function(w) { q.get('basewheres').push(w); })
           .value();
+        var bws = q.get('basewheres');
+        bws.push.apply(bws, ws);
+        bws = _.uniq(bws, function(bw) { return bw.sql; });
+        q.set('basewheres', bws);
         q.trigger('change:basewheres');
       }
     });
@@ -68,14 +74,18 @@ define(function(require) {
     });
     var whereview = new WhereView({
       collection: where, 
-      el: $("#where")
+      el: $("#temp-where")
     });
     var csv = new CStatsView({
       collection: where, 
       el: $("#facets")
     });
+    var qwv = new QueryWhereView({
+      model: q,
+      el: $("#perm-where")
+    });
+    var qf = new QueryForm({model: q, el: $("#query-form-container")});
     q.on('change:db change:table change:basewheres', function() {
-      where.reset()
       var whereSQL = _.chain(q.get('basewheres'))
         .flatten()
         .pluck('sql')
@@ -91,7 +101,13 @@ define(function(require) {
         },
         reset: true
       });
-    })
+
+      qf.render();
+    });
+    qf.on("submit", function() {
+      qv.resetState();
+    });
+    $("#q-toggle").click(qf.toggle.bind(qf));
 
     where.on('change:selection', function() {
       var opts = {silent: false};
@@ -108,6 +124,8 @@ define(function(require) {
     });
     window.q = q;
     window.qv = qv;
+    window.qf = qf;
+    window.qwv = qwv;
     window.where = where;
     window.csv = csv;
   }

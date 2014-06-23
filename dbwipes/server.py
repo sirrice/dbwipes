@@ -85,7 +85,7 @@ def drspott():
     'jsidx': 'drspott',
     'title': 'DBWipes + Scorpion!'
   }
-  return render_template("index_tuplesleft.html", **context)
+  return render_template("index_base.html", **context)
 
 
 @app.route('/hidden/', methods=["POST", "GET"])
@@ -93,19 +93,16 @@ def index():
   context = {
     'enableScorpion': 1,
     'jsidx': '',
-    'title': 'DBWipes + Scorpion!'
+    'title': 'DBWipes + Scorpion!',
+    'debug': True
   }
-  return render_template("index_tuplesleft.html", **context)
+  return render_template("index_base.html", **context)
 
 @app.route('/<int:idx>/', methods=["POST", "GET"])
 def index_idx(idx):
   templates = []
   templates.append("index%d.html" % idx)
-
-  if idx <= 2:
-    templates.append("index_tuplesright.html")
-  else:
-    templates.append("index_tuplesleft.html")
+  templates.append("index_base.html")
 
   jsidx = idx
   title = "DBWipes Tutorial"
@@ -114,6 +111,9 @@ def index_idx(idx):
 
   if idx in [0,1,2,4]:
     enable_scorpion = 0
+
+  if idx == 2:
+    title = 'DBWipes Verification Test'
 
   if idx == 3:
     title = "DBWipes + Scorpion Tutorial"

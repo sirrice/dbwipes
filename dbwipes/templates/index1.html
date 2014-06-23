@@ -1,0 +1,213 @@
+{% extends "index_base.html" %}
+
+{% block includes %}
+<style>
+  .orange {
+    color:#ff7f0e; font-family: arial; font-weight: bold;
+  }
+  .blue {
+    color:#1f77b4; font-family: arial; font-weight: bold;
+  }
+  .grey {
+    color:grey; font-family: arial; font-weight: bold;
+  }
+  .green {
+    color:rgb(92, 194, 50); font-family: arial; font-weight: bold;
+  }
+  .orange {
+    color:rgb(231, 194, 0); font-family: arial; font-weight: bold;
+    color:#ff7f0e;
+  }
+  .greenwhere {
+    font-family: "Gill Sans";
+    font-size: 9pt;
+    color: black;
+    background: rgb(237, 250, 236);
+    border-left: 2px solid rgb(92, 194, 50);
+    padding-left: .5em;
+    padding-right: .5em;
+
+  } 
+
+  .orangewhere {
+    font-family: "Gill Sans";
+    font-size: 9pt;
+    color: black;
+    background: rgb(248, 241, 201);
+    border-left: 2px solid rgb(231, 194, 0);
+    padding-left: .5em;
+    padding-right: .5em;
+
+  } 
+
+  small {
+    font-size: 8pt;
+    color: grey;
+  }
+
+  .smalllabel {
+    font-size: smaller; 
+    background: whitesmoke; 
+    border: 1px solid white; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    min-width: 50px;
+  }
+</style>
+
+{%raw%}
+
+<script id="start" type="text/x-underscore-template">
+  <p>This tutorial will walk you through the main DBWipes interface.</p>
+  <p>
+    We will use a randomly generated dataset of sales in several states
+     over a 10-day period.  
+    The attributes in the dataset include the day, the amount spent, 
+    and customer age range, gender, and state.
+  </p>
+  <p>When you are ready, click Next.</p>
+  <p class='bs-callout bs-callout-info'>
+    For this study, it may help to zoom your browser window out 
+    <kbd>ctrl-(minus) or &#8984;-(minus)</kbd> so the whole page fits on one screen comfortably.
+  </p>
+  <p class='bs-callout bs-callout-info'>
+  You can move the tutorial boxes by clicking and dragging the 
+  <span class='smalllabel' style='padding: 2px; padding-left: 1em; padding-right: 1em'>grey area</span> at the top of the box.
+  </p>
+</script>
+
+
+
+<script id="qviz" type="text/x-underscore-template">
+<p>This area visualizes query results over the sample dataset. </p>
+<p>
+  For example, this shows the daily
+  <span class='blue'>sum</span> 
+  of sales in the dataset.
+</p>
+</script>
+
+
+<script id="qformbtn-clicked" type="text/x-underscore-template">
+<p>That button will show or hide the query form below</p>
+<p>The form shows the SQL aggregation query that we
+   are visualizing below.</p>
+<p>We will walk through how to plot the <span class='orange'>average</span> 
+   sales as well.</p>
+</script>
+
+<script id="cstat-label-template" type="text/x-underscore-template">
+<p>
+  For example, this <b style='font-family: arial'>day</b> 
+  attribute corresponds with the <b style='font-family:arial'>day</b> 
+  column in the sample table on the right.
+</p>
+<p>
+  The small <span class='btn btn-xs smalllabel'>num</span> 
+  label below is the data type, so we know this attribute is 
+  a number and not a timestamp.</p>
+</script>
+
+<script id="dist-filter-2" type="text/x-underscore-template">
+<p>This selects records from day <i>1</i> to <i>3</i>.  The selected range is colored in grey, and the matching values are highlighted.</p>
+<p>You can resize and drag the selection around.  Click anywhere within the plot but outside the grey selected region to clear it.</p>
+<p>Go ahead and give it a try.</p>
+</script>
+
+
+<script id="dist-select" type="text/x-underscore-template">
+<p>
+  You can use the axes to zoom and scroll on the 
+  <span class='btn btn-xs smalllabel'>num</span>,
+  <span class='btn btn-xs smalllabel'>date</span>, and
+  <span class='btn btn-xs smalllabel'>timestamp</span> attribute types.
+</p> 
+<p>
+  Hover over the x-axis and scroll-up using your mouse wheel or touch pad.</p>
+</script>
+
+<script id="dist-filter-3" type="text/x-underscore-template">
+<p>The visualization will update whenever you filter using the facets</p>
+<p>
+  DBWipes turns the original visualization 
+  <span class='grey'>grey</span>, and overlays the
+  new query results in <span class='blue'>color</span>.  
+  That way you can compare the effects of your filter.
+</p> 
+</script>
+
+<script id="dist-filter-4" type="text/x-underscore-template">
+  <p>
+  The filters that are selected in the facets are listed in 
+  <span class='greenwhere'>green</span> boxes.
+  </p>
+  <p>You can click on the <b>&times;</b> to remove the filter.</p>
+</script>
+
+
+<script id="seltype" type="text/x-underscore-template">
+<p>
+  So far, the facets <b style='color: rgb(26, 189, 64)'>select</b> 
+  subsets of data that match your filters. </p>
+<p>
+  Sometimes it helps to see what happens if the data you selected 
+  were <i>removed</i></p>
+<p>
+  Toggle this switch to show data that <i>doesn't</i> match the filter.</p>
+<p>
+  Click on the green <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> 
+  switch to the left.</p>
+</script>
+
+
+
+
+
+<script id="selapply" type="text/x-underscore-template">
+<p>
+The distributions in the facets can be expensive to recompute, 
+so we don't recompute them when you select filters using the Facets.
+</p>
+<p>
+Add them as permanent filters to recompute the distributions on the filtered
+subset of data.
+</p>
+<p>
+Now click on
+<span class='btn btn-primary btn-xs'>Add Permanent Filters</span>.
+</p>
+</script>
+
+
+<script id="selapply-2" type="text/x-underscore-template">
+<p>
+Your original <span class='greenwhere'>filters</span> have turned
+<span class='orangewhere'>orange</span>, meaning they are permanent
+parts of the query.
+</p>
+<p>
+DBWipes is also recomputing the facet distributions based on 
+the records that match the <span class='orangewhere'>orange</span> WHERE clauses
+<small>(which may take some time.)</small>
+</p>
+</script>
+
+<script id="selapply-3" type="text/x-underscore-template">
+<p>
+Since they are part of the query, they are also listed in the 
+WHERE clause of the query form.
+</p>
+<p>
+Note that you can also directly edit these fields if there is a specific
+filter you want to apply.
+</p>
+</script>
+
+
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+{%endraw%}
+
+{% endblock %}

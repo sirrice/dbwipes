@@ -125,7 +125,8 @@
   border-bottom-color: #eeeeee; }
 .shepherd-element.shepherd-theme-arrows.shepherd-has-title .shepherd-content header {
   background: #eeeeee;
-  padding: 1em; }
+  padding: 1em; 
+  cursor: move;}
   .shepherd-element.shepherd-theme-arrows.shepherd-has-title .shepherd-content header a.shepherd-cancel-link {
     padding: 0;
     margin-bottom: 0; }

@@ -183,6 +183,32 @@
       if (this.options.highlight) {
         $(this.getAttachTo().element).css("box-shadow", "rgb(18, 179, 255) 0px 0px 10px 0px");
       }
+
+      // make draggable 
+      if (true) {
+        var pagex = null, pagey = null;
+        var startx = null, starty = null;
+        var header = $(this.el).find("header");
+        var me = $(this.el);
+        header
+          .mousedown(function(ev) {
+            pagey = ev.pageY;
+            pagex = ev.pageX;
+            startx = me.css("left");
+            starty = me.css("top");
+            startx = +startx.substr(0, startx.length-2);
+            starty = +starty.substr(0, starty.length-2);
+            $("body")
+              .mousemove(function(ev) {
+                me.css("top", starty + ev.pageY - pagey);
+                me.css("left", startx + ev.pageX - pagex);
+              })
+              .mouseup(function() {
+                $("body").off("mousemove");
+                $("body").off("mouseup");
+              });
+          })
+      }
       return this.trigger('show');
     };
 

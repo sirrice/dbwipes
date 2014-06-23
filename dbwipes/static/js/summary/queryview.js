@@ -7,11 +7,7 @@ define(function(require) {
       Where = require('summary/where'),
       util = require('summary/util'),
       DrawingView = require('summary/drawingview'),
-      QueryForm = require('summary/queryform'),
       Query = require('summary/query');
-
-
-
 
 
   var QueryView = Backbone.View.extend({
@@ -27,7 +23,7 @@ define(function(require) {
         xaxis: null,
         yaxis: null,
         series: null,
-        w: 500,
+        w: 400,
         h: 400,
         lp: 70,
         tp: 20,
@@ -63,14 +59,6 @@ define(function(require) {
         .attr('stroke', 'none')
         .style('pointer-events', 'all')
 
-      this.queryform = new QueryForm({model: this.model});
-      this.listenTo(this.queryform, 'submit', this.resetState.bind(this));
-      this.$el.append(this.queryform.render().el)
-
-      this.$toggle = $("#q-toggle")
-        .addClass("btn btn-primary")
-        .css("margin-left", this.state.lp)
-        .click(this.toggleQueryForm.bind(this));
 
       this.listenTo(this.model, 'change:db', this.resetState);
       this.listenTo(this.model, 'change:table', this.resetState);
@@ -84,28 +72,6 @@ define(function(require) {
 
     onChange: function() {
       return;
-    },
-
-    showQueryForm: function() {
-      this.$toggle.text("Show Visualization");
-      this.queryform.render().$el.show();
-      this.$('.legend').hide();
-      this.$svg.hide();
-    },
-
-    hideQueryForm: function() {
-      this.$toggle.text("Show Query Form");
-      this.queryform.render().$el.hide();
-      this.$('.legend').show();
-      this.$svg.show();
-    },
-
-    toggleQueryForm: function() {
-      if (this.queryform.render().$el.css('display') == 'none') {
-        this.showQueryForm();
-      } else {
-        this.hideQueryForm();
-      }
     },
 
     // persistently update scales information
@@ -221,7 +187,7 @@ define(function(require) {
       }
 
       if (el.select('.yaxis-label').size() == 0) {
-        var txt = _.pluck(this.model.get('ys'), 'alias').join(', ');
+        var txt = _.uniq(_.pluck(this.model.get('ys'), 'col')).join(', ');
         el.append('g')
           .classed('yaxis-label', true)
           .attr('text-anchor', 'middle')
@@ -553,13 +519,10 @@ define(function(require) {
 
     render: function() {
       if (!this.model.isValid()) {
-        this.queryform.render().$el.show()
         this.$svg.hide();
         return this;
       }
       this.$svg.show();
-      this.queryform.$el.hide();
-
 
       if (!this.state.xaxis) {
         $(this.c[0]).empty();

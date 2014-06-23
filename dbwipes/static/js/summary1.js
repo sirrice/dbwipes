@@ -60,6 +60,7 @@ requirejs(['jquery',
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
   setup.setupTuples(window.q, null, window.where);
+  window.qf.show();
 
 
   var testq = {
@@ -78,27 +79,6 @@ requirejs(['jquery',
 
 
 
-
-  /*
-  var intelq = {
-    x: 'hr',
-    ys: [
-      {col: 'temp', expr: "avg(temp)", alias: 'avg'},
-    //  {col: 'temp', expr: "stddev(temp)", alias: 'std'}
-    ],
-    schema: {
-      hr: 'timestamp',
-      temp: 'num'
-    },
-    where: '',
-    table: 'readings' ,
-    db: 'intel'
-  };
-  q.set(intelq);
-  */
-
-
-
   var tour = new Shepherd.Tour({
     defaults: { classes: "shepherd-element shepherd-open shepherd-theme-arrows"}
   });
@@ -114,29 +94,23 @@ requirejs(['jquery',
 
 
   step = tour.addStep('start', {
-    id: 1,
     title: "Welcome to Scorpion!",
-    text: "<p>This tutorial will walk you through the main parts of the manual interface. </p>"+
-          "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
-          "<p>When you are ready, click Next.</p>"+
-          "<p class='bs-callout bs-callout-info'>For this study, it may help to zoom your browser window out <kbd>ctrl-(minus) or &#8984;-(minus)</kbd> so the whole page fits on one screen comfortably.</p>",
-          //"<p>The dataset we will use is a sensor dataset containing voltage, light, and humidity readings from 54 different sensors installed around a building</p> ",
-    classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
-    style: { width: "500px" },
-    showCancelLink: true
+    text: $("#start").html(),
+    classes: "shepherd-theme-arrows",
+    style: { width: "500px" }
   });
   step.on("show", function() { $("div.row").css("opacity", 0.6); });
   step.on("hide", function() { $("div.row").css("opacity", 1); });
 
 
   step = tour.addStep('tupleviz', {
-    attachTo: "#tuples top",
+    attachTo: "#tuples left",
     title: "Record Table",
-    text: "This table shows a random sample of records that match the current query being rendered", 
-    showCancelLink: true,
+    text: "This table shows a random sample of the current query results.", 
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '10px 0' },
     highlight: true,
+    scrollTo: true,
     style: { width: "500px" },
     buttons: btns,
   });
@@ -145,60 +119,53 @@ requirejs(['jquery',
   tour.addStep('qviz', {
     attachTo: "#queryview-container left",
     title: "Main Visualization",
-    showCancelLink: true,
-    text: "<p>This area visualizes query results over the sample dataset. </p>"+
-          "<p>For example, this shows the daily"+
-          " <span style='color:#1f77b4; font-family: arial; font-weight: bold;'>sum</span> "+
-          "of sales in the dataset.</p>",
+    text: $("#qviz").html(),
     classes: "shepherd-theme-arrows",
     highlight: true,
+    scrollTo: true,
     style: { width: "500px" },
     buttons: btns,
   });
+
+  step = tour.addStep('qformbtn-clicked', {
+    attachTo: "#q left",
+    title: "Query Form Toggle Button",
+    text: $("#qformbtn-clicked").html(),
+    classes: "shepherd-theme-arrows",
+    scrollTo: true,
+    highlight: true,
+    buttons: btns,
+    style: { width: 400 }
+  });
+  step.on('show', function() { window.qf.show(); });
+
   tour.addStep('qformbtn', {
     attachTo: "#q-toggle",
     title: "Query Form Toggle Button",
-    text: "<p>You can see and edit the query that generated this visualization by clicking on this button.</p>"+
-          "<p>Click on it to continue!</p>",
-    showCancelLink: true,
+    text: "<p>This button toggles the query form</p>",
     classes: "shepherd-theme-arrows",
     tetherOptions: {
       attachment: 'top right',
       targetAttachment: 'top left',
       offset: '10px 10px'
     },
-    highlight: true,
-    buttons: { next: false },
-    style: { width: "400px" },
-    advanceOn: "#q-toggle click"
-  });
-  step = tour.addStep('qformbtn-clicked', {
-    attachTo: "#q left",
-    title: "Query Form Toggle Button",
-    text: "<p>That button will switch between this query edit form and the visualization view.</p>"+
-          "<p> This is the query edit form that describes the data that we are visualizing and interacting with.</p>"+
-          "<p>We're going to plot the "+
-          "<span style='color:#ff7f0e; font-family: arial; font-weight: bold;'>average</span> "+
-          "sales as well</p>",
-    showCancelLink: true,
-    classes: "shepherd-theme-arrows",
+    scrollTo: true,
     highlight: true,
     buttons: btns,
-    style: { width: 400 }
+    style: { width: 400 },
   });
-  step.on('show', function() { qv.showQueryForm(); });
+
 
 
   step = tour.addStep('add-expr-1', {
     attachTo: "#q-add-select-expr bottom",
     title: "Add a Select Clause",
     text: "<p>These SELECT clauses specify what aggregations to compute</p>"+
-          "<p>Click <span class='btn btn-primary btn-xs'>add</span> to create a new field for us to edit</p>",
-    showCancelLink: true,
+          "<p>Click <span class='btn btn-primary btn-xs'>add</span> to create a new field for us to edit and move to the next step.</p>",
     classes: "shepherd-theme-arrows",
     highlight: true,
     buttons: { next: false },
-    tetherOptions: { offset: '-15px 0px' },
+    tetherOptions: { offset: '0px 0px' },
     style: { width: 400 },
     advanceOn: "#q-add-select-expr click"
   });
@@ -207,8 +174,7 @@ requirejs(['jquery',
   step = tour.addStep('add-expr-2', {
     attachTo: "#q input[name=q-y-expr]:last bottom",
     title: "Add a Select Clause",
-    text: "<p>Type the SELECT aggregation expression <span style='color:#ff7f0e; font-family: arial; font-weight: bold;'>avg(amt)</span> into this field</p>",
-    showCancelLink: true,
+    text: "<p>Type the SELECT aggregation expression <span class='orange'>avg(amt)</span> into this field.</p>",
     classes: "shepherd-theme-arrows",
     highlight: true,
     buttons: btns,
@@ -219,9 +185,9 @@ requirejs(['jquery',
   step = tour.addStep('add-expr-3', {
     attachTo: "#q input[name=q-y-col]:last bottom",
     title: "Add a Select Clause",
-    text: "<p>This field is the attribute you are computing the aggregation over.  In this case, type in <span style='color:#ff7f0e; font-family: arial; font-weight: bold;'>amt</span> </p>"+
-          "<p>We ask for this information because knowing this makes Scorpion's life easier</p>",
-    showCancelLink: true,
+    text: "<p>This field is the attribute you are computing the aggregation over. "+
+          "In this case, type in <span class='orange'>amt</span>.</p>"+
+          "<p>We ask for this information because knowing this makes our life easier</p>",
     classes: "shepherd-theme-arrows",
     highlight: true,
     buttons: btns,
@@ -233,7 +199,6 @@ requirejs(['jquery',
     attachTo: "#q .q-submit bottom",
     title: "Submit New Query",
     text: "<p>Click <span class='btn btn-primary btn-xs'>Execute Query</span> to re-run the query with our new SELECT clause!</p>",
-    showCancelLink: true,
     classes: "shepherd-theme-arrows",
     highlight: true,
     buttons: { next: false },
@@ -245,18 +210,18 @@ requirejs(['jquery',
   step = tour.addStep('qviz-2', {
     attachTo: "#queryview-container left",
     title: "Main Visualization",
-    showCancelLink: true,
     text: "<p>Now the visualization shows both the "+
           " <span style='color:#1f77b4; font-family: arial; font-weight: bold;'>sum</span> "+
           "and <span style='color:#ff7f0e; font-family: arial; font-weight: bold;'>average</span> "+
           " sales amounts in the dataset.</p><p>Nice Job!</p>",
     classes: "shepherd-theme-arrows",
     highlight: true,
+    scrollTo: true,
     style: { width: 400 },
     buttons: btns,
   });
   step.on("show", function() {
-    qv.hideQueryForm();
+    window.qf.hide();
   })
 
 
@@ -265,8 +230,7 @@ requirejs(['jquery',
   tour.addStep('facets', {
     attachTo: "#facets right",
     title: "Faceting Panel",
-    text: "The Facetting panel shows value distributions as histograms for every attribute in the dataset.",
-    showCancelLink: true,
+    text: "The Faceting panel shows value distributions as histograms for every attribute in the dataset.",
     classes: "shepherd-theme-arrows",
     highlight: true,
     buttons: btns,
@@ -277,7 +241,6 @@ requirejs(['jquery',
     attachTo: "#tuples top",
     title: "Faceting Panel",
     text: "<p>Each facet on the left corresponds with one of the columns in the sample records table.</p>",
-    showCancelLink: true,
     classes: "shepherd-theme-arrows",
     highlight: false,
     buttons: btns,
@@ -298,9 +261,7 @@ requirejs(['jquery',
   step = tour.addStep('cstat-label', {
     attachTo: "#cstat-day .cstat-label right",
     title: "Attribute info",
-    text: "<p>For example, this <b>day</b> attribute corresponds with the <b>day</b> column in the sample table on the right.</p>"+
-          "<p>The small <span class='btn btn-xs' style='font-size: smaller; color: black; background: whitesmoke; border: 1px solid white; border-radius: 4px; cursor: pointer; min-width: 50px;'>num</span> label below is the data type, so we know this attribute is a number and not a timestamp.</p>",
-    showCancelLink: true,
+    text: $("#cstat-label-template").html(),
     classes: "shepherd-theme-arrows",
     highlight: true,
     buttons: btns,
@@ -318,9 +279,9 @@ requirejs(['jquery',
   tour.addStep('cstat-plot', {
     attachTo: "#cstat-day .cstat-plot right",
     title: "Faceting Distribution",
-    text: "This is the distribution of values in the <b>day</b> attribute.  The y-axis shows the count of records within a particular value range.</p>"+
-          "<p>You can use this to filter the visualization.</p>",
-    showCancelLink: true,
+    text: "This is the distribution of values in the <b style='font-family:arial'>day</b> attribute."+
+          "The y-axis shows the count of records within a particular value range.</p>"+
+          "<p>We will show you how to use this to filter the visualization.</p>",
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '-10px 0px' },
     style: { width: 400 },
@@ -332,9 +293,7 @@ requirejs(['jquery',
   step = tour.addStep('dist-select', {
     attachTo: "#cstat-day .cstat-plot .xaxis right",
     title: "Zoomable and Pannable Axes",
-    text: "<p>You can use the axes to zoom and scroll.</p>  "+
-          "<p>Hover over the x-axis and scroll-up using your mouse wheel or touch pad.</p>",
-    showCancelLink: true,
+    text: $("#dist-select").html(),
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '0px -5px' },
     style: { width: 400 },
@@ -358,9 +317,8 @@ requirejs(['jquery',
   step = tour.addStep('dist-filter', {
     attachTo: "#cstat-day .cstat-plot .plot-background right",
     title: "Filtering",
-    text: "<p>You can also select portions of this distribution to filter the query.</p>"+
+    text: "<p>You can also select subsets of this distribution to filter the query.</p>"+
           "<p>Click Next to see an example</p>",
-    showCancelLink: true,
     classes: "shepherd-theme-arrows",
     //tetherOptions: { offset: '-28px 0px' },
     tetherOptions: { offset: '0px -10px' },
@@ -377,45 +335,51 @@ requirejs(['jquery',
   step = tour.addStep('dist-filter-2', {
     attachTo: "#cstat-day .cstat-plot .plot-background right",
     title: "Filtering (example)",
-    text: "<p>This selects records from day <i>0</i> to <i>3</i></p>"+
-          "<p>Notice it changes the subset of data shown in the visualization on the right.</p>"+
-          "<p>You can resize and drag the selection around.  Clicking outside of it will clear the filter.</p>"+
-          "<p>Go ahead and give it a try</p>",
-    showCancelLink: true,
+    text: $("#dist-filter-2").html(),
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '-20px -10px' },
-    style: { width: '400px'},
+    style: { width: 500},
     highlight: true,
     buttons: btns,
   });
   step.on('show', function() {
-    where.setSelection( [ {col:'day', type:'num', vals: [0, 3.5]}])
+    where.setSelection( [ {col:'day', type:'num', vals: [0.5, 3.5]}])
   })
   step.on('hide', function() {
     $("#cstat-day .cstat-plot .plot-background").attr("stroke", "none");
   })
 
   step = tour.addStep('dist-filter-3', {
-    attachTo: "#where right",
+    attachTo: "#queryview-container left",
     title: "Filtering (example)",
-    text: "<p>The filters that you add are also listed textually.</p>",
-    showCancelLink: true,
+    text: $("#dist-filter-3").html(),
     classes: "shepherd-theme-arrows",
-    //tetherOptions: { offset: '-28px 0px' },
-    tetherOptions: { offset: '0px -10px' },
+    style: { width: 400},
+    tetherOptions: {
+      attachment: 'top right',
+      targetAttachment: 'top left',
+      offset: '10px 10px'
+    },
+    highlight: true,
+    buttons: btns,
+  });
+
+  step = tour.addStep('dist-filter-4', {
+    attachTo: "#where-container right",
+    title: "Filtering (example)",
+    text: $("#dist-filter-4").html(),
+    classes: "shepherd-theme-arrows",
     style: { width: '400px'},
     highlight: true,
     buttons: btns,
   });
 
 
-
   tour.addStep('facets-2', {
     attachTo: "#facets right",
     title: "Filtering (conjunctions)",
-    text: "<p>If you filter multiple attributes, it will use the conjunction (AND) of your selections.</p>" +
-          "<p>Try clicking and dragging on some of the other attributes to the left.  Click Next when you are done.</p>",
-    showCancelLink: true,
+    text: "<p>If you filter multiple attributes, it will use the conjunction (logical AND) of your selections.</p>" +
+          "<p>Try clicking and dragging on some of the other attributes to the left.</p>",
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '-28px 0px' },
     buttons: btns,
@@ -426,12 +390,7 @@ requirejs(['jquery',
   tour.addStep('seltype', {
     attachTo: "#selection-type",
     title: "Filtering (<b style='color:rgb(26, 189, 64); '>select</b> vs <b style='color:#D46F6F;'>remove</b>)",
-    text: "<p>So far, the facets <b style='color: rgb(26, 189, 64)'>select</b> subsets of data that match your filters. </p>"+
-          "<p>Sometimes it helps to see what happens if the data you selected were <i>removed</i></p>"+
-          "<p>Toggle this switch to show data that <i>doesn't</i> match the filter.</p>"+
-          "<p>Click on the green <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> "+
-          "switch to the left.</p>",
-    showCancelLink: true,
+    text: $("#seltype").html(),
     classes: "shepherd-theme-arrows",
     tetherOptions: {
       attachment: 'top right',
@@ -446,15 +405,7 @@ requirejs(['jquery',
   step = tour.addStep('selapply', {
     attachTo: "#apply-btn right",
     title: "Updating the Facets",
-    text: "<p>The distributions in the facets are can be expensive to recompute, so we only recompute it for a new query.</p>"+
-          "<p>You can apply your current "+
-          "<span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span>"+
-          " or "+
-          "<span style='font-family: arial; font-weight: bold;'><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b></span>"+
-          "filters by pressing the button to the left.  This will copy the "+
-          "<span style='background: grey; color: white; border-radius: 5px; padding-left: 1em; padding-right: 1em;'>filters</span> into the WHERE clauses in the Query Form.</p>"+
-          "<p>Go ahead and click it!</p>",
-    showCancelLink: true,
+    text: $("#selapply").html(),
     classes: "shepherd-theme-arrows",
     tetherOptions: {
       attachment: 'top left',
@@ -465,17 +416,25 @@ requirejs(['jquery',
     buttons: btns,
     style: { width: 500 },
   });
+
+  step = tour.addStep('selapply-2', {
+    attachTo: "#where-container right",
+    title: "Updating the Facets",
+    text: $("#selapply-2").html(),
+    classes: "shepherd-theme-arrows",
+    tetherOptions: { offset: '0px 10px' },
+    buttons: btns,
+    style: { width: "400px" }
+  });
   step.on('hide', function() {
-    qv.showQueryForm();
+    window.qf.show();
   });
 
-  step = tour.addStep('qform-2', {
+
+  step = tour.addStep('selapply-3', {
     attachTo: "#q input[name=q-where]:first left",
     title: "Updating the Facets",
-    text: "<p>Scorpion added your <span style='background: grey; color: white; border-radius: 5px; padding-left: 1em; padding-right: 1em;'>filters</span> to the WHERE clause of the query and re-submitted the query.</p>"+
-          "<p>Scorpion is also recomputing the facet distributions based on the records that match the WHERE clause <small>(which may take some time)</small></p>"+
-          "<p>You can always directly edit this field in addition to clicking on <span class='btn btn-primary btn-xs' style='font-size:9pt'>Add Filters to Query</span>.</p>",
-    showCancelLink: true,
+    text: $("#selapply-3").html(),
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '0px 10px' },
     buttons: btns,
@@ -497,10 +456,8 @@ requirejs(['jquery',
     text: "<p>We've just walked through the main components of the basic interface!</p>"+
           "<p>We will ask you to use this tool to analyze a few datasets</p>"+
           "<p>Click Exit to go back to the directory.</p>",
-    showCancelLink: true,
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },
-    showCancelLink: true,
     buttons: [{
       text: "Exit",
       action: function() {

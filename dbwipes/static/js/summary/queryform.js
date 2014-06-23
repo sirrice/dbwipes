@@ -8,7 +8,6 @@ define(function(require) {
       util = require('summary/util');
 
 
-
   var DBModel = Backbone.Model.extend({
     url: '/api/databases',
     defaults: function() {
@@ -30,9 +29,9 @@ define(function(require) {
       'click .q-where-close': "onWhereClick"
     },
 
-    initialize: function(opts) {
-      //this.dbmodel = new DBModel();
-      //this.listenTo(opts.dbmodel, 'change', this.renderDatabases);
+    initialize: function() {
+      this.$toggle = $("#q-toggle");
+      this.listenTo(this.model, 'change', this.render);
     },
 
     onAggAdd: function() {
@@ -78,9 +77,9 @@ define(function(require) {
       }));
 
       var basewheres = this.$("input[name=q-where]").map(getVal).get();
-      basewheres = [_.compact(basewheres).map(function(w) {
+      basewheres = _.compact(basewheres).map(function(w) {
         return { col: null, type: null, vals: null, sql: w }
-      })];
+      });
 
       var q = {
         db: db,
@@ -104,6 +103,24 @@ define(function(require) {
       el.parent().remove();
       this.model.trigger('change:basewheres');
 
+    },
+
+
+    show: function() {
+      this.$toggle.text("Hide Query Form");
+      this.render().$el.show();
+    },
+
+    hide: function() {
+      this.$toggle.text("Show Query Form");
+      this.render().$el.hide();
+    },
+
+    toggle: function() {
+      if (this.$el.css('display') == 'none') 
+        this.show();
+      else
+        this.hide();
     },
 
     render: function(errText) {

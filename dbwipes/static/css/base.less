@@ -37,32 +37,6 @@ body {
 
 
 
-  #where {
-    margin-top: 2em;
-
-    .clause {
-      list-style-type: none;
-      font-family: arial;
-      padding: 3px;
-      border-radius: 4px;
-      padding-left: 1em;
-      padding-right: 2em;
-      margin-bottom: 2px;
-      max-height: 3em;
-      overflow: hidden;
-
-      button {
-        color: grey;
-        font-weight: bold;
-        cursor: pointer;
-        float: right;
-        margin-right: -1em;
-        opacity: .8;
-      }
-    
-    }
-  }
-
 
   .cstat-label {
     overflow: hidden;
@@ -90,7 +64,7 @@ body {
    }
 
    .count {
-      font-size:smaller;
+      font-size:9px;
     }
  
   .cstat {
@@ -213,12 +187,70 @@ body {
   }
 }
 
-#scorpion-results-container, #scorpion-partialresults-container {
-  height: 300px;
+/*
+  
+*/
+
+#where-container {
+    height: 22em;
+    overflow-y: scroll;
+    padding-left: .5em;
+    border: 1px solid #ddd;
+
+
+  .where {
+    .clause {
+      font-family: "Gill Sans";
+      font-size: 10pt;
+      max-height: 5em;
+      color: black;
+      border-left: 2px solid grey;
+      padding: .5em;
+      padding-left: 1em;
+      padding-top: 1.5em;
+      margin: 0;
+      margin-top: .5em;
+      clear: both;
+      list-style-type: none;
+      position: relative;
+      overflow: hidden;
+      width: 85%;
+
+      button {
+        color: grey;
+        font-weight: bold;
+        cursor: pointer;
+        opacity: .8;
+        top: 0px;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        font-size: 15px;
+      }
+    
+    }
+
+    .temporary {
+      background: rgb(237, 250, 236);
+      border-left: 2px solid rgb(92, 194, 50);
+    }
+
+    .permanent {
+      background: rgb(248, 241, 201);
+      border-left: 2px solid rgb(231, 194, 0);
+    }
+  }
+}
+
+
+
+#all-scorpion-results-container {
+  height: 400px;
   overflow-y: scroll;
   border: 1px solid #ddd;
   padding: 10px;
-
+}
+#scorpion-results-container, #scorpion-partialresults-container {
   > div {
     width: 85%;
   }
@@ -227,11 +259,23 @@ body {
 .scorpion-results {
   padding: 0px;
 
+  .equiv-toggle-container {
+    padding-left: 1em;
+    .equiv-toggle {
+      font-size: 10pt;
+      color: grey;
+      text-align: right;
+    }
+    .equiv-toggle {
+      color: black;
+      cursor: pointer;
+    }
+  }
+
   .scorpion-result {
     .filter-clause {
-      font-family: "Gill Sans";
-      font-size: 12pt;
-      line-height: 15pt;
+      font-family: arial, "Gill Sans";
+      font-size: 10pt;
       color: black;
       clear: both;
       background: steelblue;
@@ -275,7 +319,7 @@ body {
       background: rgb(17, 78, 102);
       color: white;
     }
-    .filter-clause:hover, .equiv-toggle:hover {
+    .filter-clause:hover {
       color: white;
       background: rgb(53, 159, 219);
     }
@@ -290,10 +334,7 @@ body {
       margin-left: 1em;
     }
 
-    .equiv-toggle-container {
-      padding-left: 1em;
-    }
-    .equiv-clause, .equiv-toggle {
+    .equiv-clause {
       font-family: "Gill Sans";
       font-size: 11pt;
       line-height: 13pt;
@@ -308,11 +349,6 @@ body {
       clear: both;
     }
 
-    .equiv-toggle {
-      cursor: pointer;
-      padding: 5px;
-      padding-left: 1em;
-    }
 
 
   } /* /.scorpion-result */
@@ -327,11 +363,11 @@ body {
       color: black;
     }
     
-    .equiv-clause, .equiv-toggle {
+    .equiv-clause {
       background: rgb(123, 128, 133);
     }
       
-    .filter-clause:hover, .equiv-toggle:hover {
+    .filter-clause:hover {
       background: #bfbfbf;
     }
     .filter-clause.locked:hover {

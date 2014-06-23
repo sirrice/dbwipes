@@ -1,6 +1,6 @@
 import sys
 from sqlalchemy import *
-from summary.summary import Summary
+from dbwipes.summary import Summary
 
 
 def get_tables(db):
