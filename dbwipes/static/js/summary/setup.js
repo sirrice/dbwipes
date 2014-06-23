@@ -110,14 +110,15 @@ define(function(require) {
     $("#q-toggle").click(qf.toggle.bind(qf));
 
     where.on('change:selection', function() {
-      var opts = {silent: false};
+      var defaultOpts = {silent: false, clear: true};
       arguments.length && (opts = _.last(arguments))
       opts || (opts = {silent: false});
+      opts = _.extend(defaultOpts, opts);
       console.log(['summary.js', 'where.onselection', opts]);
       if (!opts.silent) {
         if (window.srv) {
-          window.srv.unlockAll();
-          window.psrv.unlockAll();
+          window.srv.unlockAll({clear: false});
+          window.psrv.unlockAll({clear: false});
         }
         qv.renderWhereOverlay(where.toJSON());
       }

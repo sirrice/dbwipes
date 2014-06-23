@@ -79,14 +79,16 @@ define(function(require) {
           .toggleClass("locked", this.state.locked == model);
     },
 
-    unlockAll: function() {
+    unlockAll: function(opts) {
+      opts || (opts = {});
       if (this.state.locked) {
         console.log(['srv.unlockAll'])
         this.$list.find('.filter-clause').removeClass('locked');
         this.state.locked = null;
         this.trigger('modifiedData', null);
         var selection = this.state.where.get('selection');
-        this.state.where.clearScorpionSelections();
+        if (opts.clear)
+          this.state.where.clearScorpionSelections(opts);
       }
       return this;
     },

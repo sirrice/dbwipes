@@ -54,7 +54,7 @@ define(function(require) {
 
     },
 
-    clearScorpionSelections: function() {
+    clearScorpionSelections: function(opts) {
       this.bTriggerModelSelection = false;
       this.each(function(model) {
         if (model.get('scorpion')) {
@@ -62,7 +62,7 @@ define(function(require) {
           model.trigger('clearScorpionSelection');
         }
       });
-      this.trigger('change:selection');
+      this.trigger('change:selection', opts);
       this.bTriggerModelSelection = true;
     },
 
