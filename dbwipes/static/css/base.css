@@ -8,6 +8,9 @@ body {
   margin-right: auto;
   margin-left: auto;
 }
+body .link {
+  cursor: pointer;
+}
 body .row {
   margin-top: .2em;
 }

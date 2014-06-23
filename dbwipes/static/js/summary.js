@@ -32,7 +32,11 @@ requirejs.config({
     'bootstrap': {
       deps: ['jquery'],
       exports: '$'
-    }
+    },
+    'bootstrap-slider': {
+      deps: ['bootstrap'],
+      exports: '$'
+    },
   }
 });
 
@@ -41,10 +45,11 @@ requirejs([
   'jquery', 'd3',
   'summary/util',
   'summary/setup',
-  'bootstrap'
+  'bootstrap',
+  'bootstrap-slider'
   ], function ( $, d3, util, setup) {
 
-  $ = require('bootstrap');
+  $ = require('bootstrap-slider');
 
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);

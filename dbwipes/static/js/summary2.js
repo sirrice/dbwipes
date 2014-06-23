@@ -36,6 +36,10 @@ requirejs.config({
       deps: ['jquery'],
       exports: '$'
     },
+    'bootstrap-slider': {
+      deps: ['bootstrap'],
+      exports: '$'
+    },
     'shepherd': {
       deps: ['jquery', 'tether', 'backbone'],
       exports: 'Shepherd'
@@ -51,10 +55,11 @@ requirejs([
   'summary/setup',
   'underscore',
   'shepherd',
-  'bootstrap'
+  'bootstrap',
+  'bootstrap-slider'
   ], function ($, d3, util, TaskView, setup,  _, Shepherd) {
 
-  $ = require('bootstrap');
+  $ = require('bootstrap-slider');,
 
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);

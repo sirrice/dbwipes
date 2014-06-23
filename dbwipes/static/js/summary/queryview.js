@@ -248,16 +248,18 @@ define(function(require) {
       // relying on setupScales/renderAxes is too extreme because
       // it computes the union of all domains seen so far
       if (this.yzoom) {
-        var ydomain = this.state.yscales.domain(); //this.state.ydomain;
         if (data) {
+          var ydomain = this.state.yscales.domain(); //this.state.ydomain;
           ydomain = util.getYDomain(data, this.model.get('ys'))
             console.log(ydomain);
           ydomain = util.mergeDomain(this.state.yscales.domain(), ydomain, 'num')
             console.log(ydomain)
+        } else {
+          var ydomain = this.state.ydomain;
         }
         this.yzoom.y(this.state.yscales.domain(ydomain));
         this.yzoom.event(this.c);
-      } 
+      }
       if (this.state.yaxis)
         this.c.select('.yaxis').call(this.state.yaxis);
 

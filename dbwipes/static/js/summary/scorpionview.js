@@ -56,12 +56,6 @@ define(function(require) {
       //
       // ewu: I'm sorry for this ghetto hack to make sliders work
       //
-      $("#scorpion-showbest")
-        .off("click")
-        .click(function() {
-          _this.model.get('results').reset(_this.model.get('_results'));
-        });
-
       var c_vals = _.chain(resp.get('top_k_results'))
         .keys()
         .map(function(v) { return +v; })
@@ -75,6 +69,7 @@ define(function(require) {
       }
       var slider = $("#scorpion-slider");
       var prev_c = null;
+
       slider.slider({
           min: d3.min(c_vals),
           max: d3.max(c_vals),
@@ -90,6 +85,15 @@ define(function(require) {
           _this.model.get('results').reset(results);
           prev_c = c;
         });
+
+      $("#scorpion-showbest")
+        .off("click")
+        .click(function() {
+          _this.model.get('results').reset(_this.model.get('_results'));
+        });
+      //
+      // ewu: end ghetto hack
+      //
 
       if (resp.get('errmsg')) {
         this.$("#errmsg").text(resp.errormsg);

@@ -32,6 +32,10 @@ requirejs.config({
     'handlebars': {
       exports: 'Handlebars'
     },
+    'bootstrap-slider': {
+      deps: ['bootstrap'],
+      exports: '$'
+    },
     'bootstrap': {
       deps: ['jquery'],
       exports: '$'
@@ -50,10 +54,11 @@ requirejs(['jquery',
            'summary/setup',
            'underscore',
            'shepherd',
-           'bootstrap'
+           'bootstrap',
+           'bootstrap-slider'
   ], function ($, d3, util, setup, _, Shepherd) {
 
-  $ = require('bootstrap');
+  $ = require('bootstrap-slider');
 
 
 
