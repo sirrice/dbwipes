@@ -4,21 +4,24 @@
 <div class="walkthrough row" >
 	<div class="col-md-12">
     <h4>
-      <h4 id="selectionmsg">
-        Scorpion Query <small>selected <span class="badge">{{nselected}}</span> </small>
+      <h4> 
+        Scorpion Query 
         <button type="button" class="close pull-right" aria-hidden="true">&times;</button>
       </h4>
     </h4>
 
     <fieldset>
+        <small id="selectionmsg">The <span class="badge">{{nselected}}</span> selected results are </small>
 
       <div class="row">
         <div class="col-sm-10">
           <span id="addbad" class="form-control btn btn-danger" style='position: relative' >
-            Add bad examples <span class="badge pull-right" style="position: absolute; top: .5em; right: 1em;">{{nbad}}</span>
+            examples of outlier values
+            <span class="badge pull-right" style="position: absolute; top: .5em; right: 1em;">{{nbad}}</span>
           </span>
           <span id="addgood" class="form-control btn btn-success" style="position: relative;">
-            Add good examples <span class="badge pull-right" style="position: absolute; top: .5em; right: 1em;">{{ngood}}</span>
+            examples of normal values 
+            <span class="badge pull-right" style="position: absolute; top: .5em; right: 1em;">{{ngood}}</span>
           </span>
         </div>
         <div class="col-sm-2" style="padding-left: 0px">
@@ -34,7 +37,7 @@
       <div class="row">
         <div class="col-sm-12">
           <span id="draw" class="form-control btn btn-default" >
-            click to draw expected values for selected results
+            click to draw expected values for outliers
           </span>
         </div>
       </div>

@@ -60,25 +60,27 @@ for date in range(10):
       amtcenter = 100
       amtstd = 5
 
+      if state == 'CA':
+        numcenter *= 0.5 * date
+
+
       state2gender['PA'] = 0.2
+      state2gender['CA'] = 0.80
 
       nsales = max(0, int(random.gauss(numcenter, numstd)))
       agelist = np.random.choice(ages, nsales, p=state2ages[state])
       for i, age in enumerate(agelist):
         damtcenter = damtstd = 0
-        nloops = 1
         male = random.random() < state2gender[state]
         gender = (male and 'Male' or 'Female')
 
-        if state == 'CA' and gender == 'Male':
-          nloops = date * 2 
-        if state == 'PA' and gender == 'Female':
-          damtcenter += 15 * date
+        if state == 'PA' and gender == 'Female' and date >= 3:
+          damtcenter += 25 * date
+          damtstd = -amtstd
 
-        for j in xrange(nloops):
-          amt = max(0, random.gauss(amtcenter + damtcenter, amtstd+damtstd))
-          #if state in ['CA', 'PA', 'OH']:
-          print "%d,%s,%s,%s,%.2f" % (date, state, age, gender, amt)
+        amt = max(0, random.gauss(amtcenter + damtcenter, amtstd+damtstd))
+        #if state in ['CA', 'PA', 'OH']:
+        print "%d,%s,%s,%s,%.2f" % (date, state, age, gender, amt)
 
 
     #

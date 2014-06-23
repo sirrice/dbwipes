@@ -104,7 +104,7 @@ requirejs([
     }),
     new TaskView({
       text: "<p>Which gender has higher total sum of sales on day 9?</p>",
-      options: [ 'Male', 'Female', 'They are roughly equal'],
+      options: [ 'Male', 'Female', 'They are equal'],
       truth: 0,
       attachTo: '#tasks'
     }),
@@ -120,12 +120,20 @@ requirejs([
         });
         return matches.length > 0;
       },
+      attachTo: '#tasks'
+    }),
+    new TaskView({
+      text: "<p>What is the average per-day total sales if we ignored California (round to the nearest 10 thousand)?</p>",
+      textbox: true,
+      truth: function(answer) {
+        return Math.abs(+answer - 40000) < 7000;
+      },
       attachTo: '#tasks',
       successText: "One more question!"
     }),
     new TaskView({
       text: "<p>Which gender has a higher number (count) of California sales overall?</p>",
-      options: [ 'Male', 'Female', 'They are roughly equal'],
+      options: [ 'Male', 'Female', 'They are equal'],
       truth: 0,
       attachTo: '#tasks',
       successText: "Nice!  You're all done!"
@@ -144,7 +152,7 @@ requirejs([
         } else {
           tour.show('end');
         }
-      }, 200);
+      }, 2000);
     });
   })
   window.tasks = tasks;
@@ -164,9 +172,9 @@ requirejs([
 
 
   step = tour.addStep('start', {
-    title: "Validation",
-    text: "<p>This is a randomly generated dataset of sales over a 10 day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
-          "<p>We will ask you to answer a few questions about this dataset using the baseline DBWipes tool.</p>"+
+    title: "Validation Tests",
+    text: "<p>This is a randomly generated dataset of sales over a 10-day period.  The attributes in the dataset include the day, the amount spent, and customer age range, gender, and state.</p>"+
+          "<p>We will ask you to answer a few questions about this dataset using DBWipes.</p>"+
           "<p>When you are ready, click Next.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
     style: { width: "500px" },

@@ -95,7 +95,7 @@ def scorpion_run(db, requestdata, requestid):
     start = time.time()
     parallel_debug(
       obj,
-      parallel=True,
+      parallel=False,
       nstds=0,
       errperc=0.001,
       epsilon=0.008,
@@ -116,7 +116,8 @@ def scorpion_run(db, requestdata, requestid):
 
 
     obj.update_status('serializing results')
-    context['results'] = create_scorpion_results(obj)
+    context['results'] = encode_best_rules(obj)
+    context['top_k_results'] = encode_top_k(obj)
 
     obj.update_status('done!')
 
@@ -132,16 +133,36 @@ def scorpion_run(db, requestdata, requestid):
 
   return context
 
-def create_scorpion_results(obj):
+def encode_best_rules(obj):
   """
   Given the resulting rule clusters, package them into renderable
   JSON objects
   """
   from scorpion.learners.cn2sd.rule import rule_to_json
   results = []
-  nrules = 6 
   for yalias, rules in obj.rules.items():
     for rule in rules:
       result = rule_to_json(rule, yalias=yalias)
       results.append(result)
   return results
+
+def encode_top_k(obj):
+  """
+  extract the top_k per c_value and encode as a dictionary:
+  {
+    c_val: [json_rules in descending influence order]
+  }
+  """
+  from scorpion.learners.cn2sd.rule import rule_to_json
+  results = [] #defaultdict(lambda: defaultdict(list))
+  for yalias, top_k_rules in obj.top_k_rules.items():
+    for c_val, rules in top_k_rules.iteritems():
+      for rule in rules:
+        rule.c_range = [c_val, c_val]
+        result = rule_to_json(rule, yalias=yalias)
+        result['c'] = round(c_val, 3)
+        results.append(result)
+        #results[yalias][c_val].append(result)
+  return results
+
+

@@ -159,8 +159,7 @@ define(function(require) {
     });
     $("#scorpion-results-container").append(srv.render().el);
     $("#scorpion-partialresults-container").append(psrv.render().el);
-
-
+    
 
     sq = new ScorpionQuery({
       query: q, 

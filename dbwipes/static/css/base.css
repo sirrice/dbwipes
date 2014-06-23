@@ -153,7 +153,7 @@ body table.tuples tr th {
   
 */
 #where-container {
-  height: 22em;
+  height: 20em;
   overflow-y: scroll;
   padding-left: .5em;
   border: 1px solid #ddd;
@@ -308,7 +308,7 @@ body table.tuples tr th {
   z-index: 100;
 }
 #walkthrough-container .walkthrough {
-  width: 40%;
+  width: 500px;
   position: fixed;
   left: -10px;
   background: white;

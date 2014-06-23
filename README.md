@@ -1,16 +1,29 @@
-summary
+DBWipes
 =======
 
-show summaries of a database
+Interactive browsing of a database + integration with Scorpion (if scorpion is installed).
 
 
-Setup
+## Pre-install instructions
 
-    pip install -e .                  # install scorpion
-    sudo apt-get install postgresql   # install postgresql 9
+    sudo apt-get install postgresql   # install postgresql 9+
     # set postgresql to accept localhost:5432 connections 
     createdb status
     createdb cache
+
+## INSTALL
+
+Manual install
+
+    python setup.py install
+
+
+PyPi install
+
+    pip install dbwipes
+
+
+## Usage
 
 DBSetup -- pre-compute attribute value distributions
 

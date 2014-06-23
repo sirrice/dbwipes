@@ -39,6 +39,7 @@ define(function(require) {
     },
 
     onResult: function(resp) {
+      var _this = this;
       $("#scorpion-wait").hide();
       if (this.statusview) {
         this.statusview.state.running = false;
@@ -51,7 +52,46 @@ define(function(require) {
       $("#scorpion-results-container").fadeIn(500);
       this.model.get('partialresults').reset();
 
-      if (resp.errmsg) {
+
+      //
+      // ewu: I'm sorry for this ghetto hack to make sliders work
+      //
+      $("#scorpion-showbest")
+        .off("click")
+        .click(function() {
+          _this.model.get('results').reset(_this.model.get('_results'));
+        });
+
+      var c_vals = _.chain(resp.get('top_k_results'))
+        .keys()
+        .map(function(v) { return +v; })
+        .sortBy()
+        .value()
+      var nearest_c = function(v) {
+        var cs = _.filter(c_vals, function(c) { return c <= v; });
+        var c = _.last(cs);
+        console.log(['nearestc', v, c])
+        return c;
+      }
+      var slider = $("#scorpion-slider");
+      var prev_c = null;
+      slider.slider({
+          min: d3.min(c_vals),
+          max: d3.max(c_vals),
+          step: (d3.max(c_vals) - d3.min(c_vals)) / 100.0,
+          formater: function(v) {
+            return ""+nearest_c(v);
+          } 
+        })
+        .on("slide", function() {
+          var c = nearest_c(+slider.slider('getValue'));
+          if (c == prev_c) return;
+          var results = resp.get('top_k_results')[c];
+          _this.model.get('results').reset(results);
+          prev_c = c;
+        });
+
+      if (resp.get('errmsg')) {
         this.$("#errmsg").text(resp.errormsg);
       } else {
         this.$el.fadeOut();
@@ -78,9 +118,12 @@ define(function(require) {
       ignore_cols = _.compact(ignore_cols);
       this.model.set('ignore_cols', ignore_cols);
 
+      $("#scorpion-wait").show();
+      try { $("#scorpion-slider").slider('destroy'); } catch(e) {}
+      $("#scorpion-slider").hide();
+
       $.get('/api/requestid', function(resp) {
         var requestid = resp.requestid;
-        var wait = $("#scorpion-wait").show();
         _this.model.fetch({
           data: {
             fake: util.debugMode(),

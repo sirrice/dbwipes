@@ -59,7 +59,7 @@ define(function(require) {
         c_range: this.get('c_range').join(' - '),
         yalias: this.get('yalias')
       };
-      console.log(json)
+      //console.log(json)
       return json;
     },
 

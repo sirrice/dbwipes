@@ -22,7 +22,9 @@ define(function(require) {
         ignore_cols: [],
         query: null,
         drawing: null,
-        results: new ScorpionResults()
+        results: new ScorpionResults(),
+        _results: [],
+        top_k_results: {}  // c_val -> list of rules
       }
     },
 
@@ -108,7 +110,12 @@ define(function(require) {
 
     parse: function(resp) {
       //
-      // [ { score:, c_range:, clauses:, alt_clauses:, } ]
+      // results: [ { score:, c_range:, clauses:, alt_clauses:, } ]
+      // top_k_results: { 
+      //  yalias: { 
+      //    c_val: [ { score:, c_range:, clauses: } ] 
+      //   } 
+      // }
       //
       console.log("scorpionquery got response");
       console.log(resp);
@@ -122,7 +129,19 @@ define(function(require) {
         });
 
         results.reset(newresults);
+        resp._results = newresults;
         resp.results = results;
+      }
+      if (resp.top_k_results) {
+        var top_k = {};
+        _.each(resp.top_k_results, function(r) {
+          var c = r.c;
+          if (!top_k[c]) top_k[c] = [];
+          r.query = q;
+          r = new ScorpionResult(r);
+          top_k[c].push(r);
+        });
+        resp.top_k_results = top_k;
       }
       console.log("scorpionquery parsed true response")
       return resp;

@@ -1,0 +1,158 @@
+{% extends "index_base.html" %}
+
+{% block includes %}
+<style>
+  .orange {
+    color:#ff7f0e; font-family: arial; font-weight: bold;
+  }
+  .blue {
+    color:#1f77b4; font-family: arial; font-weight: bold;
+  }
+  .grey {
+    color:grey; font-family: arial; font-weight: bold;
+  }
+  .green {
+    color:rgb(92, 194, 50); font-family: arial; font-weight: bold;
+  }
+  .orange {
+    color:rgb(231, 194, 0); font-family: arial; font-weight: bold;
+    color:#ff7f0e;
+  }
+  .greenwhere {
+    font-family: "Gill Sans";
+    font-size: 9pt;
+    color: black;
+    background: rgb(237, 250, 236);
+    border-left: 2px solid rgb(92, 194, 50);
+    padding-left: .5em;
+    padding-right: .5em;
+
+  } 
+
+  .orangewhere {
+    font-family: "Gill Sans";
+    font-size: 9pt;
+    color: black;
+    background: rgb(248, 241, 201);
+    border-left: 2px solid rgb(231, 194, 0);
+    padding-left: .5em;
+    padding-right: .5em;
+
+  } 
+
+  small {
+    font-size: 8pt;
+    color: grey;
+  }
+
+  .smalllabel {
+    font-size: smaller; 
+    background: whitesmoke; 
+    border: 1px solid white; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    min-width: 50px;
+  }
+</style>
+
+{%raw%}
+
+
+<script id="start" type="text/x-underscore-template">
+<p>
+  This tutorial will introduce you to an extension
+  to DBWipes called <b class='orange'>Scorpion</b>.
+</p>
+<p>
+  You can ask Scorpion questions about anomalous query result values
+  and it will suggest relevant filters.  It will automatically
+  search through combinations of the attribute values so you don't have to!
+</p>
+<p>
+  We will use the same randomly generated sales data 
+  as the previous tutorial.  When you are ready, click Next.</p>
+</script>
+
+<script id="sq-submit" type="text/x-underscore-template">
+<p>Great!  That's all Scorpion needs from you!  Now click
+<span class='btn btn-primary btn-xs'>Run Scorpion!</span>
+</p>
+</p>
+<p>
+ <blockquote id='sq-helptext'>
+   <p>When you click submit, Scorpion will look for subsets of the records that can be removed to:
+     <ol><li>Drive the bad points you selected as far in the direction of the normal examples as possible.</li>
+     <li>Minimize the number of records that need to be removed.</li>
+     <li>Minimize how much the normal examples change.</li></ol></p>
+   <p>Scorpion tries to describe the subsets of records as WHERE clause filtering rules, the same as the ones you create when using the Facets.</p>
+ </blockquote>
+</p>
+</script>
+
+
+
+<script id="psrs" type="text/x-underscore-template">
+<p>
+  While Scorpion runs, this section lists the best result 
+  filters found in the search so far.</p>
+<p>
+  Hover over a result to filter the dataset.  
+  This is the same as manually filtering the data using the Facets.</p>
+<p>
+  When Scorpion is done, the results will turn
+  <span class='blue'>blue</span> and the Next button will be enabled.
+  Until then, hover over the results
+  <small>(the list may change at any time.</small>
+</p>
+<p class='bg-info' id='psrs-info' style='display: none;'>
+  Scorpion has finished, click Next to continue!
+</p>
+</script>
+
+<script id="srs-1" type="text/x-underscore-template">
+<p>
+  This is the list of final scorpion results ordered 
+  from the biggest overall impact on the bad examples 
+  but may require removing many records, to those that 
+  have the most impact <i>per removed record.</i></p>
+<p>
+  In addition to the Male Californians from the previous 
+  verification test, there are several other types of shoppers 
+  that are responsible for the increasing purchases to varying degrees.</p>
+<p>
+  It can be jarring to see the display jump to the 
+  base query when you hover on and off of results. 
+  Click on a result to lock it so that the filters will 
+  not reset when your cursor moves away from the result. 
+  You can lock a result, then scroll the page or hover over 
+  another result for compare against it.</p>
+<p>Click on a result to turn it black and lock it in place.</p>
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+{%endraw%}
+
+{% endblock %}
