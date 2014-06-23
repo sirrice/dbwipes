@@ -56,41 +56,43 @@ define(function(require) {
       //
       // ewu: I'm sorry for this ghetto hack to make sliders work
       //
-      var c_vals = _.chain(resp.get('top_k_results'))
-        .keys()
-        .map(function(v) { return +v; })
-        .sortBy()
-        .value()
-      var nearest_c = function(v) {
-        var cs = _.filter(c_vals, function(c) { return c <= v; });
-        var c = _.last(cs);
-        console.log(['nearestc', v, c])
-        return c;
+      var top_k_results = resp.get('top_k_results');
+      if (top_k_results && _.size(top_k_results)) {
+        var c_vals = _.chain(top_k_results)
+          .keys()
+          .map(function(v) { return +v; })
+          .sortBy()
+          .value()
+        var nearest_c = function(v) {
+          var cs = _.filter(c_vals, function(c) { return c <= v; });
+          var c = _.last(cs);
+          console.log(['nearestc', v, c])
+          return c;
+        }
+        var slider = $("#scorpion-slider");
+        var prev_c = null;
+
+        slider.slider({
+            min: d3.min(c_vals),
+            max: d3.max(c_vals),
+            step: (d3.max(c_vals) - d3.min(c_vals)) / 100.0,
+            formater: function(v) {
+              return ""+nearest_c(v);
+            } 
+          })
+          .on("slide", function() {
+            var c = nearest_c(+slider.slider('getValue'));
+            if (c == prev_c) return;
+            _this.model.get('results').reset(top_k_results[c]);
+            prev_c = c;
+          });
+
+        $("#scorpion-showbest")
+          .off("click")
+          .click(function() {
+            _this.model.get('results').reset(_this.model.get('_results'));
+          });
       }
-      var slider = $("#scorpion-slider");
-      var prev_c = null;
-
-      slider.slider({
-          min: d3.min(c_vals),
-          max: d3.max(c_vals),
-          step: (d3.max(c_vals) - d3.min(c_vals)) / 100.0,
-          formater: function(v) {
-            return ""+nearest_c(v);
-          } 
-        })
-        .on("slide", function() {
-          var c = nearest_c(+slider.slider('getValue'));
-          if (c == prev_c) return;
-          var results = resp.get('top_k_results')[c];
-          _this.model.get('results').reset(results);
-          prev_c = c;
-        });
-
-      $("#scorpion-showbest")
-        .off("click")
-        .click(function() {
-          _this.model.get('results').reset(_this.model.get('_results'));
-        });
       //
       // ewu: end ghetto hack
       //
