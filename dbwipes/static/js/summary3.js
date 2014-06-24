@@ -112,7 +112,7 @@ requirejs(['jquery',
   var addStep = (function(tour) {
     var defaults = {
       title: "",
-      text: "",
+      text: null,
       highlight: true,
       buttons: btns,
       classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
@@ -120,6 +120,7 @@ requirejs(['jquery',
     }
     return function(name, opts) {
       opts = _.extend(_.clone(defaults), opts)
+      opts.text || (opts.text = $("#"+name).html());
       return tour.addStep(name, opts);
     };
   })(tour);
@@ -150,7 +151,7 @@ requirejs(['jquery',
     }, {
       text: "Next",
       action: function() {
-        qv.gbrush.call(qv.d3brush.extent([[5.3, 58000], [9.5, 75000]]))
+        qv.gbrush.call(qv.d3brush.extent([[5.3, 60000], [9.5, 81000]]))
         qv.d3brush.event(qv.gbrush);
         _.delay(tour.show.bind(tour), 50, 'sq');
       }
@@ -178,9 +179,20 @@ requirejs(['jquery',
     text: "<p>This button will add your selected points as examples of results whose values are wrong (either too high or too low)</p>" +
           "<p>Since we are interested in why the sales have gone up, click on <span class='btn btn-danger btn-xs'>examples of outlier values</span></p>",
     attachTo: "div.walkthrough #addbad right",
-    advanceOn: "#addbad click",
+    //advanceOn: "#addbad click",
     buttons: backbtn
   });
+  step.on("show", (function(step) {
+    return function() {
+      $("#addbad").click(function() {
+        $(step.el).find(".next-btn")
+          .removeClass('disabled')
+          .click(tour.next.bind(tour));
+      });
+    }
+  })(step));
+
+
 
   step = addStep('sq-brush', {
     title: "Scorpion Query",
@@ -276,7 +288,7 @@ requirejs(['jquery',
       action: tour.back
     }, {
       text: "Next",
-      class: "shepherd-button-secondary psrs-next-btn",
+      classes: "disabled next-btn",
       action: function() {
         if (window.scorpionReturned) {
           tour.show('srs-1');
@@ -285,12 +297,17 @@ requirejs(['jquery',
     }] 
   });
 
-  window.sqv.on('scorpionquery:done', function() {
-    window.sqv.off('scorpionquery:done');
-    window.scorpionReturned = true;
-    $("#psrs-info").show();
-    $(".psrs-next-btn").removeClass("shepherd-button-secondary").addClass('shepherd-button');
-  });
+  (function(step) {
+    window.sqv.on('scorpionquery:done', function() {
+      window.sqv.off('scorpionquery:done');
+      window.scorpionReturned = true;
+      $("#psrs-info").show();
+      $(step.el).find('.next-btn')
+        .removeClass("disabled")  
+        .click(tour.next.bind(tour));
+    });
+  })(step);
+
 
   var scorpionReturned = false;
   step.on("show", function() {
@@ -300,8 +317,7 @@ requirejs(['jquery',
 
   step = addStep('srs-1', {
     title: "Scorpion Final Results",
-    text: $("#srs-1").html(),
-    attachTo: "#all-scorpion-results-container left",
+    attachTo: "#all-scorpion-results-container right",
     tetherOptions: {
       attachment: 'top left',
       targetAttachment: 'top right',
@@ -309,11 +325,29 @@ requirejs(['jquery',
     }
   });
 
+
+  step = addStep('srs-2', {
+    title: "Varying &lambda;",
+    attachTo: "#slider-container left",
+  });
+
+  step = addStep('srs-3', {
+    title: "Showing Best Overall Filters",
+    attachTo: "#scorpion-showbest top",
+  });
+
+  step = addStep('srs-4', {
+    title: "Locking Result Filters",
+    attachTo: "#all-scorpion-results-container left",
+  });
+
+
+
   step = addStep('srs-remove', {
     title: "How Much Influence?",
     text: "<p>Try switching this to <span style='font-family: arial; font-weight: bold;'><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b></span>.</p>"+
           "<p>Now try hovering over a Scorpion result.   The visualization now shows what would happen if the records matching the result did not exist.  This is a proxy for how much those records <i>influenced</i> the final result.</p>",
-    attachTo: "#selection-type right",
+    attachTo: "#selection-type left",
     tetherOptions: {
       attachment: 'top right',
       targetAttachment: 'top left',
@@ -324,26 +358,51 @@ requirejs(['jquery',
 
   step = addStep('checkboxes', {
     title: "Ignoring Attributes",
-    text: "<p>You can uncheck the checkboxes next to each attribute to remove them from consideration.</p>"+
-          "<p>This is useful if you know that certain attributes are not interesting, or if you want to restrict the results to filters over a small number of attributes.</p>",
     attachTo: ".errcol right",
-    tetherOptions: { 
+    buttons: backbtn,
+    tetherOptions: {
       attachment: 'top right',
-       targetAttachment: 'top left',
-      offset: '19px -10px' 
+      targetAttachment: 'top left',
+      offset: '10px -10px'
     }
   });
   step.on('show', function() {
-      $(".cstat-label .type").css("box-shadow", "rgb(18, 179, 255) 0px 0px 10px 0px");
+    $(".cstat-label .type").css("box-shadow", "rgb(18, 179, 255) 0px 0px 10px 0px");
   });
   step.on('hide', function() {
       $(".cstat-label .type").css("box-shadow", "none");
   });
+  step.on("show", (function(step) {
+    return function() {
+      $("#cstat-age input[type=checkbox]").click(function() {
+        $(step.el).find(".next-btn")
+          .removeClass('disabled')
+          .click(tour.next.bind(tour));
+      });
+    }
+  })(step));
 
+
+
+
+  step = addStep('checkboxes-2', {
+    title: "Ignoring Attributes",
+    attachTo: "#viz left",
+    tetherOptions: {
+      attachment: 'top left',
+      targetAttachment: 'top right',
+      offset: '10px -10px'
+    }
+  });
+
+  step = addStep('checkboxes-3', {
+    title: "Ignoring Attributes",
+    attachTo: "#all-scorpion-results-container right",
+  });
 
   step = addStep('checkboxes-all', {
     title: "Ignoring Attributes",
-    text: "<p>For convenience, you can click this button to uncheck all of the attributes at once.</p>",
+    text: "<p>Finally, you can click this button to uncheck all of the attributes at once.</p>",
     attachTo: "#facet-togglecheckall right",
     tetherOptions: {
       attachment: 'top right',
@@ -351,8 +410,6 @@ requirejs(['jquery',
       offset: '10px -10px'
     }
   });
-
-
 
   step = addStep('end', {
     title: "Done!",
@@ -376,6 +433,7 @@ requirejs(['jquery',
 
 
   tour.start();
+  _.delay(tour.show.bind(tour), 500, ('checkboxes'))
   window.tour = tour;
 
 });

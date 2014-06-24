@@ -29,6 +29,17 @@
 
   } 
 
+  .greywhere {
+    font-family: "Gill Sans";
+    font-size: 9pt;
+    color: black;
+    background: #efefef;
+    border-left: 2px solid grey;
+    padding-left: .5em;
+    padding-right: .5em;
+
+  } 
+
   .orangewhere {
     font-family: "Gill Sans";
     font-size: 9pt;
@@ -139,7 +150,7 @@
 <script id="dist-filter-4" type="text/x-underscore-template">
   <p>
   The filters that are selected in the facets are listed in 
-  <span class='greenwhere'>green</span> boxes.
+  <span class='greywhere'>grey</span> boxes.
   </p>
   <p>You can click on the <b>&times;</b> to remove the filter.</p>
 </script>
@@ -160,17 +171,24 @@
 </script>
 
 
+<script id="seltype-2" type="text/x-underscore-template">
+<p>
+When you set the switch to <span style='font-family: arial; font-weight: bold;'><span style='background:#D95050; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>Remove</b></span>, 
+the <span class='greywhere'>filters</span> are negated to remove those corresponding records from the query.
+</p>
+</script>
+
 
 
 
 <script id="selapply" type="text/x-underscore-template">
 <p>
 The distributions in the facets can be expensive to recompute, 
-so we don't recompute them when you select filters using the Facets.
+so we don't recompute them when the temporary filters change.
 </p>
 <p>
-Add them as permanent filters to recompute the distributions on the filtered
-subset of data.
+Add the temporary filters as permanent filters to recompute the 
+distributions on the filtered subset of data.
 </p>
 <p>
 Now click on
@@ -181,14 +199,13 @@ Now click on
 
 <script id="selapply-2" type="text/x-underscore-template">
 <p>
-Your original <span class='greenwhere'>filters</span> have turned
-<span class='orangewhere'>orange</span>, meaning they are permanent
-parts of the query.
+Your original <span class='greywhere'>temporary filters</span> 
+have moved to the permanent filters section and turned
+<span class='greenwhere'>green</span>, meaning their distributions are
+reflected in the Facets.
 </p>
 <p>
-DBWipes is also recomputing the facet distributions based on 
-the records that match the <span class='orangewhere'>orange</span> WHERE clauses
-<small>(which may take some time.)</small>
+DBWipes is recomputing the facet distributions, which may take some time.
 </p>
 </script>
 
@@ -203,6 +220,17 @@ filter you want to apply.
 </p>
 </script>
 
+
+<script id="tupletoggle" type="text/x-underscore-template">
+<p>
+Click on this button to toggle a table of individual records that match
+the data points shown in the visualization 
+(conjunction of the temporary and permanent filters.)
+</p>
+<p>
+The table is shown below the main visualization.
+</p>
+</script>
 
 
 <script id="" type="text/x-underscore-template">

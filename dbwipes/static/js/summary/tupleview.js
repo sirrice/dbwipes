@@ -117,6 +117,22 @@ define(function(require) {
 
     },
 
+    hide: function() {
+      $("#tuples-toggle").text("Show Tuples");
+      this.$el.hide();
+    },
+    show: function() {
+      $("#tuples-toggle").text("Hide Tuples");
+      this.$el.show();
+    },
+    toggle: function() {
+      if ($(this.$el).css("display") == 'none') {
+        this.show();
+      } else {
+        this.hide();
+      }
+    },
+
     render: function() {
       this.$el.html(this.template(this.model.toDataJSON()));
       return this;

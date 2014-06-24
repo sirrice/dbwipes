@@ -213,6 +213,7 @@ define(function(require) {
       query: q, 
       el: $("#tuples").get()[0]
     });
+    tv.hide();
 
     if (srv) {
       srv.on('setActive', function(whereJSON) {
@@ -229,6 +230,8 @@ define(function(require) {
       tv.model.set('where', wheres);
       tv.model.trigger('change:where');
     });
+
+    $("#tuples-toggle").click(tv.toggle.bind(tv));
     window.tv = tv;
   };
 

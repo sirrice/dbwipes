@@ -1,13 +1,16 @@
 {%raw%}
 <script id="task-template" type="text/x-underscore-template">
   <div class='row'>
-    <div class='col-md-3'>
+    <div class='col-md-4 col-md-offset-1' style='border-right: 1px solid #ddd'>
       {{#if title}}
       <h3>{{title}}</h3>
       {{/if}}
-    </div>
-    <div class='col-md-9'>
       <div>{{{text}}}</div>
+
+      <div class="submit btn btn-primary">Submit</div>
+      <div class="error bs-callout bs-callout-danger" style="display:none"> </div>
+    </div>
+    <div class='col-md-7' >
       {{#each options}}
       <div class="radio">
         <label>
@@ -19,8 +22,6 @@
       {{#if textbox}}
         <input name="text" class="form-control" placeholder="type in the answer"/>
       {{/if}}
-      <div class="submit btn btn-primary">Submit</div>
-      <div class="error bs-callout bs-callout-danger" style="display:none"> </div>
     </div>
   </div>
 </script>

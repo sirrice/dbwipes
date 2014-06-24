@@ -59,7 +59,7 @@ requirejs([
   'bootstrap-slider'
   ], function ($, d3, util, TaskView, setup,  _, Shepherd) {
 
-  $ = require('bootstrap-slider');,
+  $ = require('bootstrap-slider');
 
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
@@ -128,7 +128,7 @@ requirejs([
       attachTo: '#tasks'
     }),
     new TaskView({
-      text: "<p>What is the average per-day total sales if we ignored California (round to the nearest 10 thousand)?</p>",
+      text: "<p>What are the total sales on day 1 if we ignored California sales (round to the nearest 10 thousand)?</p>",
       textbox: true,
       truth: function(answer) {
         return Math.abs(+answer - 40000) < 7000;

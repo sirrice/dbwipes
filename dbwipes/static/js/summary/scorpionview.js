@@ -40,7 +40,7 @@ define(function(require) {
 
     onResult: function(resp) {
       var _this = this;
-      $("#scorpion-wait").hide();
+      $(".scorpion-wait").hide();
       if (this.statusview) {
         this.statusview.state.running = false;
         this.statusview.$el.remove();
@@ -62,22 +62,24 @@ define(function(require) {
           .keys()
           .map(function(v) { return +v; })
           .sortBy()
-          .value()
+          .value();
+        var maxv = d3.max(c_vals),
+            minv = d3.min(c_vals);
         var nearest_c = function(v) {
           var cs = _.filter(c_vals, function(c) { return c <= v; });
           var c = _.last(cs);
-          console.log(['nearestc', v, c])
           return c;
         }
+        $("#slider-container").show();
         var slider = $("#scorpion-slider");
         var prev_c = null;
 
         slider.slider({
-            min: d3.min(c_vals),
-            max: d3.max(c_vals),
-            step: (d3.max(c_vals) - d3.min(c_vals)) / 100.0,
+            min: minv,
+            max: maxv,
+            step: (maxv - minv) / 100.0,
             formater: function(v) {
-              return ""+nearest_c(v);
+              return String(nearest_c(+v));
             } 
           })
           .on("slide", function() {
@@ -124,9 +126,10 @@ define(function(require) {
       ignore_cols = _.compact(ignore_cols);
       this.model.set('ignore_cols', ignore_cols);
 
-      $("#scorpion-wait").show();
+      $(".scorpion-wait").show();
       try { $("#scorpion-slider").slider('destroy'); } catch(e) {}
       $("#scorpion-slider").hide();
+      $("#slider-container").hide();
 
       $.get('/api/requestid', function(resp) {
         var requestid = resp.requestid;

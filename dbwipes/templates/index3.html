@@ -2,6 +2,9 @@
 
 {% block includes %}
 <style>
+  b {
+    font-family: arial;
+  }
   .orange {
     color:#ff7f0e; font-family: arial; font-weight: bold;
   }
@@ -74,17 +77,24 @@
 </script>
 
 <script id="sq-submit" type="text/x-underscore-template">
-<p>Great!  That's all Scorpion needs from you!  Now click
+<p>That's all Scorpion needs from you!  Now click
 <span class='btn btn-primary btn-xs'>Run Scorpion!</span>
 </p>
 </p>
 <p>
  <blockquote id='sq-helptext'>
-   <p>When you click submit, Scorpion will look for subsets of the records that can be removed to:
-     <ol><li>Drive the bad points you selected as far in the direction of the normal examples as possible.</li>
-     <li>Minimize the number of records that need to be removed.</li>
-     <li>Minimize how much the normal examples change.</li></ol></p>
-   <p>Scorpion tries to describe the subsets of records as WHERE clause filtering rules, the same as the ones you create when using the Facets.</p>
+   <p>When you click <span class='btn btn-primary btn-xs'>Run Scorpion!</span>, 
+      Scorpion will look for subsets of the records to remove that will:
+    <ol>
+      <li>drive the bad example values as toward the normal example values as possible.</li>
+      <li>minimize the number of records that need to be removed.</li>
+      <li>minimize how much the normal examples change.</li>
+    </ol>
+   </p>
+   <p>
+    Scorpion describes the subsets of records as filters, 
+    the same as the ones you create when using the Facets.
+   </p>
  </blockquote>
 </p>
 </script>
@@ -93,16 +103,19 @@
 
 <script id="psrs" type="text/x-underscore-template">
 <p>
-  While Scorpion runs, this section lists the best result 
-  filters found in the search so far.</p>
+  This section lists the best filters Scorpion has found
+  so far.  The results while Scorpion runs are 
+  <span class='greywhere'>grey</span> because they 
+  may change when Scorpion finds better results.
+</p>
 <p>
-  Hover over a result to filter the dataset.  
-  This is the same as manually filtering the data using the Facets.</p>
+  The results will turn
+  <span class='blue'>blue</span> and you can click Next when Scorpion
+  is done.
+</p>
 <p>
-  When Scorpion is done, the results will turn
-  <span class='blue'>blue</span> and the Next button will be enabled.
-  Until then, hover over the results
-  <small>(the list may change at any time.</small>
+  Move your mouse over a result to filter the dataset.  
+  This is the same as manually filtering the data using the Facets.
 </p>
 <p class='bg-info' id='psrs-info' style='display: none;'>
   Scorpion has finished, click Next to continue!
@@ -111,32 +124,101 @@
 
 <script id="srs-1" type="text/x-underscore-template">
 <p>
-  This is the list of final scorpion results ordered 
-  from the biggest overall impact on the bad examples 
-  but may require removing many records, to those that 
-  have the most impact <i>per removed record.</i></p>
+  A summary of the top suggested filters are ordered 
+  from the biggest absolute impact on the bad examples 
+  (may require removing many records), to filters that 
+  have the most impact <i>per matched record.</i>
+</p>
 <p>
-  In addition to the Male Californians from the previous 
-  verification test, there are several other types of shoppers 
-  that are responsible for the increasing purchases to varying degrees.</p>
+  For example, in addition to the Male Californians from 
+  the previous verification test, Females from Pennsylvania
+  spend <i>more per purchase</i> but have less absolute impact on the
+  total sales.
+</p>
+</script>
+
+
+<script id="srs-2" type="text/x-underscore-template">
+<p>
+  Scorpion explicitly manages the trade-off between 
+  <i>absolute impact </i> and the <i>biggest impact per record</i>
+  using a parameter &lambda;.  
+</p>
+<p>
+  When the value is small, Scorpion prefers large absolute impact
+  on the bad examples.  When the value is big, Scorpion prefers 
+  the biggest impact per record.
+</p>
+<p>
+  This slider lets you see the top filters for different &lambda;
+  values.  Try it out!
+</p>
+</script>
+
+<script id="srs-3" type="text/x-underscore-template">
+<p>
+  You can see the summarized results by clicking on this button
+</p>
+</script>
+
+
+
+<script id="srs-4" type="text/x-underscore-template">
 <p>
   It can be jarring to see the display jump to the 
-  base query when you hover on and off of results. 
-  Click on a result to lock it so that the filters will 
-  not reset when your cursor moves away from the result. 
-  You can lock a result, then scroll the page or hover over 
-  another result for compare against it.</p>
-<p>Click on a result to turn it black and lock it in place.</p>
+  original query when you hover on and off of results. 
+</p>
+<p>
+  Click on a <span class='bluewhere'>result filter</span> 
+  to prevent DBWipes from rendering the original query
+  when your cursor moves off the result (this <b>locks</b> the result).
+  Click a locked result to unlock it.
+</p>
+<p>
+  When you lock a result, you can hover over
+  another result for compare against it.
+</p>
+<p>
+  Interacting with the Facets or the Temporary filters will
+  automatically unlock the result.
+</p>
+<p>Try clicking on a result.</p>
 </script>
 
-<script id="" type="text/x-underscore-template">
+<script id="checkboxes" type="text/x-underscore-template">
+<p>
+  By default, Scorpion searches through combinations of all 
+  the attributes in the dataset (except for the GROUPBY and SELECT attributes).
+</p>
+<p>
+  You can uncheck the checkboxes next to an attribute to 
+  ignore that attribute from the search. 
+</p>
+<p>
+Let's rerun Scorpion and ignore <b>age</b>.  First uncheck <b>age</b>. 
+</p>
 </script>
 
-<script id="" type="text/x-underscore-template">
+<script id="checkboxes-2" type="text/x-underscore-template">
+<p>
+  Select some of the colored points in the 
+  visualization to show the Scorpion dialog box and click 
+  <span class='btn btn-xs btn-primary'>Run Scorpion!</span>.
+</p>
+<p>
+  The previous Scorpion query inputs are saved so you don't need
+  to set any examples.
+</p>
 </script>
 
-<script id="" type="text/x-underscore-template">
+
+<script id="checkboxes-3" type="text/x-underscore-template">
+<p>
+  The suggested filters don't contain any <b>age</b> attributes in the rules.
+</p>
 </script>
+
+
 
 <script id="" type="text/x-underscore-template">
 </script>

@@ -26,12 +26,10 @@ body #q_loading {
   display: none;
   margin-left: 2em;
 }
-body #facet-togglecheckall {
-  float: right;
-}
 body #footer {
   text-align: center;
-  margin-top: 1em;
+  margin-top: 2em;
+  border-top: 1px solid #ddd;
 }
 body .cstat-label {
   overflow: hidden;
@@ -79,7 +77,8 @@ body .tick text {
   font-size: 10pt;
 }
 body .mark:hover {
-  fill: steelblue;
+  /*fill:steelblue;*/
+
 }
 body circle.selected {
   fill: black;
@@ -93,7 +92,7 @@ body rect.faded {
   fill: whitesmoke;
 }
 body rect.highlighted {
-  fill: red;
+  fill: black;
 }
 body rect.extent {
   fill: grey;
@@ -155,30 +154,30 @@ body table.tuples tr th {
 /*
   
 */
-#where-container {
-  height: 20em;
+.where-container {
+  height: 125px;
   overflow-y: scroll;
   padding-left: .5em;
   border: 1px solid #ddd;
 }
-#where-container .where .clause {
+.where-container .where .clause {
   font-family: "Gill Sans";
   font-size: 10pt;
   max-height: 5em;
   color: black;
   border-left: 2px solid grey;
   padding: .5em;
-  padding-left: 1em;
-  padding-top: 1.5em;
+  padding-left: .5em;
+  padding-top: .2em;
   margin: 0;
-  margin-top: .5em;
+  margin-top: .2em;
   clear: both;
   list-style-type: none;
   position: relative;
   overflow: hidden;
-  width: 85%;
+  width: 90%;
 }
-#where-container .where .clause button {
+.where-container .where .clause button {
   color: grey;
   font-weight: bold;
   cursor: pointer;
@@ -189,23 +188,53 @@ body table.tuples tr th {
   top: 5px;
   font-size: 15px;
 }
-#where-container .where .temporary {
+.where-container .where .temporary {
+  background: #efefef;
+  border-left: 2px solid grey;
+}
+.where-container .where .permanent {
   background: #edfaec;
   border-left: 2px solid #5cc232;
 }
-#where-container .where .permanent {
-  background: #f8f1c9;
-  border-left: 2px solid #e7c200;
+#slider-container {
+  display: none;
+  text-align: center;
+  margin-bottom: .4em;
+}
+#slider-container span.slider-span {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+#slider-container #scorpion-slider {
+  display: none;
+}
+#slider-container span.info {
+  border-bottom: 1px dotted #56aaf7;
+  cursor: pointer;
+}
+#slider-container span.info:hover {
+  background: #efefef;
+  border-bottom: 1px dotted #56aaf7;
+  cursor: pointer;
 }
 #all-scorpion-results-container {
-  height: 400px;
+  height: 300px;
   overflow-y: scroll;
   border: 1px solid #ddd;
   padding: 10px;
 }
+#all-scorpion-results-container::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+#all-scorpion-results-container::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
 #scorpion-results-container > div,
 #scorpion-partialresults-container > div {
-  width: 85%;
+  width: 90%;
 }
 .scorpion-results {
   padding: 0px;
@@ -213,14 +242,13 @@ body table.tuples tr th {
 
 }
 .scorpion-results .equiv-toggle-container {
-  padding-left: 1em;
+  padding-left: 2em;
 }
 .scorpion-results .equiv-toggle-container .equiv-toggle {
   font-size: 10pt;
-  color: grey;
   text-align: right;
-}
-.scorpion-results .equiv-toggle-container .equiv-toggle {
+  padding-right: 1em;
+  background: #e4ebeb;
   color: black;
   cursor: pointer;
 }
@@ -235,13 +263,13 @@ body table.tuples tr th {
   border-left: 2px solid #5bc0de;
   width: 100%;
   padding: .5em;
-  padding-left: 1em;
-  padding-top: 1.5em;
+  padding-left: .5em;
+  padding-top: .2em;
+  margin: 0;
+  margin-top: .2em;
   list-style-type: none;
   cursor: pointer;
   position: relative;
-  margin: 0;
-  margin-top: 1.5em;
 }
 .scorpion-results .scorpion-result .filter-clause .load-text {
   display: none;
@@ -361,13 +389,12 @@ body table.tuples tr th {
 #tasks div.task h3 {
   margin-top: .0em;
 }
-#scorpion-wait {
-  position: absolute;
-  width: 24px;
-  height: 24px;
+.scorpion-wait {
   margin-left: 10px;
+  display: none;
+  color: grey;
 }
-#scorpion-wait .loadingspincircle {
+.scorpion-wait .loadingspincircle {
   width: 24px;
   height: 24px;
   /*
@@ -376,145 +403,22 @@ body table.tuples tr th {
     */
 
 }
-#scorpion-wait .loadingspincircle:before {
+.scorpion-wait .loadingspincircle:before {
   display: block;
   width: 12px;
   height: 12px;
   margin: 4px 4px 0 0;
-  background-color: white;
+  background-color: grey;
   content: "";
   border-radius: 100%;
   animation: spin 4s ease infinite;
   -webkit-animation: spin 4s ease infinite;
-}
-.loading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-}
-.loading i {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  display: block;
-  width: 12px;
-  height: 12px;
-  background: #799ED2;
-  border-radius: 12px;
-  -webkit-animation: spin2 1.5s ease-in-out infinite;
-}
-.loading i:first-child {
-  top: -12px;
-  left: 0;
-  background: #194685;
-  -webkit-animation: spin 1.5s ease-in-out infinite;
-}
-.loading i:last-child {
-  top: 12px;
-  left: -12px;
-  background: #C7202C;
-  -webkit-animation: spin3 1.5s ease-in-out infinite;
-}
-@-webkit-keyframes spin {
-  0% {
-    top: -12px;
-    left: 0;
-    -webkit-transform: scale(1);
-  }
-  17% {
-    -webkit-transform: scale(0.5);
-  }
-  33% {
-    top: 12px;
-    left: 12px;
-    -webkit-transform: scale(1);
-  }
-  50% {
-    -webkit-transform: scale(0.5);
-  }
-  66% {
-    top: 12px;
-    left: -12px;
-    -webkit-transform: scale(1);
-  }
-  83% {
-    -webkit-transform: scale(0.5);
-  }
-  100% {
-    top: -12px;
-    left: 0;
-    -webkit-transform: scale(1);
-  }
-}
-@-webkit-keyframes spin2 {
-  0% {
-    top: 12px;
-    left: 12px;
-    -webkit-transform: scale(1);
-  }
-  17% {
-    -webkit-transform: scale(0.5);
-  }
-  33% {
-    top: 12px;
-    left: -12px;
-    -webkit-transform: scale(1);
-  }
-  50% {
-    -webkit-transform: scale(0.5);
-  }
-  66% {
-    top: -12px;
-    left: 0;
-    -webkit-transform: scale(1);
-  }
-  83% {
-    -webkit-transform: scale(0.5);
-  }
-  100% {
-    top: 12px;
-    left: 12px;
-    -webkit-transform: scale(1);
-  }
-}
-@-webkit-keyframes spin3 {
-  0% {
-    top: 12px;
-    left: -12px;
-    -webkit-transform: scale(1);
-  }
-  17% {
-    -webkit-transform: scale(0.5);
-  }
-  33% {
-    top: -12px;
-    left: 0;
-    -webkit-transform: scale(1);
-  }
-  50% {
-    -webkit-transform: scale(0.5);
-  }
-  66% {
-    top: 12px;
-    left: 12px;
-    -webkit-transform: scale(1);
-  }
-  83% {
-    -webkit-transform: scale(0.5);
-  }
-  100% {
-    top: 12px;
-    left: -12px;
-    -webkit-transform: scale(1);
-  }
+  -moz-animation: spin 4s ease infinite;
 }
 /* Thanks http://proto.io/freebies/onoff/ !! */
 .onoffswitch {
   position: relative;
-  width: 102px;
+  width: 90px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -527,7 +431,7 @@ body table.tuples tr th {
   overflow: hidden;
   cursor: pointer;
   border: 2px solid #FFFFFF;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 .onoffswitch-inner {
   display: block;
@@ -543,10 +447,10 @@ body table.tuples tr th {
   display: block;
   float: left;
   width: 50%;
-  height: 26px;
+  height: 20px;
   padding: 0;
-  line-height: 26px;
-  font-size: 13px;
+  line-height: 20px;
+  font-size: 11px;
   color: white;
   font-family: Trebuchet, Arial, sans-serif;
   font-weight: bold;
@@ -555,27 +459,29 @@ body table.tuples tr th {
   box-sizing: border-box;
 }
 .onoffswitch-inner:before {
-  padding-left: 12px;
-  background-color: #EBEBEB;
+  content: "SELECT";
+  padding-left: 10px;
+  background-color: #EEEEEE;
   color: #000000;
 }
 .onoffswitch-inner:after {
-  padding-right: 12px;
-  background-color: #EBEBEB;
+  content: "REMOVE";
+  padding-right: 10px;
+  background-color: #EEEEEE;
   color: #000000;
   text-align: right;
 }
 .onoffswitch-switch {
   display: block;
-  width: 26px;
-  margin: 0px;
-  background: #D46F6F;
+  width: 16px;
+  margin: 1px;
+  background: #D95050;
   border: 2px solid #FFFFFF;
-  border-radius: 5px;
+  border-radius: 4px;
   position: absolute;
   top: 0;
   bottom: 0;
-  right: 72px;
+  right: 68px;
   -moz-transition: all 0.3s ease-in 0s;
   -webkit-transition: all 0.3s ease-in 0s;
   -o-transition: all 0.3s ease-in 0s;
@@ -589,10 +495,10 @@ body table.tuples tr th {
   background-color: #6ADE85;
 }
 #selection-type .onoffswitch-inner:before {
-  content: "Select";
+  content: "SELECT";
 }
 #selection-type .onoffswitch-inner:after {
-  content: "Remove";
+  content: "REMOVE";
 }
 #fake-type .onoffswitch-inner:before {
   content: "Real";

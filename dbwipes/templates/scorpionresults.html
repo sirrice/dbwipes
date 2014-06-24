@@ -3,11 +3,17 @@
 <div class='row'>
   <div class="col-md-12 scorpion-result">
     <ul class="filter-clause">
-      <span class="info">
-        <span class="count">{{count}}</span>
-        <span class="score">{{score}}</span>
-        <span class="crange">{{c_range}}</span>
-      </span>
+{%endraw%}
+{% if debug %}
+{%raw%}
+        <span class="info">
+          <span class="count">{{count}}</span>
+          <span class="score">{{score}}</span>
+          <span class="crange">{{c_range}}</span>
+        </span>
+{%endraw%}
+{% endif %}
+{%raw%}
       {{#each clauses}}
         <li class='clause-part'>{{this}}</li>
       {{/each}}

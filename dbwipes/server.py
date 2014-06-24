@@ -133,7 +133,8 @@ def index_idx(idx):
     'enableScorpion': enable_scorpion,
     'jsidx': jsidx,
     'title': title,
-    'subtitle': subtitle
+    'subtitle': subtitle,
+    'debug': False
   }
   print context
 
@@ -442,14 +443,76 @@ def scorpion():
     }
   ]
 
+  top_k = [
+    {
+      'c': 0,
+      'score': 0.2,
+      'c_range': [0, 0],
+      'count': 100,
+      'clauses': [
+        {'col': 'sensor', 'type': 'str', 'vals': map(str, [18])}
+      ]
+    },
+    {
+      'c': 0,
+      'score': 0.2,
+      'c_range': [0, 0],
+      'count': 100,
+      'clauses': [
+        {'col': 'voltage', 'type': 'num', 'vals': [0, 2.15]},
+        {'col': 'sensor', 'type': 'str', 'vals': ['18']}
+      ]
+    },
+    {
+      'c': 0.5,
+      'score': 0.2,
+      'c_range': [0.5, .5],
+      'count': 100,
+      'clauses': [
+        {'col': 'sensor', 'type': 'str', 'vals': map(str, [18, 15])}
+      ]
+    },
+    {
+      'c': 0.5,
+      'score': 0.2,
+      'c_range': [0.5, .5],
+      'count': 100,
+      'clauses': [
+        {'col': 'voltage', 'type': 'num', 'vals': [-5, 2.5]},
+        {'col': 'sensor', 'type': 'str', 'vals': ['18', '15']}
+      ]
+    },
+    {
+      'c': 1.0,
+      'score': 0.2,
+      'c_range': [1.0, 1.0],
+      'count': 100,
+      'clauses': [
+        {'col': 'sensor', 'type': 'str', 'vals': map(str, [18, 30, 35])}
+      ]
+    },
+    {
+      'c': 1.0,
+      'score': 0.2,
+      'c_range': [1.0, 1.0],
+      'count': 100,
+      'clauses': [
+        {'col': 'humidity', 'type': 'num', 'vals': [-100, 40]},
+        {'col': 'sensor', 'type': 'str', 'vals': ['18', '19']}
+      ]
+    }
+
+  ]
+
   from scorpion.util import Status
   status = Status(requestid)
   status.update_rules('label', results)
   status.close()
 
-  time.sleep(3)
+  time.sleep(1)
 
   ret['results'] = results
+  ret['top_k_results'] = top_k
   return ret
 
 

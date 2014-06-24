@@ -5,74 +5,121 @@
 <div class="row">
   <div class="col-md-5" style="min-width: 500px; max-width: 550px;">
 
-    <div class="row">
-      <div class="col-md-2">
-        {% if enableScorpion == 1 %}
-        <span id="facet-togglecheckall" state='checked' class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Remove all attributes from Scorpion analysis">uncheck all</span>
-        {% endif %}
-      </div>
-      <div class="col-md-3">
-        <span>
-          <div id="selection-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
-            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
-            <label class="onoffswitch-label" for="myonoffswitch">
-              <span class="onoffswitch-inner"></span>
-              <span class="onoffswitch-switch"></span>
-            </label>
-          </div>
-        </span>
-      </div>
-      <div class="col-md-3">
-        <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Set base query to current selection" class="btn btn-primary btn-sm">Add Permanent Filters</span>
-      </div>
 
-
-      {% if debug %}
-      <div class="col-md-3">
-        <div id="fake-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
-          <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="fakeswitch" checked>
-          <label class="onoffswitch-label" for="fakeswitch">
-            <span class="onoffswitch-inner"></span>
-            <span class="onoffswitch-switch"></span>
-          </label>
-        </div>
+    <div class='row'>
+      <div class='col-md-9 col-md-offset-3'>
       </div>
-      {% endif %}
     </div>
+
+
+    <div class='row'>
+      <div class='col-md-3'>
+        <h5>
+          {% if enableScorpion == 1 %}
+          <span id="facet-togglecheckall" state='checked' class="btn btn-primary btn-xs" data-toggle="tooltip" data-placement="top" title="Remove all attributes from Scorpion analysis">uncheck all</span>
+          {% endif %}
+        </h5>
+      </div>
+      <div class="col-md-9">
+        <h5>
+          Facets
+
+          {% if debug %}
+          <span style='float: right'>
+            <div id="fake-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
+              <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="fakeswitch" checked>
+              <label class="onoffswitch-label" for="fakeswitch">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+              </label>
+            </div>
+          </span>
+          {% endif %}
+
+          <span style='float:right'>
+            <div id="selection-type" data-toggle="tooltip" data-placement="top" class="onoffswitch">
+              <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+              <label class="onoffswitch-label" for="myonoffswitch">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+              </label>
+            </div>
+          </span>
+
+        </h5>
+      </div>
+    </div>
+
+
+
 
     <div id="facets"></div>
   </div>
 
   <div class="col-md-3" style="max-width: 350px;">
-    <div id='cur_sql'></div>
-    <h4>WHERE clauses</h4>
-    <div id='where-container'>
-      <div class='where' id='temp-where'></div>
-      <div class='where' id='perm-where'></div>
-    </div>
+    <div class='row'>
+      <div class='col-md-12'>
+        <div id='cur_sql'></div>
+        <h5>Temporary Filters</h5>
+        <div id='temp-where-container' class='where-container'>
+          <div class='where' id='temp-where'></div>
+        </div>
 
-    {% if enableScorpion == 1 %}
-    <h4>
-      Scorpion Results 
-      <small><a class="link" id="scorpion-showbest">show overall best</a></small>
-    </h4>
-    <input class='slider' id="scorpion-slider" data-slider-id='ex1Slider' type="text" style="display: none;"/>
+        <h5>
+          Permanent Filters
+          <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Add temporary filters to permanent" class="btn btn-primary btn-xs" style='float:right'>
+            &darr; Add Permanent
+          </span>
+        </h5>
+        <div id='perm-where-container' class='where-container'>
+          <div class='where' id='perm-where'></div>
+        </div>
 
-    <div id='all-scorpion-results-container'>
-      <div id="scorpion-results-container" style="display:none">
-      </div>
-      <div id="scorpion-partialresults-container" style="display:none">
+
+        {% if enableScorpion == 1 %}
+        <h5 style="position:relative;">
+          Scorpion Results 
+          <span class="scorpion-wait" style="display: none;">
+            <small>loading</small>
+          </span>
+
+          <span class="btn btn-xs btn-primary" id="scorpion-showbest" style='float: right;'>Show Best Overall</span>
+        </h5>
+        <div id='slider-container'>
+          <span id="slider-smallest" class='info' data-toggle="tooltip" data-placement="top" title="Most responsible per record (biggest bang for the buck)" >
+            small &lambda;
+          </span>
+          <span class='slider-span'>
+            <input class='slider' id="scorpion-slider" data-slider-id='ex1Slider' type="text" style="display: none;"/>
+          </span>
+          <span id="slider-biggest" class='info'  data-toggle="tooltip" data-placement="top" title="Most absolute responsibility.">
+            big &lambda;
+          </span>
+        </div>
+
+        <div id='all-scorpion-results-container'>
+          <div id="scorpion-results-container" style="display:none">
+          </div>
+          <div id="scorpion-partialresults-container" style="display:none">
+          </div>
+        </div>
+        {% endif %}
       </div>
     </div>
-    {% endif %}
   </div>
 
   <div class="col-md-4">
+    <h5>
+      Visualization
+      <span id="q-toggle" style='float:right; margin-left: 1em;' class="btn btn-xs btn-primary">Show Query Form</span>
+      <span id="tuples-toggle" style='float:right' class="btn btn-xs btn-primary">Show Tuples</span>
+    </h5>
+    <!--
     <div class="row">
       <div class="col-md-12">
-        <span id="q-toggle" class="btn btn-sm btn-primary"> Show Query Form </span>
       </div>
     </div>
+    -->
 
     <div id="query-form-container" style="display:none;"></div>
     <div id="right"></div>
