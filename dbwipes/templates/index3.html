@@ -76,6 +76,35 @@
   as the previous tutorial.  When you are ready, click Next.</p>
 </script>
 
+<script id="sq-bad" type="text/x-underscore-template">
+<p>
+  This button will add your selected points as examples of results 
+  whose values are wrong (either too high or too low)
+</p>
+<p>
+  Since we are interested in why the sales have gone up, 
+  click on <span class='btn btn-danger btn-xs'>examples of outlier values</span>
+</p>
+</script>
+
+<script id="sq-good" type="text/x-underscore-template">
+<p>
+  This button will add your selected points as examples of results 
+  whose values are OK
+</p>
+<p>
+  Scorpion will compute the values of the average bad point 
+  and the average good point to decide if the bad points'
+  values are too high or too low.
+</p>
+<p>
+  Go ahead and click on 
+  <span class='btn btn-success btn-xs'>examples of good values</span>
+</p>
+</script>
+
+
+
 <script id="sq-submit" type="text/x-underscore-template">
 <p>That's all Scorpion needs from you!  Now click
 <span class='btn btn-primary btn-xs'>Run Scorpion!</span>
@@ -185,6 +214,22 @@
 <p>Try clicking on a result.</p>
 </script>
 
+
+<script id="srs-remove" type="text/x-underscore-template">
+<p>
+  Try switching this to 
+  <span style='font-family: arial; font-weight: bold;'><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b></span>.
+</p>
+<p>
+  Now try hovering over a Scorpion result.   The visualization 
+  now shows what would happen if the records matching the result did not 
+  exist.  This is a proxy for how much those records <i>influenced</i> 
+  the final result.
+</p>
+</script>
+
+
+
 <script id="checkboxes" type="text/x-underscore-template">
 <p>
   By default, Scorpion searches through combinations of all 
@@ -220,6 +265,18 @@ Let's rerun Scorpion and ignore <b>age</b>.  First uncheck <b>age</b>.
 
 
 
+<script id="checkboxes-all" type="text/x-underscore-template">
+<p>Finally, you can click this button to uncheck all of the attributes at once.</p>
+</script>
+
+<script id="end" type="text/x-underscore-template">
+<p>You have just finished a tour of Scorpion!</p>
+<p>Now we will ask you to to participate in the user study by analyzing a few datasets with and without the automated tool.</p>
+<p>Please press Exit to go back to the main directory when you are ready.</p>
+</script>
+
+<script id="" type="text/x-underscore-template">
+</script>
 <script id="" type="text/x-underscore-template">
 </script>
 
@@ -234,6 +291,11 @@ Let's rerun Scorpion and ignore <b>age</b>.  First uncheck <b>age</b>.
 
 <script id="" type="text/x-underscore-template">
 </script>
+
+<script id="" type="text/x-underscore-template">
+</script>
+
+
 
 {%endraw%}
 

@@ -176,10 +176,7 @@ requirejs(['jquery',
 
   step = addStep('sq-bad', {
     title: "Scorpion Query",
-    text: "<p>This button will add your selected points as examples of results whose values are wrong (either too high or too low)</p>" +
-          "<p>Since we are interested in why the sales have gone up, click on <span class='btn btn-danger btn-xs'>examples of outlier values</span></p>",
     attachTo: "div.walkthrough #addbad right",
-    //advanceOn: "#addbad click",
     buttons: backbtn
   });
   step.on("show", (function(step) {
@@ -239,12 +236,8 @@ requirejs(['jquery',
 
   step = addStep('sq-good', {
     title: "Scorpion Query",
-    text: "<p>This button will add your selected points as examples of results whose values are OK</p>" +
-          "<p>Scorpion will compute the values of the average bad point and the average good point to decide if the bad points' values are too high or too low.</p>" +
-          "<p>Go ahead and click on <span class='btn btn-success btn-xs'>examples of good values</span></p>",
     attachTo: "div.walkthrough #addgood right",
     buttons: backbtn,
-    //advanceOn: "#addgood click"
   });
   step.on("show", (function(step) {
     return function() {
@@ -345,8 +338,6 @@ requirejs(['jquery',
 
   step = addStep('srs-remove', {
     title: "How Much Influence?",
-    text: "<p>Try switching this to <span style='font-family: arial; font-weight: bold;'><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b></span>.</p>"+
-          "<p>Now try hovering over a Scorpion result.   The visualization now shows what would happen if the records matching the result did not exist.  This is a proxy for how much those records <i>influenced</i> the final result.</p>",
     attachTo: "#selection-type left",
     tetherOptions: {
       attachment: 'top right',
@@ -384,7 +375,6 @@ requirejs(['jquery',
 
 
 
-
   step = addStep('checkboxes-2', {
     title: "Ignoring Attributes",
     attachTo: "#viz left",
@@ -402,7 +392,6 @@ requirejs(['jquery',
 
   step = addStep('checkboxes-all', {
     title: "Ignoring Attributes",
-    text: "<p>Finally, you can click this button to uncheck all of the attributes at once.</p>",
     attachTo: "#facet-togglecheckall right",
     tetherOptions: {
       attachment: 'top right',
@@ -413,9 +402,6 @@ requirejs(['jquery',
 
   step = addStep('end', {
     title: "Done!",
-    text: "<p>You have just finished a tour of Scorpion!</p>"+
-          "<p>Now we will ask you to to participate in the user study by analyzing a few datasets with and without the automated tool.</p>"+
-          "<p>Please press Exit to go back to the main directory when you are ready.</p>",
     showCancelLink: true,
     buttons: [{
       text: 'Back',
@@ -433,7 +419,6 @@ requirejs(['jquery',
 
 
   tour.start();
-  _.delay(tour.show.bind(tour), 500, ('checkboxes'))
   window.tour = tour;
 
 });
