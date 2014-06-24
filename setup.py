@@ -26,5 +26,8 @@ setup(name="dbwipes",
         'bin/summarizedb.py'
       ],
       #zip_safe = False,
-      install_requires = ['flask', 'psycopg2', 'sqlalchemy', 'flask-compress', 'scorpionsql'],
+      install_requires = [
+        'flask', 'psycopg2', 'sqlalchemy', 
+        'flask-compress', 'scorpionsql', 'click'
+      ],
       keywords= "")

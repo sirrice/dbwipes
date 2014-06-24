@@ -22,20 +22,24 @@ PyPi install
 
     pip install dbwipes
 
+## Setup example data
+
+    setupdbwipes.sh
 
 ## Usage
 
 DBSetup -- pre-compute attribute value distributions
 
-    summarizedb.py <dbname>
-    vi settings.py           # specify your own dburl prefix.
+    summarizedb.py <dbname>          # precompute attribute value distributions
+    vi settings.py                   # specify your own dburl prefix.
+    dbwipesserver.py <hostname/ip>   # runs on port 8111
 
 Add new dataset:
 
     pip install dbtruck
-    importmydata.py <table> <db> <file>
-    python fixnulls <db> <tablename>     # scorpion doesn't deal with nulls well, otherwise don't worry about this
-    python summarizedb.py dbname         # precompute attribute value distributions
+    importmydata.py <table> <db> <datafile>
+    fixnulls.py <db> <table>      # scorpion doesn't deal with nulls well, otherwise don't worry about this
+    summarizedb.py <db> <table>   # precompute attribute value distributions
 
 
 
