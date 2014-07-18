@@ -1,7 +1,23 @@
 {% extends "index_base.html" %}
 
 {% block includes %}
+<style>
+  b {
+    font-family: arial;
+  }
+</style>
 {%raw%}
+
+
+<script id="where-ans-template" type="text/x-underscore-template">
+<div class='where'>
+  <div class='clause temporary'>
+    {{ sql }}
+  </div>
+</div>
+</script>
+
+
 
 <script id="start-template" type="text/x-underscore-template">
   <p>This is a more complex synthetic sales dataset.  The attributes include the day, the amount spent, and customer age range, gender, and state.</p>
@@ -13,9 +29,10 @@
 
 <script id="q1-template" type="text/x-underscore-template">
   <div style='margin-bottom: 1em'>
-    <p> What subset of the data is most responsible for the increase in sales?</p>
-    <small class='text-muted'>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.  Click submit when you are satisfied.</small>
-    <p class='bs-callout' id='q1-answer' style='padding: 10px;height: 6em; overflow: scroll'>Nothing Selected Yet</p>
+    <p>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.</p>
+    <p>Click submit when you are satisfied.</p>
+    <p class='where-container bs-callout' id='q1-answer' style='padding: 10px;height: 10em; overflow: scroll; '>
+      Nothing Selected Yet</p>
   </div>
 </script>
 
@@ -38,14 +55,22 @@
   </div>
 </script>
 
-<script id="q5-template" type="text/x-underscore-template">
+<script id="q5-question" type="text/x-underscore-template">
   <div style='margin-bottom: 1em'>
     <p>We updated the query to compute the <b>average</b> sales amount per day.</p>
     <p>What subset of the data is most responsible for the increase in average sales?</p>
-    <small class='text-muted'>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.  Click submit when you are satisfied.</small>
+  </div>
+</script>
+
+<script id="q5-text" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.</p>
+    <p>Click submit when you are satisfied.</small>
     <p class='bs-callout' id='q5-answer' style='padding: 10px;height: 6em; overflow: scroll'>Nothing Selected Yet</p>
   </div>
 </script>
+
+
 
 {%endraw%}
 

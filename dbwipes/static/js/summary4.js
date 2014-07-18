@@ -55,9 +55,10 @@ requirejs(['jquery',
            'summary/task',
            'underscore',
            'shepherd',
+           'handlebars',
            'bootstrap',
            'bootstrap-slider'
-  ], function ($, d3, util, setup, TaskView, _, Shepherd) {
+  ], function ($, d3, util, setup, TaskView, _, Shepherd, Handlebars) {
 
   $ = require('bootstrap-slider');
 
@@ -91,9 +92,11 @@ requirejs(['jquery',
     }
     return true;
   };
+  var wheretemplate = Handlebars.compile($("#where-ans-template").html());
 
   var tasks = [
     new TaskView({
+      question: "<p> What subset of the data is most responsible for the increase in sales?</p>",
       text: $("#q1-template").html(),
       textbox: false,
       attachTo: '#tasks',
@@ -111,10 +114,14 @@ requirejs(['jquery',
                   vals = _.keys(sel);
               if (vals.length) return model;
             }));
-            var clauses = _.map(models, function(model) { 
-              return util.negateClause(model.toSQLWhere())
+            $("#q1-answer").empty();
+            var clauses = _.map(models, function(model, idx) { 
+              var sql = util.negateClause(model.toSQLWhere());
+              var json = { idx: idx, sql: sql};
+              $("#q1-answer").append($(wheretemplate(json)));
+              return sql;
             });
-            $("#q1-answer").html(clauses.join('<br/>')).show();
+            //$("#q1-answer").html(clauses.join('<br/>')).show();
             task.model.set('answer', models);
           }
           window.where.on('change:selection', onChange);
@@ -125,19 +132,19 @@ requirejs(['jquery',
       }
     }),
     new TaskView({
-      text: $("#q2-template").html(),
+      question: $("#q2-template").html(),
       textbox: true,
       truth: checkAnswer,
       attachTo: '#tasks',
     }),
     new TaskView({
-      text: $("#q3-template").html(),
+      question: $("#q3-template").html(),
       textbox: true,
       truth: checkAnswer,
       attachTo: '#tasks',
     }),
     new TaskView({
-      text: $("#q4-template").html(),
+      question: $("#q4-template").html(),
       options: [ 
         'not confident', 
         'somwhat confident',
@@ -154,7 +161,8 @@ requirejs(['jquery',
       }
     }),
     new TaskView({
-      text: $("#q5-template").html(),
+      question: $("#q5-question").html(),
+      text: $("#q5-text").html(),
       textbox: false,
       truth: function(answer) {
         return false;
@@ -179,10 +187,14 @@ requirejs(['jquery',
                   vals = _.keys(sel);
               if (vals.length) return model;
             }));
-            var clauses = _.map(models, function(model) { 
-              return util.negateClause(model.toSQLWhere())
+            $("#q5-answer").empty();
+            var clauses = _.map(models, function(model, idx) { 
+              var sql = util.negateClause(model.toSQLWhere());
+              var json = { idx: idx, sql: sql};
+              $("#q5-answer").append($(wheretemplate(json)));
+              return sql;
             });
-            $("#q5-answer").html(clauses.join('<br/>')).show();
+            //$("#q5-answer").html(clauses.join('<br/>')).show();
             task.model.set('answer', models);
           }
           window.where.on('change:selection', onChange);
@@ -192,8 +204,35 @@ requirejs(['jquery',
         }
       }
     }),
-
-
+    new TaskView({
+      question: $("#q2-template").html(),
+      textbox: true,
+      truth: checkAnswer,
+      attachTo: '#tasks',
+    }),
+    new TaskView({
+      question: $("#q3-template").html(),
+      textbox: true,
+      truth: checkAnswer,
+      attachTo: '#tasks',
+    }),
+    new TaskView({
+      question: $("#q4-template").html(),
+      options: [ 
+        'not confident', 
+        'somwhat confident',
+        'very confident',
+        'without a doubt'
+      ],
+      textbox: true,
+      truth: checkAnswer,
+      attachTo: '#tasks',
+      on: {
+        'submit': function() {
+          q.set(testq2);
+        }
+      }
+    })
   ];
   _.each(tasks, function(task, idx) {
     var prefix = "Q" + (idx+1) + " of " + tasks.length;

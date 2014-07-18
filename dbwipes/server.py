@@ -401,6 +401,7 @@ def scorpion():
     import scorpionutil
   except:
     print >>sys.stderr, "Could not load scorpionutil.  Maybe scorpion has not been installed?"
+    traceback.print_exc()
     return {}
 
   try:

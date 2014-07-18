@@ -5,12 +5,13 @@
       {{#if title}}
       <h3>{{title}}</h3>
       {{/if}}
-      <div>{{{text}}}</div>
+      <div>{{{question}}}</div>
 
       <div class="submit btn btn-primary">Submit</div>
       <div class="error bs-callout bs-callout-danger" style="display:none"> </div>
     </div>
-    <div class='col-md-7' >
+    <div class='col-md-5' >
+      <div>{{{text}}}</div>
       {{#each options}}
       <div class="radio">
         <label>

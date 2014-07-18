@@ -331,6 +331,32 @@ body table.tuples tr th {
   background: grey;
   color: white;
 }
+.scorpion-wait {
+  margin-left: 10px;
+  display: none;
+  color: grey;
+}
+.scorpion-wait .loadingspincircle {
+  width: 24px;
+  height: 24px;
+  /*
+    border: 2px solid #ccc;
+    border-radius: 100%;
+    */
+
+}
+.scorpion-wait .loadingspincircle:before {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 4px 4px 0 0;
+  background-color: grey;
+  content: "";
+  border-radius: 100%;
+  animation: spin 4s ease infinite;
+  -webkit-animation: spin 4s ease infinite;
+  -moz-animation: spin 4s ease infinite;
+}
 #walkthrough-container {
   position: absolute;
   top: 8em;
@@ -364,6 +390,9 @@ body table.tuples tr th {
 #walkthrough-container .walkthrough #draw.drawing {
   background: whitesmoke;
 }
+#walkthrough-container .walkthrough .scorpion-wait {
+  color: white;
+}
 #tasks {
   border-bottom: 2px solid #ddd;
 }
@@ -388,32 +417,6 @@ body table.tuples tr th {
 }
 #tasks div.task h3 {
   margin-top: .0em;
-}
-.scorpion-wait {
-  margin-left: 10px;
-  display: none;
-  color: grey;
-}
-.scorpion-wait .loadingspincircle {
-  width: 24px;
-  height: 24px;
-  /*
-    border: 2px solid #ccc;
-    border-radius: 100%;
-    */
-
-}
-.scorpion-wait .loadingspincircle:before {
-  display: block;
-  width: 12px;
-  height: 12px;
-  margin: 4px 4px 0 0;
-  background-color: grey;
-  content: "";
-  border-radius: 100%;
-  animation: spin 4s ease infinite;
-  -webkit-animation: spin 4s ease infinite;
-  -moz-animation: spin 4s ease infinite;
 }
 /* Thanks http://proto.io/freebies/onoff/ !! */
 .onoffswitch {

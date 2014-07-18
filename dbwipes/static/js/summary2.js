@@ -102,19 +102,19 @@ requirejs([
 
   var tasks = [
     new TaskView({
-      text: "<p>Which gender has higher total sum of sales on day 0?</p>",
+      question: "<p>Which gender has higher total sum of sales on day 0?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 1,
       attachTo: '#tasks'
     }),
     new TaskView({
-      text: "<p>Which gender has higher total sum of sales on day 9?</p>",
+      question: "<p>Which gender has higher total sum of sales on day 9?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 0,
       attachTo: '#tasks'
     }),
     new TaskView({
-      text: "<p>Which state most contributes to the rising sales?</p>",
+      question: "<p>Which state most contributes to the rising sales?</p>",
       textbox: true,
       truth: function(answer) {
         var matches = _.filter(['CA', 'Cali', 'California'], function(truth) {
@@ -128,7 +128,7 @@ requirejs([
       attachTo: '#tasks'
     }),
     new TaskView({
-      text: "<p>What are the total sales on day 1 if we ignored California sales (round to the nearest 10 thousand)?</p>",
+      question: "<p>What are the total sales on day 1 if we ignored California sales (round to the nearest 10 thousand)?</p>",
       textbox: true,
       truth: function(answer) {
         return Math.abs(+answer - 40000) < 7000;
@@ -137,7 +137,7 @@ requirejs([
       successText: "One more question!"
     }),
     new TaskView({
-      text: "<p>Which gender has a higher number (count) of California sales overall?</p>",
+      question: "<p>Which gender has a higher number (count) of California sales overall?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 0,
       attachTo: '#tasks',

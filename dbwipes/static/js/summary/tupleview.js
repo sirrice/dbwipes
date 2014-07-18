@@ -11,6 +11,27 @@ define(function(require) {
       Query = require('summary/query');
 
 
+
+  window.queryCache = queryCache = {};
+  function checkQueryCache(json) {
+    var key = JSON.stringify(json);
+    return queryCache[key];
+  }
+
+  function addToCache(json, data) {
+    var key = JSON.stringify(json);
+    var n = _.size(queryCache);
+    if (!_.contains(queryCache, key) && n > 10) {
+      _.each(_.last(_.keys(queryCache), n - 10), function(k) {
+        delete queryCache[k];
+      });
+    }
+    queryCache[key] = data;
+    return;
+  }
+
+
+
   var TupleQuery = Backbone.Model.extend({
     url: "/api/tuples/",
 
@@ -40,6 +61,31 @@ define(function(require) {
         });
       }).bind(this));
         
+    },
+
+
+    fetch: function(options) {
+      var json = this.toJSON();
+      var resp = checkQueryCache(json);
+      if (resp) {
+        resp = this.parse(resp, options);
+        this.set(resp, options);
+        if (options.complete) options.complete(this, resp, options);
+        if (options.success) options.success(this, resp, options);
+        if (options.error) options.error(this, resp, options);
+
+        return;
+      }
+
+
+      options || (options = {});
+      var complete = options.complete;
+      var f = function(resp) {
+        addToCache(json, resp.responseJSON);
+        if (complete) complete(model, resp, options);
+      };
+      options.complete = f;
+      return Backbone.Model.prototype.fetch.call(this, options);
     },
 
     parse: function(resp, opts) {
