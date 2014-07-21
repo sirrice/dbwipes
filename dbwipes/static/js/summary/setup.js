@@ -175,11 +175,6 @@ define(function(require) {
 
     var scr_btn = $(".walkthrough-btn");
     scr_btn.click(function() {
-      if (scr_btn.text() == 'show scorpion') {
-        scr_btn.text("hide scorpion");
-      } else {
-        scr_btn.text("show scorpion");
-      }
       sqv.$el.toggle()
     });
 
