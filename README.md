@@ -44,7 +44,7 @@ Interactive browsing of a database + integration with Scorpion (if scorpion is i
 
 ## Setup example data
 
-    setupdbwipes.sh
+    ./bin/setupdbwipes.sh
 
 ## Usage
 

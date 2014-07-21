@@ -1,3 +1,12 @@
+#!/usr/bin/env python2.7
+
+try:
+  activate_this = './bin/activate_this.py'
+  execfile(activate_this, dict(__file__=activate_this))
+except:
+  pass
+
+
 import click
 import sys
 import psycopg2
