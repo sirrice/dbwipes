@@ -23,7 +23,9 @@ setup(name="dbwipes",
       package_dir = {'dbwipes' : 'dbwipes'},
       scripts = [
         'bin/dbwipesserver.py',
-        'bin/summarizedb.py'
+        'bin/summarizedb.py',
+        'bin/gen_dbwipes_test_data.py',
+        'bin/setupdbwipes.sh'
       ],
       #zip_safe = False,
       install_requires = [

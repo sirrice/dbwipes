@@ -78,6 +78,31 @@ def teardown_request(exception):
   except Exception as e:
     pass
 
+
+@app.route('/', methods=["POST", "GET"])
+def index():
+  try:
+    import scorpion
+    enable_scorpion = 1
+    title = 'DBWipes + Scorpion!'
+  except:
+    enable_scorpion = 0
+    title = 'DBWipes'
+
+  context = {
+    'enableScorpion': enable_scorpion,
+    'jsidx': '',
+    'title': title,
+    'debug': True
+  }
+  return render_template("index_base.html", **context)
+
+
+@app.route('/dir/', methods=["POST", "GET"])
+def dirpage():
+  return render_template("dir.html")
+
+
 @app.route('/drspott/', methods=["POST", "GET"])
 def drspott():
   context = {
@@ -89,7 +114,7 @@ def drspott():
 
 
 @app.route('/hidden/', methods=["POST", "GET"])
-def index():
+def hidden():
   context = {
     'enableScorpion': 1,
     'jsidx': '',
@@ -140,10 +165,6 @@ def index_idx(idx):
 
   return render_template(templates, **context)
 
-@app.route('/', methods=["POST", "GET"])
-@app.route('/dir/', methods=["POST", "GET"])
-def dirpage():
-  return render_template("dir.html")
 
 
 

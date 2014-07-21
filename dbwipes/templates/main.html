@@ -12,6 +12,9 @@
 
 <body>
 <h4>{{title}} <small>{{subtitle}}</small>
+  {% if enableScorpion == 1 %}
+  <span class="btn btn-sm btn-primary walkthrough-btn">show scorpion</span>
+  {% endif %}
   <span id="q_loading" style="display:none;">loading query results...</span>
 </h4>
 

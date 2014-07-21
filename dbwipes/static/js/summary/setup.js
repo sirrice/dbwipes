@@ -145,7 +145,6 @@ define(function(require) {
         psrs = null,
         psrv = null;
 
-
     srs = new ScorpionResults()
     srv = new ScorpionResultsView({
       collection: srs, 
@@ -172,6 +171,17 @@ define(function(require) {
       queryview: qv
     });
     $("body").append(sqv.render().$el.hide());
+
+
+    var scr_btn = $(".walkthrough-btn");
+    scr_btn.click(function() {
+      if (scr_btn.text() == 'show scorpion') {
+        scr_btn.text("hide scorpion");
+      } else {
+        scr_btn.text("show scorpion");
+      }
+      sqv.$el.toggle()
+    });
 
     srv.on('setActive', function(whereJson) {
       console.log(['summary.js', 'setactive', whereJson])
