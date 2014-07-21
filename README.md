@@ -4,7 +4,7 @@ DBWipes
 Interactive browsing of a database + integration with Scorpion (if scorpion is installed).
 
 
-## Pre-install instructions
+## Database Setup Instructions
 
     # install postgresql 9+
     sudo apt-get install postgresql-9.3   
@@ -21,20 +21,28 @@ Interactive browsing of a database + integration with Scorpion (if scorpion is i
     createdb cache
 
 
-## Install Directions
+## Setup virtual environment
+
+Install pip and virtualenv if you want to make sure
+dbwipes is installed in a self contained environment.
+Otherwise feel free to skip
 
     sudo apt-get install python-pip 
     pip install virtualenv
 
-    # setup a virtual environment
-    mkdir env
-    cd env
+setup a virtual environment
+
+    mkdir <directory name>
+    cd <directory name>
     virtualenv .
 
-    # switch to using virtualenv binaries
+switch to using virtualenv binaries
+
     . ./bin/activate
 
-    # Install it!
+## Installation
+
+    #
     #   If you experience pain installing numpy/scipy/matplotlib, 
     #   consider using enthought canopy
     #
@@ -44,6 +52,7 @@ Interactive browsing of a database + integration with Scorpion (if scorpion is i
 
 ## Setup example data
 
+    cd <root of virtualenv directory>
     ./bin/setupdbwipes.sh
 
 ## Usage
