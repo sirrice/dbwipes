@@ -50,18 +50,23 @@ switch to using virtualenv binaries
     pip install dbwipes
 
 
-## Setup example data
+## Setup
+
+Load some sample data into the database
 
     cd <root of virtualenv directory>
     ./bin/setupdbwipes.sh
 
-## Usage
 
-Setup Settings 
+These settings tell scorpion and dbwipes how to connect to the
+database.  If you have a default postgresql installation, you may
+not need to edit these settings.
 
     vi <python site-packages>/scorpionsql/settings.py       # specify your own dburl prefix.
     vi <python site-packages>/dbwipes/settings.py           # specify your own dburl prefix.
 
+
+## Usage
 
 Add new dataset:
 
