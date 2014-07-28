@@ -6,6 +6,7 @@ import md5
 import pdb
 import psycopg2
 import traceback
+import numpy.random as nprand
 
 from collections import *
 from datetime import datetime
@@ -82,6 +83,21 @@ def scorpion_run(db, requestdata, requestid):
       if errtype == 1:
         erreq = erreqs[alias]
         print "erreq", erreq
+
+
+      # XXX: for better end-to-end performance
+      #      sample the badkeys and goodkeys so there are ~20
+      if len(badkeys) > 20:
+        idxs = range(len(badkeys))
+        newidxs = nprand.choice(idxs, 20, False)
+        badkeys = map(badkeys.__getitem__, newidxs)
+        if erreq:
+          erreq = map(erreq.__getitem__, newidxs)
+      if len(goodkeys) > 20:
+        idxs = range(len(goodkeys))
+        newidxs = nprand.choice(idxs, 20, False)
+        goodkeys = map(goodkeys.__getitem__, newidxs)
+
 
       err = AggErr(agg, badkeys, 20, errtype, {'erreq': erreq})
       obj.goodkeys[alias] = goodkeys

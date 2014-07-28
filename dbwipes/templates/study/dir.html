@@ -1,0 +1,110 @@
+<html>
+  <script src="/static/js/lib/jquery.js"></script>
+  <script src="/static/js/lib/underscore.js"></script>
+
+<style>
+  a {
+    width: 100%;
+  }
+
+  .btn-cancelled {
+    background: whitesmoke;
+    color: black;
+  }
+</style>
+
+<body>
+
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <h1>Scorpion User Study</h1>
+
+    <h2><span id="nametitle">Before we start, what is your name?</span> <small id="nameclear">clear</small></h2>
+    <p><form id="nameform"><input class='input form-control' id="name" style='width:100%'/></form></p>
+
+    <div class="steps">
+      <h2>Tutorial Section</h2>
+      <p>
+        Please complete the following tutorial and tasks in order.  The current task will
+        be highlighted in <span class="btn btn-xs btn-primary">blue</span>, tasks you have
+        completed will be in <span class="btn btn-xs btn-success">green</span>.  
+        Tasks that cannot be started until the current task is finished are in
+        <span class="btn btn-xs btn-cancelled">grey</span>.
+      </p>
+      <p>
+        During the study, we will ask you to think outloud, which means 
+        that you verbally say every question, thought, and observation that you are 
+        thinking.  This helps us review the study afterwards to understand your 
+        thought process.  
+      </p>
+      <p><a id="study1" href="/study/1/" class='btn'>DBWipes Tutorial</a></p>
+      <p><a id="study2" href="/study/2/" class='btn'>Verification Tasks</a></p>
+      <p><a id="study3" href="/study/3/" class='btn'>Scorpion Tutorial</a></p>
+
+      <h2>User Study</h2>
+      <p><a id="study4" href="/study/5/" class='btn'>Task 1</a></p>
+      <p><a id="study5" href="/study/9/" class='btn'>Task 2</a></p>
+    </div>
+
+
+  </div>
+</div>
+
+<script>
+  $(function() {
+    var validName = function(name) {
+      return name && name != '';
+    };
+
+    var render = function(name) {
+      $("#name").val(name);
+      if (validName(name)) {
+        localStorage['name'] = name;
+        $("#nametitle").text("Your name: " + name);
+        $(".steps").show();
+      } else {
+        delete localStorage['name'];
+        $("#nametitle").text("Before we start, what is your name?")
+        $(".steps").hide();
+      }
+    };
+
+    var stepCompleted = +(localStorage['stepCompleted']||0);
+
+    _.times(5, function(idx) {
+      idx = idx + 1;
+      if (stepCompleted > idx-1) {
+        $("#study"+idx).addClass("btn-success");
+      } else if (stepCompleted == idx-1) {
+        $("#study"+idx).addClass("btn-primary");
+      } else {
+          $("#study"+idx)
+          .addClass("btn-cancelled")
+          .attr("href", "#")
+          .click(function() {
+            alert("Please complete the current task (blue button) first");
+          });
+        }
+    })
+
+
+    render(localStorage['name']);
+
+    $("#nameform").on("submit", function() {
+      render($("#name").val());
+      return false;
+    });
+
+    $("#nameclear").click(function() {
+      render(null);
+    });
+  });
+</script>
+
+{% include 'footer.html' %}
+
+</body>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/base.css"/>
+</html>

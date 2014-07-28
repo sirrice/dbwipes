@@ -26,8 +26,8 @@ define(function(require) {
   var setupButtons = function(q, qv) {
     $("[data-toggle=tooltip]").tooltip();
 
-    var st_on_text = "Query only what you highlight below" ,
-        st_off_text = "Queries will ignore what you highlight below";
+    var st_on_text = "Visualization shows what data matching your filter" ,
+        st_off_text = "Visualization removes data matching your filter";
     $("#selection-type > input[type=checkbox]").click(function() {
       where.trigger("change:selection");
       var txt = (this.checked)? st_on_text : st_off_text;
@@ -56,6 +56,7 @@ define(function(require) {
         bws = _.uniq(bws, function(bw) { return bw.sql; });
         q.set('basewheres', bws);
         q.trigger('change:basewheres');
+        window.where.trigger('change:selection');
       }
     });
 
@@ -111,6 +112,7 @@ define(function(require) {
 
     where.on('change:selection', function() {
       var defaultOpts = {silent: false, clear: true};
+      var opts = null;
       arguments.length && (opts = _.last(arguments))
       opts || (opts = {silent: false});
       opts = _.extend(defaultOpts, opts);

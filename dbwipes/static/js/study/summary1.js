@@ -65,7 +65,8 @@ requirejs(['jquery',
   setup.setupBasic();
   setup.setupButtons(window.q, window.qv);
   setup.setupTuples(window.q, null, window.where);
-  window.qf.show();
+  //window.qf.show();
+  window.tv.hide();
 
 
   var testq = {
@@ -108,6 +109,7 @@ requirejs(['jquery',
   step.on("hide", function() { $("div.row").css("opacity", 1); });
 
 
+  /*
   step = tour.addStep('tupleviz', {
     attachTo: "#tuples left",
     title: "Record Table",
@@ -119,6 +121,7 @@ requirejs(['jquery',
     style: { width: "500px" },
     buttons: btns,
   });
+  */
 
 
   tour.addStep('qviz', {
@@ -132,6 +135,7 @@ requirejs(['jquery',
     buttons: btns,
   });
 
+  /*
   step = tour.addStep('qformbtn-clicked', {
     attachTo: "#q left",
     title: "Query Form Toggle Button",
@@ -228,6 +232,7 @@ requirejs(['jquery',
   step.on("show", function() {
     window.qf.hide();
   })
+  */
 
 
 
@@ -242,6 +247,7 @@ requirejs(['jquery',
     style: { width: "400px" }
   });
 
+  /*
   step = tour.addStep('facets-2', {
     attachTo: "#tuples top",
     title: "Faceting Panel",
@@ -279,6 +285,7 @@ requirejs(['jquery',
   step.on("hide", function() {
     $("#tuples th[data-col=day]").css("box-shadow", "none");
   });
+  */
 
 
   tour.addStep('cstat-plot', {
@@ -407,15 +414,25 @@ requirejs(['jquery',
     style: { width: "500px" },
   });
 
+
+  tour.addStep('seltype-2', {
+    attachTo: "#temp-where-container right",
+    title: "Filtering (<b style='color:rgb(26, 189, 64); '>select</b> vs <b style='color:#D46F6F;'>remove</b>)",
+    text: $("#seltype-2").html(),
+    buttons: btns,
+    highlight: true,
+    style: { width: "500px" },
+  });
+
+
+
   step = tour.addStep('selapply', {
     attachTo: "#apply-btn right",
     title: "Updating the Facets",
     text: $("#selapply").html(),
     classes: "shepherd-theme-arrows",
     tetherOptions: {
-      attachment: 'top left',
-      targetAttachment: 'top right',
-      offset: '10px -10px'
+      offset: '0px -10px'
     },
     highlight: true,
     buttons: btns,
@@ -423,7 +440,7 @@ requirejs(['jquery',
   });
 
   step = tour.addStep('selapply-2', {
-    attachTo: "#where-container right",
+    attachTo: "#perm-where-container right",
     title: "Updating the Facets",
     text: $("#selapply-2").html(),
     classes: "shepherd-theme-arrows",
@@ -431,11 +448,9 @@ requirejs(['jquery',
     buttons: btns,
     style: { width: "400px" }
   });
-  step.on('hide', function() {
-    window.qf.show();
-  });
 
 
+  /*
   step = tour.addStep('selapply-3', {
     attachTo: "#q input[name=q-where]:first left",
     title: "Updating the Facets",
@@ -450,6 +465,24 @@ requirejs(['jquery',
   });
   step.on("hide", function() { 
     $("#q input[name=q-where]:first").css("box-shadow", "none");
+  });
+  */
+
+
+  step = tour.addStep('tupletoggle', {
+    attachTo: "#tuples-toggle bottom",
+    title: "Showing Individual Records",
+    text: $("#tupletoggle").html(),
+    classes: "shepherd-theme-arrows",
+    tetherOptions: { offset: '-10px 0px' },
+    buttons: btns,
+    style: { width: "400px" }
+  });
+  step.on('show', function() {
+    window.tv.show();
+  });
+  step.on('hide', function() {
+    window.tv.hide();
   });
 
 
@@ -466,7 +499,10 @@ requirejs(['jquery',
     buttons: [{
       text: "Exit",
       action: function() {
-        window.location = '/dir/';
+        var completed = +(localStorage['stepCompleted'] || 0);
+        alert(completed);
+        localStorage['stepCompleted'] = Math.max(completed, 1)
+        window.location = '/study/';
       }
     }]
   });
@@ -476,6 +512,7 @@ requirejs(['jquery',
 
 
   tour.start();
+  tour.show('end');
   window.tour = tour;
 
 

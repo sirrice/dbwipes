@@ -13,9 +13,12 @@ define(function(require) {
         text: "",
         options: [],      // [ "text", "text",... ]
         textbox: false,   // setting this to True overrides .options
+        largetextbox: false,
         truth: -1,        // a value or a function(answer, Task)
         answer: -1,
-        successText: "Nice!  You'll see the next task in 2...1..."
+        successText: "Nice!  You'll see the next task in 2...1...",
+        starttime: null,
+        endtime: null
       }
     },
 
@@ -51,7 +54,7 @@ define(function(require) {
 
     events: {
       'click .submit':              'onSubmit',
-      'keydown input[name=text]': 'onMouseDown',
+      'keydown input[name=text]':   'onMouseDown',
       'click input[type=radio]':    'onOption'
     },
 
@@ -71,7 +74,10 @@ define(function(require) {
     },
 
     onMouseDown: function(ev) {
-      this.model.set('answer', this.$("input[name=text]").val());
+      if (this.model.get('largetextbox'))
+        this.model.set('answer', this.$("textarea[name=text]").val());
+      else
+        this.model.set('answer', this.$("input[name=text]").val());
     },
 
 
@@ -79,19 +85,28 @@ define(function(require) {
       if (this.model.get('textbox')) {
         this.onMouseDown();
       }
+      this.model.set('endtime', Date.now());
+
+      this.trigger("trysubmit", this);
 
       var isvalid = this.model.validate();
+      var text = "";
       if (isvalid == true) {
+        text = this.model.get('successText') || "Nice job!";
         this.$(".error")
           .removeClass("bs-callout-danger")
           .addClass('bs-callout-info')
-          .text(this.model.get('successText'))
-          .show()
         this.trigger('submit', this);
       } else {
-        var text = (isvalid == false)? "That answer doesn't seem right": isvalid;
-        this.$(".error").text(text).show();
+        if (_.isString(isvalid)) {
+          text = this.model.get('failText') || isvalid;
+        } else {
+          text = this.model.get('failText') || "That answer doesn't seem right";
+        }
       }
+
+      text = text + " " + localStorage['name'] + " " + ((this.model.get('endtime') - this.model.get('starttime'))/1000.);
+      this.$(".error").text(text).show();
     },
 
     render: function() {
@@ -102,6 +117,7 @@ define(function(require) {
     show: function() {
       $(this.model.get('attachTo')).append(this.render().el);
       this.$el.show();
+      this.model.set('starttime', Date.now())
       this.trigger('show', this);
     },
 

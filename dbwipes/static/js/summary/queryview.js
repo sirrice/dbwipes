@@ -500,7 +500,10 @@ define(function(require) {
           .data(ys)
         .enter().append("span")
           .text(function(d) { return d.expr; })
-          .style("background", function(d) { return cscales(d.alias); });
+          .style("color", function(d) { return cscales(d.alias); })
+          .style("border-bottom", function(d) { return "5px solid " + cscales(d.alias); })
+          .style("padding-bottom", function(d) { return "2px"; })
+          .style("border-radius", function(d) { return "0px"; });
     },
 
     toggleBrushDrawing: function() {

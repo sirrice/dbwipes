@@ -1,0 +1,98 @@
+{% extends "index_base.html" %}
+
+{% block includes %}
+<style>
+  b {
+    font-family: arial;
+  }
+</style>
+
+{%raw%}
+
+
+<script id="where-ans-template" type="text/x-underscore-template">
+<div class='where'>
+  <div class='clause temporary'>
+    {{ sql }}
+  </div>
+</div>
+</script>
+
+
+
+<script id="start-template" type="text/x-underscore-template">
+  <p>
+    This is a more complex synthetic sales dataset.  
+    The attributes include the day, the amount spent, and 
+    customer age range, gender, and state.
+  </p>
+  <p> 
+    The visualization shows the <b>average</b> sales amount
+    per day.  So the SQL query is:
+  </p>
+  <p class="bs-callout bs-callout-info">SELECT day, avg(amt) FROM sales GROUP BY day</span>
+  </p>
+  <p>
+    We will ask you to answer a few questions about this dataset 
+{%endraw%}
+    {% if enableScorpion %}
+      <b><i>with</i></b>
+    {% else %}
+      <b><i>without</i></b>
+    {% endif %}
+{%raw%}
+    access to the automated Scorpion tool.
+  </p>
+  <p>When you are ready, click Next.</p>
+  <p class='bs-callout bs-callout-info'>NOTE: once you submit an answer you cannot fix it</p>
+</script>
+
+
+<script id="q5-question" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>The query computes the <b>average</b> sales amount per day.</p>
+    <p>What subset of the data is most responsible for the increase in average sales from
+    days 5 to 9?</p>
+    <p>Describe the subset using a filter that does not contain day or amt</p>
+  </div>
+</script>
+
+<script id="q5-text" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.</p>
+    <p>Click submit when you are satisfied.</small>
+    <p class='where-container bs-callout' id='q5-answer' style='padding: 10px;height: 10em; overflow: scroll;'>
+      Nothing Selected Yet
+    </p>
+  </div>
+</script>
+
+
+<script id="q2-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>Please list some of the other filters that you considered.</p>
+    <small class='text-muted'>We are interested in knowing how you decided on your answer.</small>
+  </div>
+</script>
+
+<script id="q3-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>How did you decide what filters to try?</p>
+    <small class='text-muted'>We are interested in knowing how you decided on your answer.</small>
+  </div>
+</script>
+
+<script id="q4-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>How confident are you in your answer and why?</p>
+  </div>
+</script>
+
+
+
+
+
+
+{%endraw%}
+
+{% endblock %}

@@ -110,10 +110,9 @@
 <span class='btn btn-primary btn-xs'>Run Scorpion!</span>
 </p>
 </p>
-<p>
+<h2>What is Scorpion doing?</h2>
  <blockquote id='sq-helptext'>
-   <p>When you click <span class='btn btn-primary btn-xs'>Run Scorpion!</span>, 
-      Scorpion will look for subsets of the records to remove that will:
+   <p>Scorpion will look for subsets of records to remove that will:
     <ol>
       <li>drive the bad example values as toward the normal example values as possible.</li>
       <li>minimize the number of records that need to be removed.</li>
@@ -121,11 +120,10 @@
     </ol>
    </p>
    <p>
-    Scorpion describes the subsets of records as filters, 
+    Scorpion describes each subsets using a filter --
     the same as the ones you create when using the Facets.
    </p>
  </blockquote>
-</p>
 </script>
 
 
@@ -159,24 +157,20 @@
   have the most impact <i>per matched record.</i>
 </p>
 <p>
-  For example, in addition to the Male Californians from 
-  the previous verification test, Females from Pennsylvania
-  spend <i>more per purchase</i> but have less absolute impact on the
-  total sales.
+  For example, Male Californians have a large <i>absolute impact</i>, 
+  but Females from Pennsylvania spend more per purchase.
 </p>
 </script>
 
 
 <script id="srs-2" type="text/x-underscore-template">
 <p>
-  Scorpion explicitly manages the trade-off between 
-  <i>absolute impact </i> and the <i>biggest impact per record</i>
-  using a parameter &lambda;.  
+  The &lambda; slider lets you see the top filters for different
+  trade-offs between <i>absolute impact </i> and the <i>biggest impact per record</i>.
 </p>
 <p>
-  When the value is small, Scorpion prefers large absolute impact
-  on the bad examples.  When the value is big, Scorpion prefers 
-  the biggest impact per record.
+  Slide it to the left to see the biggest impact per record.  
+  Slide it to the right to see large absolute impact.
 </p>
 <p>
   This slider lets you see the top filters for different &lambda;
@@ -221,8 +215,8 @@
   <span style='font-family: arial; font-weight: bold;'><span style='background:#D46F6F; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>remove</b></span>.
 </p>
 <p>
-  Now try hovering over a Scorpion result.   The visualization 
-  now shows what would happen if the records matching the result did not 
+  When you hover over a Scorpion result the visualization will
+  show what would happen if the records matching the result did not 
   exist.  This is a proxy for how much those records <i>influenced</i> 
   the final result.
 </p>
@@ -233,7 +227,8 @@
 <script id="checkboxes" type="text/x-underscore-template">
 <p>
   By default, Scorpion searches through combinations of all 
-  the attributes in the dataset (except for the GROUPBY and SELECT attributes).
+  the attributes in the dataset (except for the x and y axes in the 
+  visualization).
 </p>
 <p>
   You can uncheck the checkboxes next to an attribute to 
@@ -246,18 +241,21 @@ Let's rerun Scorpion and ignore <b>age</b>.  First uncheck <b>age</b>.
 
 <script id="checkboxes-2" type="text/x-underscore-template">
 <p>
-  Select some of the colored points in the 
-  visualization to show the Scorpion dialog box and click 
-  <span class='btn btn-xs btn-primary'>Run Scorpion!</span>.
-</p>
-<p>
-  The previous Scorpion query inputs are saved so you don't need
+Click <span class='btn btn-xs btn-primary'>toggle scorpion</span>
+to show the Scorpion dialog box.  The previous Scorpion query inputs are saved so you don't need
   to set any examples.
 </p>
 </script>
 
+<script id="checkboxes-3"  type="text/x-underscore-template">
+<p>
+  Click <span class='btn btn-xs btn-primary'>Run Scorpion!</span> to re-run 
+  scorpion without the age attribute.
+</p>
+</script>
 
-<script id="checkboxes-3" type="text/x-underscore-template">
+
+<script id="checkboxes-4" type="text/x-underscore-template">
 <p>
   The suggested filters don't contain any <b>age</b> attributes in the rules.
 </p>

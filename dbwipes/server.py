@@ -91,23 +91,20 @@ def index():
 
   context = {
     'enableScorpion': enable_scorpion,
-    'jsidx': '',
+    'js': 'summary',
     'title': title,
     'debug': True
   }
   return render_template("index_base.html", **context)
 
 
-@app.route('/dir/', methods=["POST", "GET"])
-def dirpage():
-  return render_template("dir.html")
 
 
 @app.route('/drspott/', methods=["POST", "GET"])
 def drspott():
   context = {
     'enableScorpion': 1,
-    'jsidx': 'drspott',
+    'js': 'summarydrspott',
     'title': 'DBWipes + Scorpion!'
   }
   return render_template("index_base.html", **context)
@@ -117,19 +114,24 @@ def drspott():
 def hidden():
   context = {
     'enableScorpion': 1,
-    'jsidx': '',
+    'js': 'summary',
     'title': 'DBWipes + Scorpion!',
     'debug': True
   }
   return render_template("index_base.html", **context)
 
-@app.route('/<int:idx>/', methods=["POST", "GET"])
+@app.route('/study/', methods=["POST", "GET"])
+@app.route('/study/dir/', methods=["POST", "GET"])
+def dirpage():
+  return render_template("study/dir.html")
+
+@app.route('/study/<int:idx>/', methods=["POST", "GET"])
 def index_idx(idx):
   templates = []
-  templates.append("index%d.html" % idx)
+  templates.append("study/index%d.html" % idx)
   templates.append("index_base.html")
 
-  jsidx = idx
+  js = 'study/summary%d' % idx
   title = "DBWipes Tutorial"
   subtitle = ""
   enable_scorpion = 1
@@ -147,16 +149,44 @@ def index_idx(idx):
     title = "DBWipes User Study"
     subtitle = "without Scorpion"
 
+  if idx == 4:
+    enable_scorpion = 0
+
   if idx == 5:
     subtitle = "with Scorpion"
-    jsidx = 4
+    js = 'study/summary4'
     enable_scorpion = 1
-    templates[0] = "index4.html"
+    templates[0] = "study/index4.html"
+
+  if idx == 6:
+    subtitle = "without Scorpion"
+    js = 'study/summary6'
+    enable_scorpion = 0
+
+  if idx == 7:
+    subtitle = "with Scorpion"
+    js = 'study/summary6'
+    enable_scorpion = 1
+    templates[0] = "study/index6.html"
+
+  if idx == 8:
+    enable_scorpion = 0
+    js = 'study/summary8'
+    templates[0] = "study/index8.html"
+
+  if idx == 9:
+    subtitle = "with Scorpion"
+    js = 'study/summary8'
+    enable_scorpion = 1
+    templates[0] = "study/index8.html"
+
 
 
   context = {
     'enableScorpion': enable_scorpion,
-    'jsidx': jsidx,
+    'idx': idx,
+    'js': js,
+    'study': 1,
     'title': title,
     'subtitle': subtitle,
     'debug': False
@@ -167,7 +197,32 @@ def index_idx(idx):
 
 
 
+@app.route('/tasks/submit/', methods=["POST", "GET"])
+@returns_json
+def task_submit():
+  print request.form
+  name = request.form['name']
+  taskid = request.form['taskid']
+  data = request.form['data']
+  db = db_connect("tasks")
 
+  try:
+    q = """create table tasks(
+      name varchar, 
+      tstamp timestamp default current_timestamp,
+      taskid varchar, 
+      data text
+    )"""
+    db.execute(q)
+  except:
+    pass
+
+  q = "insert into tasks values(%s, default, %s, %s)"
+  db.execute(q, (name, taskid, data))
+
+  db.dispose()
+  return {'status': True}
+ 
 @app.route('/api/databases/', methods=['POST', 'GET'])
 @returns_json
 def dbs():

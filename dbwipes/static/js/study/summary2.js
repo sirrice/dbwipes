@@ -102,18 +102,21 @@ requirejs([
 
   var tasks = [
     new TaskView({
+      id: "tutorial-1",
       question: "<p>Which gender has higher total sum of sales on day 0?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 1,
       attachTo: '#tasks'
     }),
     new TaskView({
+      id: "tutorial-2",
       question: "<p>Which gender has higher total sum of sales on day 9?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 0,
       attachTo: '#tasks'
     }),
     new TaskView({
+      id: "tutorial-3",
       question: "<p>Which state most contributes to the rising sales?</p>",
       textbox: true,
       truth: function(answer) {
@@ -128,6 +131,7 @@ requirejs([
       attachTo: '#tasks'
     }),
     new TaskView({
+      id: "tutorial-4",
       question: "<p>What are the total sales on day 1 if we ignored California sales (round to the nearest 10 thousand)?</p>",
       textbox: true,
       truth: function(answer) {
@@ -137,6 +141,7 @@ requirejs([
       successText: "One more question!"
     }),
     new TaskView({
+      id: "tutorial-5",
       question: "<p>Which gender has a higher number (count) of California sales overall?</p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 0,
@@ -149,6 +154,18 @@ requirejs([
     var prefix = "Q" + (idx+1) + " of " + tasks.length;
     var title = task.model.get('title') || "";
     task.model.set('title', prefix + " " + title);
+
+    task.on('trysubmit', function() {
+      var username = localStorage['name'];
+      var data = JSON.stringify(task.model);
+      $.post("/tasks/submit/", {
+        name: username,
+        taskid: task.model.get('id'),
+        data: data
+      }, function() {}, "json")
+    });
+
+
     task.on('submit', function() {
       _.delay(function() {
         task.hide();
@@ -209,7 +226,9 @@ requirejs([
   });
   step.on("show", function() { $("div.row").css("opacity", 0.6); });
   step.on("hide", function() { 
-    window.location = '/dir/';
+    var completed = +(localStorage['stepCompleted'] || 0);
+    localStorage['stepCompleted'] = Math.max(completed, 2)
+    window.location = '/study/';
   });
 
 

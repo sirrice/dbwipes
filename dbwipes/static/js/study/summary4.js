@@ -96,13 +96,25 @@ requirejs(['jquery',
 
   var tasks = [
     new TaskView({
-      question: "<p> What subset of the data is most responsible for the increase in sales?</p>",
-      text: $("#q1-template").html(),
+      id: "task1-1",
+      question: $("#q1-template").html(),
+      text: $("#q1-text").html(),
       textbox: false,
       attachTo: '#tasks',
       truth: function(answer, task) {
-        if (answer == null || answer == '' || answer.length == 0) {
+        if (!(answer && answer.length)) {
           return "Please select a filter";
+        }
+        var cols = answer.map(function(cstat) { return cstat.get('col'); });
+        var illegalCols = [];
+        if (_.contains(cols, 'day')) {
+          illegalCols.push("day");
+        }
+        if (_.contains(cols, 'amt')) {
+          illegalCols.push("amt");
+        }
+        if (illegalCols.length > 0) {
+          return "Please select a filter that does not use attributes " + illegalCols.join(" or ");
         }
         return true;
       },
@@ -121,102 +133,34 @@ requirejs(['jquery',
               $("#q1-answer").append($(wheretemplate(json)));
               return sql;
             });
-            //$("#q1-answer").html(clauses.join('<br/>')).show();
             task.model.set('answer', models);
           }
           window.where.on('change:selection', onChange);
           task.on('submit', function() {
             window.where.off('change:selection', onChange);
           });
+          onChange();
         }
       }
     }),
     new TaskView({
+      id: "task1-2",
       question: $("#q2-template").html(),
       textbox: true,
+      largetextbox: true,
       truth: checkAnswer,
       attachTo: '#tasks',
     }),
     new TaskView({
+      id: "task1-3",
       question: $("#q3-template").html(),
       textbox: true,
+      largetextbox: true,
       truth: checkAnswer,
       attachTo: '#tasks',
     }),
     new TaskView({
-      question: $("#q4-template").html(),
-      options: [ 
-        'not confident', 
-        'somwhat confident',
-        'very confident',
-        'without a doubt'
-      ],
-      textbox: true,
-      truth: checkAnswer,
-      attachTo: '#tasks',
-      on: {
-        'submit': function() {
-          q.set(testq2);
-        }
-      }
-    }),
-    new TaskView({
-      question: $("#q5-question").html(),
-      text: $("#q5-text").html(),
-      textbox: false,
-      truth: function(answer) {
-        return false;
-      },
-      attachTo: '#tasks',
-      truth: function(answer, task) {
-        if (answer == null || answer == '' || answer.length == 0) {
-          return "Please select a filter";
-        }
-        return true;
-      },
-      on: {
-        'show': function(task) {
-          qv.state.yscales.domain([75, 100]);
-          qv.yzoom.y(qv.state.yscales);
-          qv.yzoom.event(qv.c);
-          qv.c.select('.yaxis').call(qv.state.yaxis);
-
-          function onChange() {
-            var models = _.compact(window.where.map(function(model) {
-              var sel = model.get('selection'),
-                  vals = _.keys(sel);
-              if (vals.length) return model;
-            }));
-            $("#q5-answer").empty();
-            var clauses = _.map(models, function(model, idx) { 
-              var sql = util.negateClause(model.toSQLWhere());
-              var json = { idx: idx, sql: sql};
-              $("#q5-answer").append($(wheretemplate(json)));
-              return sql;
-            });
-            //$("#q5-answer").html(clauses.join('<br/>')).show();
-            task.model.set('answer', models);
-          }
-          window.where.on('change:selection', onChange);
-          task.on('submit', function() {
-            window.where.off('change:selection', onChange);
-          });
-        }
-      }
-    }),
-    new TaskView({
-      question: $("#q2-template").html(),
-      textbox: true,
-      truth: checkAnswer,
-      attachTo: '#tasks',
-    }),
-    new TaskView({
-      question: $("#q3-template").html(),
-      textbox: true,
-      truth: checkAnswer,
-      attachTo: '#tasks',
-    }),
-    new TaskView({
+      id: "task1-4",
       question: $("#q4-template").html(),
       options: [ 
         'not confident', 
@@ -238,7 +182,18 @@ requirejs(['jquery',
     var prefix = "Q" + (idx+1) + " of " + tasks.length;
     var title = task.model.get('title') || "";
     task.model.set('title', prefix + " " + title);
+    task.on('trysubmit', function() {
+      var username = localStorage['name'];
+      var data = JSON.stringify(task.model);
+      $.post("/tasks/submit/", {
+        name: username,
+        taskid: task.model.get('id'),
+        data: data
+      }, function() {}, "json")
+    });
+
     task.on('submit', function() {
+      // show next task
       _.delay(function() {
         task.hide();
         if (tasks[idx+1]) {
@@ -296,7 +251,9 @@ requirejs(['jquery',
     buttons: [{
       text: 'Exit',
       action: function () {
-        window.location = '/dir/';
+        var completed = +(localStorage['stepCompleted'] || 0);
+        localStorage['stepCompleted'] = Math.max(completed, 4)
+        window.location = '/study/';
       }
     }],
     style: { width: 500 }

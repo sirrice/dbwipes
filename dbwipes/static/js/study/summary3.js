@@ -206,16 +206,18 @@ requirejs(['jquery',
         var selected = _.chain(sel.amt || []).pluck('day').value();
         var missing = _.difference([0,1,2], selected);
         var extras = _.difference(selected, [0,1,2]);
+        console.log(selected)
         if (missing.length == 0 && extras.length == 0) {
           $("#sq-brush-err")
             .removeClass("bg-danger")
             .addClass("bg-success")
             .text("Great job!").show();
-          window.qv.off('change:selection', f);
-          console.log($(step.el).find(".next-btn"))
           $(step.el).find(".next-btn")
             .removeClass('disabled')
-            .click(tour.next.bind(tour));
+            .click(function() {
+              window.qv.off('change:selection', f);
+              tour.show('sq-good');
+            });
           //_.delay(tour.show.bind(tour), 1000, 'sq-good'); 
           return;
         } else {
@@ -226,8 +228,14 @@ requirejs(['jquery',
           msg = "Please make sure to " + msg + ".";
 
           $("#sq-brush-err")
+            .removeClass("bg-success")
+            .addClass("bg-danger")
             .text(msg)
             .show();
+          $(step.el).find(".next-btn")
+            .addClass('disabled')
+            .click(null);
+
         }
       };
       window.qv.on('change:selection', f);
@@ -262,7 +270,7 @@ requirejs(['jquery',
       $("#scorpion_submit").click(function() {
         $(step.el).find(".next-btn")
           .removeClass('disabled')
-          .click(tour.next.bind(tour));
+          .click(tour.show.bind(tour, 'psrs'));
       });
     }
   })(step));
@@ -377,15 +385,34 @@ requirejs(['jquery',
 
   step = addStep('checkboxes-2', {
     title: "Ignoring Attributes",
-    attachTo: "#viz left",
-    tetherOptions: {
-      attachment: 'top left',
-      targetAttachment: 'top right',
-      offset: '10px -10px'
-    }
+    attachTo: "#togglescorpion bottom",
+    buttons: backbtn
   });
+  step.on("show", (function(step) {
+    return function() {
+      $("#togglescorpion").click(function() {
+        $("#togglescorpion").click(null);
+        _.delay(_.bind(tour.next, tour), 50);
+      });
+    }
+  })(step));
 
   step = addStep('checkboxes-3', {
+    title: "Ignoring Attributes",
+    attachTo: "#scorpion_submit right",
+    buttons: backbtn
+  });
+  step.on("show", (function(step) {
+    return function() {
+      $("#scorpion_submit").click(function() {
+        $("#scorpion_submit").click(null);
+        _.delay(_.bind(tour.next, tour), 50);
+      });
+    }
+  })(step));
+
+
+  step = addStep('checkboxes-4', {
     title: "Ignoring Attributes",
     attachTo: "#all-scorpion-results-container right",
   });
@@ -409,7 +436,9 @@ requirejs(['jquery',
     }, {
       text: 'Exit',
       action: function () {
-        window.location = '/dir/';
+        var completed = +(localStorage['stepCompleted'] || 0);
+        localStorage['stepCompleted'] = Math.max(completed, 3)
+        window.location = '/study/';
       }
     }],
   });
@@ -419,6 +448,7 @@ requirejs(['jquery',
 
 
   tour.start();
+  _.delay(_.bind(tour.show, tour, 'checkboxes-2'), 500);
   window.tour = tour;
 
 });

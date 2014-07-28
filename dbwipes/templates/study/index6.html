@@ -1,0 +1,98 @@
+{% extends "index_base.html" %}
+
+{% block includes %}
+<style>
+  b {
+    font-family: arial;
+  }
+</style>
+
+{%raw%}
+
+
+<script id="where-ans-template" type="text/x-underscore-template">
+<div class='where'>
+  <div class='clause temporary'>
+    {{ sql }}
+  </div>
+</div>
+</script>
+
+
+
+<script id="start-template" type="text/x-underscore-template">
+  <p>
+    This is a dataset of sensor readings from 50 sensors over
+    a 2 week period.  
+    The attributes include the sensor id, the time and day of 
+    the reading, and the voltage, light, humidity and temperature
+    measurements.
+  </p>
+  <p>
+    The visualization query computes the standard deviation of
+    temperature readings across all 50 sensors for each hour.
+  </p>
+  <p>
+    We will ask you to answer a few questions about this dataset 
+{%endraw%}
+    {% if enableScorpion %}
+      <b><i>with</i></b>
+    {% else %}
+      <b><i>without</i></b>
+    {% endif %}
+{%raw%}
+    access to the automated Scorpion tool.
+  </p>
+  <p>When you are ready, click Next.</p>"
+  <p class='bs-callout bs-callout-info'>NOTE: once you submit an answer you cannot fix it</p>
+</script>
+
+
+<script id="q1-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.</p>
+    <p>Click submit when you are satisfied.</p>
+    <p class='where-container bs-callout' id='q1-answer' style='padding: 10px;height: 10em; overflow: scroll; '>
+      Nothing Selected Yet</p>
+  </div>
+</script>
+
+<script id="q2-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>What were other filters that you tried?</p>
+    <small class='text-muted'>We are interested in knowing how you picked your answer.</small>
+  </div>
+</script>
+
+<script id="q3-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>How did you decide what filters to try?</p>
+  </div>
+</script>
+
+<script id="q4-template" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>How confident are you in your answer and why?</p>
+  </div>
+</script>
+
+<script id="q5-question" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>We updated the query to compute the <b>average</b> sales amount per day.</p>
+    <p>What subset of the data is most responsible for the increase in average sales?</p>
+  </div>
+</script>
+
+<script id="q5-text" type="text/x-underscore-template">
+  <div style='margin-bottom: 1em'>
+    <p>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.</p>
+    <p>Click submit when you are satisfied.</small>
+    <p class='bs-callout' id='q5-answer' style='padding: 10px;height: 6em; overflow: scroll'>Nothing Selected Yet</p>
+  </div>
+</script>
+
+
+
+{%endraw%}
+
+{% endblock %}

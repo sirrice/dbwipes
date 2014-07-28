@@ -23,6 +23,10 @@
       <div class="col-md-9">
         <h5>
           Facets
+          <span data-toggle="tooltip"
+            data-placement="top"
+            title="Facets list each attribute and the distribution of values by count"
+          >[?]</span>
 
           {% if debug %}
           <span style='float: right'>
@@ -60,15 +64,28 @@
     <div class='row'>
       <div class='col-md-12'>
         <div id='cur_sql'></div>
-        <h5>Temporary Filters</h5>
+        <h5>
+          Temporary Filters
+          <span data-toggle="tooltip"
+            data-placement="top"
+            title="Temporary filters are shown as an overlay in the visualization on the right"
+          >[?]</span>
+        </h5>
         <div id='temp-where-container' class='where-container'>
           <div class='where' id='temp-where'></div>
         </div>
 
         <h5>
           Permanent Filters
-          <span id="apply-btn" data-toggle="tooltip" data-placement="top" title="Add temporary filters to permanent" class="btn btn-primary btn-xs" style='float:right'>
-            &darr; Add Permanent
+          <span data-toggle="tooltip"
+            data-placement="top"
+            title="Permanent filters are applied and reflected in the facet distributions on the left"
+          >[?]</span>
+          <span id="apply-btn" data-toggle="tooltip" 
+            data-placement="top" 
+            title="Make temporary filters permanent" 
+            class="btn btn-primary btn-xs" style='float:right'>
+            &darr; Make Permanent
           </span>
         </h5>
         <div id='perm-where-container' class='where-container'>
@@ -86,13 +103,17 @@
           <span class="btn btn-xs btn-primary" id="scorpion-showbest" style='float: right;'>Show Best Overall</span>
         </h5>
         <div id='slider-container'>
-          <span id="slider-smallest" class='info' data-toggle="tooltip" data-placement="top" title="Most responsible per record (biggest bang for the buck)" >
+          <span id="slider-smallest" class='info' 
+            data-toggle="tooltip" data-placement="top"
+            title="Most absolute responsibility" >
             small &lambda;
           </span>
           <span class='slider-span'>
             <input class='slider' id="scorpion-slider" data-slider-id='ex1Slider' type="text" style="display: none;"/>
           </span>
-          <span id="slider-biggest" class='info'  data-toggle="tooltip" data-placement="top" title="Most absolute responsibility.">
+          <span id="slider-biggest" class='info'  data-toggle="tooltip" 
+            data-placement="top" 
+            title="Most responsible per record (biggest bang for the buck)">
             big &lambda;
           </span>
         </div>
@@ -111,7 +132,9 @@
   <div class="col-md-4">
     <h5>
       Visualization
-      <span id="q-toggle" style='float:right; margin-left: 1em;' class="btn btn-xs btn-primary">Show Query Form</span>
+      {% if study == 0 %}
+        <span id="q-toggle" style='float:right; margin-left: 1em;' class="btn btn-xs btn-primary">Show Query Form</span>
+      {% endif %}
       <span id="tuples-toggle" style='float:right' class="btn btn-xs btn-primary">Show Tuples</span>
     </h5>
     <!--
