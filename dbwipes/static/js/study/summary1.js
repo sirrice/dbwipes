@@ -512,7 +512,6 @@ requirejs(['jquery',
 
 
   tour.start();
-  tour.show('end');
   window.tour = tour;
 
 

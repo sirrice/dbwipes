@@ -448,7 +448,6 @@ requirejs(['jquery',
 
 
   tour.start();
-  _.delay(_.bind(tour.show, tour, 'checkboxes-2'), 500);
   window.tour = tour;
 
 });
