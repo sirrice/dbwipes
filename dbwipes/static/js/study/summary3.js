@@ -184,7 +184,7 @@ requirejs(['jquery',
       $("#addbad").click(function() {
         $(step.el).find(".next-btn")
           .removeClass('disabled')
-          .click(tour.next.bind(tour));
+          .click(function(){tour.show('sq-brush')});
       });
     }
   })(step));
@@ -252,7 +252,7 @@ requirejs(['jquery',
       $("#addgood").click(function() {
         $(step.el).find(".next-btn")
           .removeClass('disabled')
-          .click(tour.next.bind(tour));
+          .click(function() {tour.show('sq-submit');});
       });
     }
   })(step));
@@ -305,7 +305,7 @@ requirejs(['jquery',
       $("#psrs-info").show();
       $(step.el).find('.next-btn')
         .removeClass("disabled")  
-        .click(tour.next.bind(tour));
+        .click(function() {tour.show('srs-1');});
     });
   })(step);
 
