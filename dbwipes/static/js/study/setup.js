@@ -26,6 +26,11 @@ define(function(require) {
       scrSetup = require('summary/setup');
 
 
+
+  var wheretmptemplate = Handlebars.compile($("#where-tmp-ans-template").html());
+  var wheretemplate = Handlebars.compile($("#where-ans-template").html());
+
+
   //
   // Vanilla answer checker makes sure answer is not empty
   //
@@ -39,18 +44,19 @@ define(function(require) {
   // 
   // ensure filter answer doesn't contain day or amt attributes
   //
-  var checkFilterAnswer = function(answer, task) {
-    if (!(answer && answer.length)) {
+  var checkFilterAnswer = function(answers, task) {
+    if (!(answers && _.size(answers))) {
       return "Please select a filter";
     }
-    var cols = answer.map(function(cstat) { return cstat.get('col'); });
+
     var illegalCols = [];
-    if (_.contains(cols, 'day')) {
-      illegalCols.push("day");
-    }
-    if (_.contains(cols, 'amt')) {
-      illegalCols.push("amt");
-    }
+    _.each(answers, function(clauses, ansid) {
+      _.each(clauses, function(clause) {
+        if (/day/.test(clause.sql) ) illegalCols.push("day");
+        if (/amt/.test(clause.sql) ) illegalCols.push("amt");
+      })
+    });
+    illegalCols = _.compact(_.uniq(illegalCols));
     if (illegalCols.length > 0) {
       return "Please select a filter that does not use attributes " + illegalCols.join(" or ");
     }
@@ -62,26 +68,71 @@ define(function(require) {
   // answer input
   //
   var showf = function(task) {
+    function addTmpModels(el, models) {
+      var clauses = _.map(models, function(model, idx) { 
+        var sql = util.negateClause(model.toSQLWhere());
+        return { idx: idx, sql: sql};
+      });
+      el.append($(wheretmptemplate({clauses: clauses})).html());
+      el.find(".add-as-ans-btn").click(function() {
+        el.find(".add-as-ans-btn").remove();
+        //el.empty();
+        tmp2answer(clauses);
+      })
+      return clauses;
+    }
+
+    function tmp2answer(clauses) {
+      ansid += 1;
+      answers[ansid] = _.clone(clauses);
+      var newel = $(wheretemplate({clauses:clauses}));
+      newel.find(".rm-as-ans-btn").click((function(ansid) {
+        return function() {
+          newel.remove();
+          delete answers[ansid]
+          task.model.set('answer', answers);
+          window.answers = answers;
+        };
+      })(ansid));
+      $("#q1-answer").append(newel);
+
+      task.model.set('answer', answers);
+      window.answers = answers;
+    }
+
+
+    var answers = {};
+    var ansid = 0;
+    var tmpanswer = null;
+    var tmpel =  $("#q1-tmp-answer")
+
     function onChange() {
+      // get the cstat models that are in the filter
       var models = _.compact(window.where.map(function(model) {
         var sel = model.get('selection'),
             vals = _.keys(sel);
         if (vals.length) return model;
       }));
-      $("#q1-answer").empty();
-      var clauses = _.map(models, function(model, idx) { 
-        var sql = util.negateClause(model.toSQLWhere());
-        var json = { idx: idx, sql: sql};
-        $("#q1-answer").append($(wheretemplate(json)));
-        return sql;
-      });
-      task.model.set('answer', models);
+      if (models.length == 0) return;
+
+      tmpel.empty();
+      tmpanswer = addTmpModels(tmpel, models);
+
     }
+
+    // add the filter change handler
     window.where.on('change:selection', onChange);
     task.on('submit', function() {
       window.where.off('change:selection', onChange);
     });
+    // call just in case there is filter already
     onChange();
+
+
+    // code to manage list of rules
+    $("#q1-add-filter").click(function() {
+      var wheredivs = $("#q1-tmp-answer").children().remove()
+    });
   }
 
 
@@ -91,6 +142,8 @@ define(function(require) {
       var prefix = "Q" + (idx+1) + " of " + tasks.length;
       var title = task.model.get('title') || "";
       task.model.set('title', prefix + " " + title);
+
+      // Every time user presses submit, log it
       task.on('trysubmit', function() {
         var username = localStorage['name'];
         var data = JSON.stringify(task.model);
@@ -101,6 +154,7 @@ define(function(require) {
         }, function() {}, "json")
       });
 
+      // When task is successfully submitted, go to next task
       task.on('submit', function() {
         // show next task
         _.delay(function() {
@@ -115,7 +169,6 @@ define(function(require) {
     })
   }
 
-  var wheretemplate = Handlebars.compile($("#where-ans-template").html());
 
 
 
@@ -142,7 +195,7 @@ define(function(require) {
     });
 
     step = tour.addStep('start', {
-      title: "Validation",
+      title: "Introduction",
       text: $("#start-template").html(),
       classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",
       style: { width: 600 },

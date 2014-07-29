@@ -15,13 +15,32 @@
 {%raw%}
 
 
-<script id="where-ans-template" type="text/x-underscore-template">
+<script id="where-tmp-ans-template" type="text/x-underscore-template">
+<div>
 <div class='where'>
+  {{#each clauses}}
   <div class='clause temporary'>
     {{ sql }}
   </div>
+  {{/each}}
+</div>
+<div class="add-as-ans-btn btn btn-primary btn-xs" style="width: 90%">Add Filter to Answer</div>
 </div>
 </script>
+
+<script id="where-ans-template" type="text/x-underscore-template">
+<div style="margin-bottom: 10px">
+<div class='where'>
+  {{#each clauses}}
+  <div class='clause permanent'>
+    {{ sql }}
+  </div>
+  {{/each}}
+</div>
+<div class="rm-as-ans-btn btn btn-primary btn-xs" style="width: 90%">Remove From Answer</div>
+</div>
+</script>
+
 
 
 
@@ -66,8 +85,10 @@
   <div style='margin-bottom: 1em'>
     <p>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.</p>
     <p>Click submit when you are satisfied.</small>
-    <p class='where-container bs-callout' id='q1-answer' style='padding: 10px;height: 10em; overflow: scroll;'>
-      Nothing Selected Yet
+    <h4>Filters in Answer</h4>
+    <p class='where-container bs-callout' id='q1-answer' style='padding: 10px; height: auto;'> </p>
+    <h4>Currently Selected Filter</h4>
+    <p class='where-container bs-callout' id='q1-tmp-answer' style='padding: 10px;height: 10em; overflow: scroll; '>
     </p>
   </div>
 </script>

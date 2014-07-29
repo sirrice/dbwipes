@@ -15,30 +15,49 @@
 {%raw%}
 
 
-<script id="where-ans-template" type="text/x-underscore-template">
+
+<script id="where-tmp-ans-template" type="text/x-underscore-template">
+<div>
 <div class='where'>
+  {{#each clauses}}
   <div class='clause temporary'>
     {{ sql }}
   </div>
+  {{/each}}
+</div>
+<div class="add-as-ans-btn btn btn-primary btn-xs" style="width: 90%">Add Filter to Answer</div>
+</div>
+</script>
+
+<script id="where-ans-template" type="text/x-underscore-template">
+<div style="margin-bottom: 10px">
+<div class='where'>
+  {{#each clauses}}
+  <div class='clause permanent'>
+    {{ sql }}
+  </div>
+  {{/each}}
+</div>
+<div class="rm-as-ans-btn btn btn-primary btn-xs" style="width: 90%">Remove From Answer</div>
 </div>
 </script>
 
 
 
+
 <script id="start-template" type="text/x-underscore-template">
   <p>
-    This is a more complex synthetic sales dataset.  
-    The attributes include the day, the amount spent, and 
+    This is a more complex synthetic sales dataset.
+    The attributes include the day, the amount spent, and
     customer age range, gender, and state.
   </p>
-  <p> 
+  <p>
     The visualization shows the <b>average</b> sales amount
     per day.  So the SQL query is:
   </p>
-  <p class="bs-callout bs-callout-info">SELECT day, avg(amt) FROM sales GROUP BY day</span>
-  </p>
+  <p class="bs-callout bs-callout-info">SELECT day, avg(amt) FROM sales GROUP BY day</span></p>
   <p>
-    We will ask you to answer a few questions about this dataset 
+    We will ask you to answer a few questions about this dataset
 {%endraw%}
     {% if enableScorpion %}
       <b><i>with</i></b>
@@ -66,8 +85,10 @@
   <div style='margin-bottom: 1em'>
     <p>Use the Facets to filter the data to the responsible subset.  Your submission is shown below.</p>
     <p>Click submit when you are satisfied.</small>
-    <p class='where-container bs-callout' id='q1-answer' style='padding: 10px;height: 10em; overflow: scroll;'>
-      Nothing Selected Yet
+    <h4>Filters in Answer</h4>
+    <p class='where-container bs-callout' id='q1-answer' style='padding: 10px; height: auto;'> </p>
+    <h4>Currently Selected Filter</h4>
+    <p class='where-container bs-callout' id='q1-tmp-answer' style='padding: 10px;height: 10em; overflow: scroll; '>
     </p>
   </div>
 </script>
