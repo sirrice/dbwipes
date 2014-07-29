@@ -196,25 +196,25 @@ def index_idx(idx):
   if idx == 10:
     js = 'study/summary10'
     enable_scorpion = 0
-    templates[0] = "study/index4.html"
+    templates[0] = "study/index10.html"
 
   if idx == 11:
     subtitle = "with Scorpion"
     js = 'study/summary10'
     enable_scorpion = 1
-    templates[0] = "study/index4.html"
+    templates[0] = "study/index10.html"
 
   # hard2 avg
   if idx == 12:
     js = 'study/summary12'
     enable_scorpion = 0
-    templates[0] = "study/index8.html"
+    templates[0] = "study/index12.html"
 
   if idx == 13:
     subtitle = "with Scorpion"
     js = 'study/summary12'
     enable_scorpion = 1
-    templates[0] = "study/index8.html"
+    templates[0] = "study/index12.html"
 
 
 

@@ -26,6 +26,9 @@ define(function(require) {
       scrSetup = require('summary/setup');
 
 
+  //
+  // Vanilla answer checker makes sure answer is not empty
+  //
   var checkAnswer = function(answer, task) {
     if (answer == null || answer == '' || answer.length == 0) {
       return "Please enter an answer";
@@ -33,6 +36,9 @@ define(function(require) {
     return true;
   };
 
+  // 
+  // ensure filter answer doesn't contain day or amt attributes
+  //
   var checkFilterAnswer = function(answer, task) {
     if (!(answer && answer.length)) {
       return "Please select a filter";
@@ -51,6 +57,10 @@ define(function(require) {
     return true;
   }
 
+  //
+  // adds handler to DBWipes filter changes to reflect in
+  // answer input
+  //
   var showf = function(task) {
     function onChange() {
       var models = _.compact(window.where.map(function(model) {
@@ -75,10 +85,8 @@ define(function(require) {
   }
 
 
-  var wheretemplate = Handlebars.compile($("#where-ans-template").html());
-
-
-  var createTaskList = function(tasks) {
+  // Connect the tasks together with the tour
+  var createTaskList = function(tour, tasks) {
     _.each(tasks, function(task, idx) {
       var prefix = "Q" + (idx+1) + " of " + tasks.length;
       var title = task.model.get('title') || "";
@@ -107,20 +115,27 @@ define(function(require) {
     })
   }
 
+  var wheretemplate = Handlebars.compile($("#where-ans-template").html());
 
 
 
 
 
 
+  //
+  // setup scorpion+dbwipes
+  //
   var setup = function() {
-    console.log(scrSetup);
     scrSetup.setupBasic();
     scrSetup.setupButtons(window.q, window.qv);
     scrSetup.setupScorpion(window.enableScorpion, window.q, window.qv, window.where);
     scrSetup.setupTuples(window.q, window.srv, window.where);
   }
 
+  //
+  // given tasks and the index (step id) of the study task,
+  // create the shepherd tour object for the page
+  // 
   var setupTour = function(tasks, idx) {
     var tour = new Shepherd.Tour({
       defaults: { classes: "shepherd-element shepherd-open shepherd-theme-arrows"}
@@ -143,6 +158,7 @@ define(function(require) {
     step.on("show", function() { $("div.row").css("opacity", 0.6); });
     step.on("hide", function() { $("div.row").css("opacity", 1); });
 
+    createTaskList(tour, tasks);
 
     step = tour.addStep('end', {
       title: "Done!",
@@ -224,8 +240,8 @@ define(function(require) {
     var tasks = [
       new TaskView({
         id: taskprefix+"-1",
-        question: $("#q5-question").html(),
-        text: $("#q5-text").html(),
+        question: $("#q1-question").html(),
+        text: $("#q1-text").html(),
         textbox: false,
         attachTo: '#tasks',
         truth: checkFilterAnswer,
