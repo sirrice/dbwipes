@@ -344,7 +344,9 @@ define(function(require) {
           h = this.state.h;
 
 
-      function yzoomf() {
+      var yzoomf = function(el) {
+        var yaxis = this.state.yaxis;
+        var yscales = this.state.yscales;
         el.select('.axis.y').call(yaxis);
         el.selectAll('.mark')
           .attr('y', function(d) {
@@ -356,6 +358,35 @@ define(function(require) {
             return Math.min(h-bot, Math.max(2, height));
           })
       };
+      yzoomf = _.bind(yzoomf, this, el);
+
+
+      var yshiftf = function(el, yzoomf) {
+        var yzoom = this.yzoom;
+        var yStart = d3.event.y;
+        var curYScale = yzoom.scale();
+        var yscales = this.state.yscales;
+
+        if (d3.event.shiftKey) {
+          d3.select('body')
+            .on('mousemove.cstaty', function() {
+              var diff = ((yStart - d3.event.y) / 10);
+              if (diff >= 0) { 
+                diff += 1.0; 
+              } else {
+                diff = 1.0 / (Math.abs(diff)+1);
+              }
+              yzoom.scale(diff*curYScale);
+            })
+            .on('mouseup.cstaty', function() {
+              d3.select('body')
+                .on('mousemove.cstaty', null)
+                .on('mouseup.cstaty', null);
+            });
+        }
+      }
+      yshiftf = _.bind(yshiftf, this, el, yzoomf)
+
 
       this.yzoom = yzoom = d3.behavior.zoom()
         .y(this.state.yscales)
@@ -365,47 +396,17 @@ define(function(require) {
       el.select('.axis.y').call(yzoom)
         .style('cursor', 'ns-resize')
       
+      el.select('.yaxis')
+        .on('mousedown.cstaty', yshiftf)
+
+
+
       if (!window.zoom) {
         window.zoom = yzoom;
         window.el = el;
         window.yzoomf = yzoomf
         window.yaxis = yaxis;
       }
-
-      var yStart = null;
-      var curYScale = null;
-      el.select('.yaxis')
-        .on('mousedown.cstaty', function() {
-          if (d3.event.shiftKey) {
-            yStart = d3.event.y;
-            curYScale = yzoom.scale();
-            yzoom.on('zoom', null);
-            el.select('.yaxis rect')
-              .style('pointer-events', 'none')
-              
-            d3.select('body')
-              .on('mousemove.cstaty', function() {
-                var diff = ((yStart - d3.event.y) / 5);
-                if (diff >= 0) { 
-                  diff += 1.0; 
-                } else if (diff < 0) { 
-                  diff = 1.0 / (Math.abs(diff)+1);
-                }
-                yzoom.scale(diff*curYScale);
-                //yzoomf();
-              })
-              .on('mouseup.cstaty', function() {
-                d3.select('body')
-                  .on('mousemove.cstaty', null)
-                  .on('mouseup.cstaty', null);
-                yzoom.on('zoom', yzoomf);
-                el.select('.yaxis rect').style('pointer-events', 'all');
-              });
-          }
-        })
-
-
-
 
       if (!util.isStr(this.model.get('type'))) {
         // sorry, don't support discrete zooming...
@@ -426,7 +427,6 @@ define(function(require) {
               var within = (x >= xscales.range()[0] && x <= xscales.range()[1]);
               return (within)? null : 'none';
             });*/
-          
         }
 
         var zoom = d3.behavior.zoom()
@@ -461,7 +461,6 @@ define(function(require) {
                   } else if (diff < 0) { 
                     diff = 1.0 / (Math.abs(diff)+1);
                   }
-                  //console.log(diff)
                   zoom.scale(diff*curXScale);
 
                 })

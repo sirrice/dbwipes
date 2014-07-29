@@ -164,11 +164,11 @@ define(function(require) {
     },
 
     hide: function() {
-      $("#tuples-toggle").text("Show Tuples");
+      $("#tuples-toggle").text("Show Rows");
       this.$el.hide();
     },
     show: function() {
-      $("#tuples-toggle").text("Hide Tuples");
+      $("#tuples-toggle").text("Hide Rows");
       this.$el.show();
     },
     toggle: function() {

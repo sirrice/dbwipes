@@ -1,0 +1,76 @@
+<html>
+  <script src="/static/js/lib/jquery.js"></script>
+  <script src="/static/js/lib/underscore.js"></script>
+
+<style>
+  a {
+    width: 100%;
+  }
+
+  .btn-cancelled {
+    background: whitesmoke;
+    color: black;
+  }
+
+  b {
+    font-family: arial;
+  }
+</style>
+
+
+<body>
+
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <h1>Scorpion User Study</h1>
+
+    <h2><span id="nametitle">Before we start, what is your name?</span> <a href="#"><small id="nameclear">clear</small></a></h2>
+    <p><form id="nameform"><input class='input form-control' id="name" style='width:100%'/></form></p>
+
+    <div id="next">
+      <a href="/study/" class="btn btn-primary" style="padding:1em; font-size: 18pt">Start Study</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  $(function() {
+    var validName = function(name) {
+      return name && name != '';
+    };
+
+
+    var render = function(name) {
+      $("#name").val(name);
+      if (validName(name)) {
+        localStorage['name'] = name;
+        $("#nametitle").text("Your name: " + name);
+        $("#next").show();
+      } else {
+        delete localStorage['name'];
+        $("#nametitle").text("Before we start, what is your name?")
+        $("#next").hide();
+      }
+    };
+
+    render(localStorage['name']);
+
+    $("#nameform").on("submit", function() {
+      render($("#name").val());
+      return false;
+    });
+
+    $("#nameclear").click(function() {
+      render(null);
+    });
+  });
+</script>
+
+{% include 'footer.html' %}
+
+</body>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/static/css/base.css"/>
+</html>

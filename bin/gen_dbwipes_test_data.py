@@ -1,23 +1,34 @@
+#!/usr/bin/env python2.7
+#
 # Generate synthetic test data for user study
 #
 # shell commands:
 #
-#   python gendata.py  > simpledata.csv
+#   python gendata.py --mode hard1  > simpledata.csv
 #   importmydata.py simple test simpledata.csv 
 #   summarizedb.py test simple
 #
 #
-from collections import *
+
+
+try:
+  activate_this = './bin/activate_this.py'
+  execfile(activate_this, dict(__file__=activate_this))
+except:
+  pass
+
+
 import random
 import click
 import numpy as np
+from collections import *
 random.seed(0)
 np.random.seed(0)
 
 
 @click.command()
-@click.option('--simple', is_flag=True)
-def gen_data(simple):
+@click.argument('mode')
+def gen_data(mode):
   # numeric attributes
   #  date, amount, age, state
   # discrete attributes
@@ -42,7 +53,7 @@ def gen_data(simple):
   print "day,state,age,gender,amt"
   for date in range(10):
 
-    if simple:
+    if mode == 'simple':
       states = ["AR", "CA", "CO", "IL",  "PA", "TN", "VT", "WA", "WI" ]
 
     # 5k sales per date
@@ -55,7 +66,7 @@ def gen_data(simple):
       # CA Males have more sales 
       # PA Females have higher sales
       # 
-      if simple:
+      if mode == 'simple':
         numcenter = 50
         numstd = 5
         amtcenter = 100
@@ -86,14 +97,14 @@ def gen_data(simple):
 
 
       #
-      # Hard version
+      # Hard version 1
       #
       # average of (40 + idx*2) +- 5 sales ~$10 each
       # CA has higher sales
       # MI has _more_ sales
-      # DC and FL have higher than average number and rate of sales 
+      # FL have higher than average number and rate of sales 
 
-      else:
+      elif mode == 'hard1':
         numcenter = 40 + sidx*2
         numstd = 5
         amtcenter = 80 - sidx/2.
@@ -137,5 +148,49 @@ def gen_data(simple):
           print "%d,%s,%s,%s,%.2f" % (date, state, age, gender, amt)
 
 
+      #
+      # Hard version 2
+      #
+      # average of (40 + idx*2) +- 5 sales ~$10 each
+      # MA >60 has higher sales
+      # WA <18 has _more_ sales
+
+      elif mode == 'hard2':
+        numcenter = 20
+        numstd = 3
+        amtcenter = 50
+        amtstd = 2
 
 
+        if date >= 3 and date <= 6:
+          if state in ['MA']:
+            amtcenter *= max(1, 1.15 * (6 - abs(4-date)))
+
+          #if state == 'MA':
+            #amtcenter += 30
+          if state == 'WA':
+            numcenter += 20
+            amtcenter += 60
+
+        nsales = max(0, int(random.gauss(numcenter, numstd)))
+        perc = np.array(list(state2ages[state]))
+        if state == 'MA':
+          perc[3] += .7
+          perc = perc / perc.sum()
+        if state == 'WA':
+          perc[0] += .7
+          perc = perc / perc.sum()
+
+
+        agelist = np.random.choice(ages, nsales, p=perc)
+        for i, age in enumerate(agelist):
+          damtcenter = damtstd = 0
+          male = random.random() < state2gender[state]
+          gender = (male and 'M' or 'F')
+          amt = max(0, random.gauss(amtcenter + damtcenter, amtstd+damtstd))
+
+          print "%d,%s,%s,%s,%.2f" % (date, state, age, gender, amt)
+
+
+if __name__ == '__main__':
+  gen_data()

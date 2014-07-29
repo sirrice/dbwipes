@@ -77,12 +77,9 @@ requirejs(['jquery',
       x: 'num',
       amt: 'num'
     },
-    table: 'test',
+    table: 'hard1',
     db: 'test'
   };
-  var testq2 = _.extend(_.clone(testq1), {
-    ys: [{col: 'amt', expr: 'avg(amt)'}]
-  })
 
   q.set(testq1);
 
@@ -171,11 +168,6 @@ requirejs(['jquery',
       textbox: true,
       truth: checkAnswer,
       attachTo: '#tasks',
-      on: {
-        'submit': function() {
-          q.set(testq2);
-        }
-      }
     })
   ];
   _.each(tasks, function(task, idx) {

@@ -21,11 +21,8 @@
       </div>
       {{/each}}
       {{#if textbox}}
-        {{#if largetextbox}}
-          <textarea name="text" class="form-control" placeholder="type in the answer"></textarea>
-        {{else}}
-          <input name="text" class="form-control" placeholder="type in the answer"/>
-        {{/if}}
+          <textarea name="text" class="form-control" placeholder="type in the answer" style="min-height: 6em;"></textarea>
+          <!--<input name="text" class="form-control" placeholder="type in the answer"/>-->
       {{/if}}
     </div>
   </div>

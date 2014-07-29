@@ -64,6 +64,10 @@
     cursor: pointer; 
     min-width: 50px;
   }
+
+  b {
+    font-family: arial;
+  }
 </style>
 
 {%raw%}
@@ -78,12 +82,13 @@
   </p>
   <p>When you are ready, click Next.</p>
   <p class='bs-callout bs-callout-info'>
-    For this study, it may help to zoom your browser window out 
-    <kbd>ctrl-(minus) or &#8984;-(minus)</kbd> so the whole page fits on one screen comfortably.
+    For this study, zoom your browser window out 
+    <kbd>ctrl-(minus) or &#8984;-(minus)</kbd> if the page seems cut-off.
   </p>
   <p class='bs-callout bs-callout-info'>
   You can move the tutorial boxes by clicking and dragging the 
-  <span class='smalllabel' style='padding: 2px; padding-left: 1em; padding-right: 1em'>grey area</span> at the top of the box.
+  <span class='smalllabel' style='padding: 2px; padding-left: 1em; padding-right: 1em'>grey title bar</span> 
+  at the top of the box.
   </p>
 </script>
 
@@ -109,8 +114,8 @@
 
 <script id="cstat-label-template" type="text/x-underscore-template">
 <p>
-  For example, this <b style='font-family: arial'>day</b> 
-  attribute corresponds with the <b style='font-family:arial'>day</b> 
+  For example, this <b>day</b> 
+  attribute corresponds with the <b>day</b> 
   column in the sample table on the right.
 </p>
 <p>
@@ -120,7 +125,7 @@
 </script>
 
 <script id="dist-filter-2" type="text/x-underscore-template">
-<p>This selects records from day <i>1</i> to <i>3</i>.  The selected range is colored in grey, and the matching values are highlighted.</p>
+<p>This selects rows from day <b>1 to 3</b>.  The selected range is colored in grey, and the matching values are highlighted.</p>
 <p>You can resize and drag the selection around.  Click anywhere within the plot but outside the grey selected region to clear it.</p>
 <p>Go ahead and give it a try.</p>
 </script>
@@ -139,11 +144,28 @@
   zoom in and out.  Click and drag left and right to scroll.
 </p>
 <p>
+  For convenience, you can shift-click then drag left and right to zoom.
+</p>
+</script>
+
+<script id="dist-select-2" type="text/x-underscore-template">
+<p>
   When you hover over the y-axis your cursor will become
   <img src="/static/images/ns-resize.gif"/>.  Scroll up and down to 
   zoom in and out.  Click and drag up and down to scroll.
 </p>
+<p>
+  For convenience, you can shift-click then drag up and down to zoom.
+</p>
 </script>
+
+
+<script id="qv-zoom" type="text/x-underscore-template">
+<p>
+  The visualization axes can also be zoomed and panned in the same way!
+</p>
+</script>
+
 
 <script id="dist-filter-3" type="text/x-underscore-template">
 <p>The visualization will update whenever you filter using the facets</p>
@@ -166,23 +188,22 @@
 
 <script id="seltype" type="text/x-underscore-template">
 <p>
-  So far, the facets <b style='color: rgb(26, 189, 64)'>select</b> 
+  The facets current <b style='color: rgb(26, 189, 64)'>select</b> 
   subsets of data that match your filters. </p>
 <p>
   Sometimes it helps to see what happens if the data you selected 
-  were <i>removed</i></p>
-<p>
+  were <i>removed</i>.
   Toggle this switch to show data that <i>doesn't</i> match the filter.</p>
 <p>
   Click on the green <span style='font-family: arial; font-weight: bold;'><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>select</b><span style='background:#6ADE85; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span></span> 
-  switch to the left.</p>
+  switch to the right.</p>
 </script>
 
 
 <script id="seltype-2" type="text/x-underscore-template">
 <p>
 When you set the switch to <span style='font-family: arial; font-weight: bold;'><span style='background:#D95050; border-radius: 4px; width: 2em;'>&nbsp;&nbsp;&nbsp;&nbsp;</span><b style='background:whitesmoke; color: black; padding-left: 10px; padding-right: 10px;'>Remove</b></span>, 
-the <span class='greywhere'>filters</span> are negated to remove those corresponding records from the query.
+the <span class='greywhere'>filters</span> are negated to remove those corresponding rows from the query.
 </p>
 </script>
 
@@ -237,9 +258,9 @@ filter you want to apply.
 
 <script id="tupletoggle" type="text/x-underscore-template">
 <p>
-Click on this button to toggle a table of individual records that match
-the data points shown in the visualization 
-(conjunction of the temporary and permanent filters.)
+Click on this button to toggle a table of individual rows that match
+the colored points shown in the visualization. 
+<small>(AND/conjunction of temporary and permanent filters)</small>
 </p>
 <p>
 The table is shown below the main visualization.

@@ -77,10 +77,9 @@ requirejs(['jquery',
       x: 'num',
       amt: 'num'
     },
-    table: 'test',
+    table: 'hard1',
     db: 'test'
   };
-
   q.set(testq1);
 
   var checkAnswer = function(answer, task) {
@@ -164,11 +163,6 @@ requirejs(['jquery',
       textbox: true,
       truth: checkAnswer,
       attachTo: '#tasks',
-      on: {
-        'submit': function() {
-          q.set(testq2);
-        }
-      }
     })
   ];
   _.each(tasks, function(task, idx) {

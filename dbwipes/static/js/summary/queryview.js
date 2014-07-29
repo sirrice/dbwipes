@@ -187,7 +187,7 @@ define(function(require) {
       }
 
       if (el.select('.yaxis-label').size() == 0) {
-        var txt = _.uniq(_.pluck(this.model.get('ys'), 'col')).join(', ');
+        var txt = _.uniq(_.pluck(this.model.get('ys'), 'expr')).join(', ');
         el.append('g')
           .classed('yaxis-label', true)
           .attr('text-anchor', 'middle')
@@ -407,7 +407,9 @@ define(function(require) {
           xscales = this.state.xscales,
           xaxis = this.state.xaxis;
 
-      function yzoomf() {
+      var yzoomf = function(el) {
+        var yaxis = this.state.yaxis;
+        var yscales = this.state.yscales;
         el.select('.axis.y').call(yaxis);
         el.selectAll('.mark')
           .attr('cy', function(d) {
@@ -420,23 +422,7 @@ define(function(require) {
             return 0;
           })
       };
-
-      function xzoomf() {
-        el.select('.axis.x').call(xaxis);
-        el.selectAll('.mark')
-          .attr('cx', function(d) {
-            return xscales(d.x);
-          })
-          .style('opacity', function(d) {
-            if (xscales.range()[0] <= xscales(d.x) && 
-                xscales(d.x) <= xscales.range()[1])
-              return 1;
-            return 0;
-          })
-        _this.xscale = d3.event.scale;
-      };
-
-
+      yzoomf = _.bind(yzoomf, this, el);
 
       this.yzoom = yzoom = d3.behavior.zoom()
         .y(this.state.yscales)
@@ -445,10 +431,63 @@ define(function(require) {
       el.select('.axis.y').call(yzoom)
         .style('cursor', 'ns-resize')
 
-          
+        
+      var yshiftf = function(el, yzoomf) {
+        var yzoom = this.yzoom;
+        var yStart = d3.event.y;
+        var curYScale = yzoom.scale();
+        var yscales = this.state.yscales;
+
+        if (d3.event.shiftKey) {
+          d3.select('body')
+            .on('mousemove.qvy', function() {
+              var diff = ((-d3.event.y + yStart) / 100);
+              if (diff >= 0) { 
+                diff += 1.0; 
+              } else { 
+                diff = 1.0 / (Math.abs(diff)+1);
+              }
+              yzoom.scale(diff*curYScale);
+            })
+            .on('mouseup.qvy', function() {
+              d3.select('body')
+                .on('mousemove.qvy', null)
+                .on('mouseup.qvy', null);
+
+            });
+        }
+      }
+      yshiftf = _.bind(yshiftf, this, el, yzoomf);
+
+      el.select('.yaxis')
+        .on('mousedown.qvy', yshiftf)
+
+
+
+
       var type = this.model.get('schema')[this.model.get('x').col];
 
       if (!util.isStr(type)) {
+
+        function xzoomf(el) {
+          var xaxis = this.state.xaxis;
+          var xscales = this.state.xscales;
+          el.select('.axis.x').call(xaxis);
+          el.selectAll('.mark')
+            .attr('cx', function(d) {
+              return xscales(d.x);
+            })
+            .style('opacity', function(d) {
+              if (xscales.range()[0] <= xscales(d.x) && 
+                  xscales(d.x) <= xscales.range()[1])
+                return 1;
+              return 0;
+            })
+          _this.xscale = d3.event.scale;
+        };
+        xzoomf = _.bind(xzoomf, this, el);
+
+
         this.xzoom = xzoom = d3.behavior.zoom()
           .x(this.state.xscales)
           .on('zoom', xzoomf);

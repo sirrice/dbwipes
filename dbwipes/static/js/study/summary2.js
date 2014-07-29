@@ -117,7 +117,7 @@ requirejs([
     }),
     new TaskView({
       id: "tutorial-3",
-      question: "<p>Which state most contributes to the rising sales?</p>",
+      question: "<p>Enter the name of the state that most contributes to the rising sales?</p>",
       textbox: true,
       truth: function(answer) {
         var matches = _.filter(['CA', 'Cali', 'California'], function(truth) {
@@ -132,7 +132,7 @@ requirejs([
     }),
     new TaskView({
       id: "tutorial-4",
-      question: "<p>What are the total sales on day 1 if we ignored California sales (round to the nearest 10 thousand)?</p>",
+      question: "<p>What are the total sales on day 5 if we ignored California sales (round to the nearest 10 thousand)?</p>",
       textbox: true,
       truth: function(answer) {
         return Math.abs(+answer - 40000) < 7000;
@@ -142,7 +142,7 @@ requirejs([
     }),
     new TaskView({
       id: "tutorial-5",
-      question: "<p>Which gender has a higher number (count) of California sales overall?</p>",
+      question: "<p>Which gender has a higher number of California sales rows?<br/><span style='color: grey; font-size: smaller;'>(hint: the facets show number of rows for each attribute value and permanent filters update the facets.)</span> </p>",
       options: [ 'Male', 'Female', 'They are equal'],
       truth: 0,
       attachTo: '#tasks',
@@ -214,7 +214,7 @@ requirejs([
   
   step = tour.addStep('end', {
     title: "Great Job!",
-    text: "<p>You will notice that many of these questions involved understanding why the total sales rose over the 10 days.</p>"+
+    text: "<p>Many of these questions involved understanding why the total sales rose over the 10 days.</p>"+
           "<p>Scorpion is an extension to DBWipes that automates the task of answering these types of questions.</p>"+
           "<p>The next section will introduce you to the Scorpion extension.</p>",
     classes: "shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text",

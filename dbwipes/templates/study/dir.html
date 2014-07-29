@@ -1,6 +1,7 @@
 <html>
   <script src="/static/js/lib/jquery.js"></script>
   <script src="/static/js/lib/underscore.js"></script>
+  <script src="/static/js/lib/handlebars.js"></script>
 
 <style>
   a {
@@ -11,7 +12,12 @@
     background: whitesmoke;
     color: black;
   }
+
+  b {
+    font-family: arial;
+  }
 </style>
+
 
 <body>
 
@@ -19,16 +25,15 @@
   <div class="col-md-4 col-md-offset-4">
     <h1>Scorpion User Study</h1>
 
-    <h2><span id="nametitle">Before we start, what is your name?</span> <small id="nameclear">clear</small></h2>
-    <p><form id="nameform"><input class='input form-control' id="name" style='width:100%'/></form></p>
+    <h2><span id="nametitle"></span></h2>
 
-    <div class="steps">
-      <h2>Tutorial Section</h2>
+    <div class="steps" style="display:none;">
+      <h2>Instructions</h2>
       <p>
-        Please complete the following tutorial and tasks in order.  The current task will
+        Please complete the following tutorial and study tasks in order.  The current task will
         be highlighted in <span class="btn btn-xs btn-primary">blue</span>, tasks you have
-        completed will be in <span class="btn btn-xs btn-success">green</span>.  
-        Tasks that cannot be started until the current task is finished are in
+        completed will be in <span class="btn btn-xs btn-success">green</span>, and
+        tasks that cannot be started yet are in
         <span class="btn btn-xs btn-cancelled">grey</span>.
       </p>
       <p>
@@ -37,18 +42,31 @@
         thinking.  This helps us review the study afterwards to understand your 
         thought process.  
       </p>
+      <p>
+        Thoughout this study, <b>Do Not Use The Browser Back Button!</b>
+      </p>
+
+      <h2>Tutorial Section</h2>
       <p><a id="study1" href="/study/1/" class='btn'>DBWipes Tutorial</a></p>
       <p><a id="study2" href="/study/2/" class='btn'>Verification Tasks</a></p>
       <p><a id="study3" href="/study/3/" class='btn'>Scorpion Tutorial</a></p>
 
       <h2>User Study</h2>
-      <p><a id="study4" href="/study/5/" class='btn'>Task 1</a></p>
-      <p><a id="study5" href="/study/9/" class='btn'>Task 2</a></p>
+      <div id="studytasks"></div>
     </div>
 
 
   </div>
 </div>
+
+{%raw%}
+<script id="dir-task-btn-template" type="text/x-underscore-template">
+<p>
+  <a id='study{{taskid}}' href='/study/{{taskid}}/' class='btn'>Task {{idx}} ({{taskid}})</a>
+</p>
+</script>
+
+{%endraw%}
 
 <script>
   $(function() {
@@ -60,44 +78,77 @@
       $("#name").val(name);
       if (validName(name)) {
         localStorage['name'] = name;
-        $("#nametitle").text("Your name: " + name);
+        $("#nametitle").text("Hello " + name);
         $(".steps").show();
       } else {
-        delete localStorage['name'];
-        $("#nametitle").text("Before we start, what is your name?")
-        $(".steps").hide();
+        window.location = '/study/name/';
       }
     };
 
-    var stepCompleted = +(localStorage['stepCompleted']||0);
+    var setupLinks = function() {
+      var stepCompleted = +(localStorage['stepCompleted']||0);
 
-    _.times(5, function(idx) {
-      idx = idx + 1;
-      if (stepCompleted > idx-1) {
-        $("#study"+idx).addClass("btn-success");
-      } else if (stepCompleted == idx-1) {
-        $("#study"+idx).addClass("btn-primary");
-      } else {
-          $("#study"+idx)
+      /* color the links depending on what tasks have been completed */
+      var studyLinks = $("a").map(function() {
+        if (/study/.test(this.id)) return this;
+      });
+      studyLinks = _.compact(studyLinks);
+
+      var doneLinks = _.filter(studyLinks, function(el) {
+        var idx = +/\d+/.exec(el.id)[0];
+        return stepCompleted >= idx;
+      });
+      var incompleteLinks = _.filter(studyLinks, function(el) {
+        var idx = +/\d+/.exec(el.id)[0];
+        return stepCompleted < idx;
+      });
+      var curLink = _.first(incompleteLinks);
+      incompleteLinks = _.rest(incompleteLinks);
+
+      _.each(doneLinks, function(el) {
+        $(el).addClass('btn-success');
+      });
+      _.each(incompleteLinks, function(el) {
+        $(el)
           .addClass("btn-cancelled")
           .attr("href", "#")
           .click(function() {
             alert("Please complete the current task (blue button) first");
           });
-        }
-    })
+      });
+      if (curLink) {
+        $(curLink).addClass('btn-primary');
+      }
+      /* done coloring */
+    }
 
+
+    if (!validName(localStorage['name'])) {
+      window.location = '/study/name/';
+    }
 
     render(localStorage['name']);
+    setupLinks();
 
-    $("#nameform").on("submit", function() {
-      render($("#name").val());
-      return false;
-    });
+    $.post("/tasks/get/", { 'name': localStorage['name'] }, function(resp) {
+      var tasktemplate = Handlebars.compile($("#dir-task-btn-template").html());
 
-    $("#nameclear").click(function() {
-      render(null);
-    });
+      if (resp.status == false) {
+        // uh oh?
+      } else {
+        resp.tasks = _.sortBy(resp.tasks);
+        _.each(resp.tasks, function(taskid, idx) {
+          var data = {
+            taskid: taskid,
+            idx: idx+1
+          };
+          $("#studytasks").append($(tasktemplate(data)))
+        });
+        setupLinks()
+      }
+    }, 'json')
+
+
   });
 </script>
 

@@ -291,7 +291,8 @@ requirejs(['jquery',
   tour.addStep('cstat-plot', {
     attachTo: "#cstat-day .cstat-plot right",
     title: "Faceting Distribution",
-    text: "This is the distribution of values in the <b style='font-family:arial'>day</b> attribute."+
+    text: "This distribution of values in the <b style='font-family:arial'>day</b> attribute"+
+          "shows that there are roughly the same number of sales every day."+
           "The y-axis shows the count of records within a particular value range.</p>"+
           "<p>We will show you how to use this to filter the visualization.</p>",
     classes: "shepherd-theme-arrows",
@@ -309,21 +310,62 @@ requirejs(['jquery',
     classes: "shepherd-theme-arrows",
     tetherOptions: { offset: '0px -5px' },
     style: { width: 400 },
-    highlight: true,
     buttons: btns,
   });
   step.on('show', function() {
     $("#cstat-day .cstat-plot .xaxis rect")
       .attr("stroke", "rgb(18, 179, 255)")
       .attr("stroke-width", "2px");
+  })
+  step.on('hide', function() {
+    $("#cstat-day .cstat-plot .xaxis rect").attr("stroke", "none");
+  })
+
+  step = tour.addStep('dist-select-2', {
+    attachTo: "#cstat-day .cstat-plot right",
+    title: "Zoomable and Pannable Axes",
+    text: $("#dist-select-2").html(),
+    classes: "shepherd-theme-arrows",
+    tetherOptions: { offset: '0px -5px' },
+    style: { width: 400 },
+    buttons: btns,
+  });
+  step.on('show', function() {
     $("#cstat-day .cstat-plot .yaxis rect")
       .attr("stroke", "rgb(18, 179, 255)")
       .attr("stroke-width", "2px");
   })
   step.on('hide', function() {
-    $("#cstat-day .cstat-plot .xaxis rect").attr("stroke", "none");
     $("#cstat-day .cstat-plot .yaxis rect").attr("stroke", "none");
   })
+
+
+
+
+  step = tour.addStep('qv-zoom', {
+    attachTo: "#queryview-container left",
+    title: "Zoomable and Pannable Axes",
+    text: $("#qv-zoom").html(),
+    highlight: false,
+    scrollTo: true,
+    classes: "shepherd-theme-arrows",
+    style: { width: 400 },
+    buttons: btns,
+  });
+  step.on('show', function() {
+    $("#viz .xaxis rect")
+      .attr("stroke", "rgb(18, 179, 255)")
+      .attr("stroke-width", "2px");
+    $("#viz .yaxis rect")
+      .attr("stroke", "rgb(18, 179, 255)")
+      .attr("stroke-width", "2px");
+  })
+  step.on('hide', function() {
+    $("#viz .xaxis rect").attr("stroke", "none");
+    $("#viz .yaxis rect").attr("stroke", "none");
+  })
+
+
 
 
   step = tour.addStep('dist-filter', {
@@ -343,6 +385,11 @@ requirejs(['jquery',
       .attr("stroke", "rgb(18, 179, 255)")
       .attr("stroke-width", "2px");
   })
+  step.on('hide', function() {
+    $("#cstat-day .cstat-plot .plot-background").attr("stroke", "none");
+  })
+
+
 
   step = tour.addStep('dist-filter-2', {
     attachTo: "#cstat-day .cstat-plot .plot-background right",
@@ -355,6 +402,9 @@ requirejs(['jquery',
     buttons: btns,
   });
   step.on('show', function() {
+    $("#cstat-day .cstat-plot .plot-background")
+      .attr("stroke", "rgb(18, 179, 255)")
+      .attr("stroke-width", "2px");
     where.setSelection( [ {col:'day', type:'num', vals: [0.5, 3.5]}])
   })
   step.on('hide', function() {
@@ -407,21 +457,21 @@ requirejs(['jquery',
     tetherOptions: {
       attachment: 'top right',
       targetAttachment: 'top left',
-      offset: '10px -10px'
+      offset: '10px 10px'
     },
     highlight: true,
     buttons: btns,
-    style: { width: "500px" },
+    style: { width: "400px" },
   });
 
 
   tour.addStep('seltype-2', {
-    attachTo: "#temp-where-container right",
+    attachTo: "#temp-where-container bottom",
     title: "Filtering (<b style='color:rgb(26, 189, 64); '>select</b> vs <b style='color:#D46F6F;'>remove</b>)",
     text: $("#seltype-2").html(),
     buttons: btns,
     highlight: true,
-    style: { width: "500px" },
+    style: { width: "400px" },
   });
 
 
@@ -436,11 +486,11 @@ requirejs(['jquery',
     },
     highlight: true,
     buttons: btns,
-    style: { width: 500 },
+    style: { width: 400 },
   });
 
   step = tour.addStep('selapply-2', {
-    attachTo: "#perm-where-container right",
+    attachTo: "#perm-where-container bottom",
     title: "Updating the Facets",
     text: $("#selapply-2").html(),
     classes: "shepherd-theme-arrows",
@@ -478,14 +528,6 @@ requirejs(['jquery',
     buttons: btns,
     style: { width: "400px" }
   });
-  step.on('show', function() {
-    window.tv.show();
-  });
-  step.on('hide', function() {
-    window.tv.hide();
-  });
-
-
 
 
   step = tour.addStep('end', {
@@ -500,7 +542,6 @@ requirejs(['jquery',
       text: "Exit",
       action: function() {
         var completed = +(localStorage['stepCompleted'] || 0);
-        alert(completed);
         localStorage['stepCompleted'] = Math.max(completed, 1)
         window.location = '/study/';
       }

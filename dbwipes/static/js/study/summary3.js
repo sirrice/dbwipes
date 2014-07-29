@@ -311,9 +311,16 @@ requirejs(['jquery',
 
 
   var scorpionReturned = false;
-  step.on("show", function() {
-    $(".psrs-next-btn").removeClass("shepherd-button").addClass("shepherd-button-secondary");
-  });
+  step.on("show", (function(step) {
+    //$(".psrs-next-btn").removeClass("shepherd-button").addClass("shepherd-button-secondary");
+    console.log("scorpionReturned = " + window.scorpionReturned);
+    if (window.scorpionReturned) {
+      $(step.el).find('.next-btn')
+        .removeClass("disabled")  
+        .click(function(){tour.show("srs-1");});
+    }
+
+  })(step));
 
 
   step = addStep('srs-1', {
@@ -374,9 +381,15 @@ requirejs(['jquery',
   step.on("show", (function(step) {
     return function() {
       $("#cstat-age input[type=checkbox]").click(function() {
-        $(step.el).find(".next-btn")
-          .removeClass('disabled')
-          .click(tour.next.bind(tour));
+        var checked = $("#cstat-age input[type=checkbox]").get()[0].checked;
+        console.log("hi " + checked)
+        if (!checked) {
+          $(step.el).find(".next-btn")
+            .removeClass('disabled')
+            .click(function(){tour.show('checkboxes-2')});
+        } else {
+          $(step.el).find(".next-btn").addClass('disabled').click(null);
+        }
       });
     }
   })(step));
@@ -392,7 +405,9 @@ requirejs(['jquery',
     return function() {
       $("#togglescorpion").click(function() {
         $("#togglescorpion").click(null);
-        _.delay(_.bind(tour.next, tour), 50);
+        $(step.el).find(".next-btn")
+          .removeClass('disabled')
+          .click(function(){tour.show('checkboxes-3')});
       });
     }
   })(step));
@@ -406,7 +421,9 @@ requirejs(['jquery',
     return function() {
       $("#scorpion_submit").click(function() {
         $("#scorpion_submit").click(null);
-        _.delay(_.bind(tour.next, tour), 50);
+        $(step.el).find(".next-btn")
+          .removeClass('disabled')
+          .click(function(){tour.show('checkboxes-4')});
       });
     }
   })(step));
@@ -448,6 +465,7 @@ requirejs(['jquery',
 
 
   tour.start();
+  _.delay(_.bind(tour.show, tour, 'checkboxes'), 800);
   window.tour = tour;
 
 });

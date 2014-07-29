@@ -4,8 +4,10 @@ import time
 import json
 import md5
 import pdb
+import random
 import psycopg2
 import traceback
+import numpy as np
 
 from functools import wraps
 from collections import *
@@ -120,10 +122,16 @@ def hidden():
   }
   return render_template("index_base.html", **context)
 
+@app.route('/study/name/', methods=["POST", "GET"])
+def study_name():
+  return render_template("study/name.html")
+
 @app.route('/study/', methods=["POST", "GET"])
 @app.route('/study/dir/', methods=["POST", "GET"])
-def dirpage():
-  return render_template("study/dir.html")
+def study_dir():
+  return render_template("study/dir.html", **{
+    'taskids': enumerate([4,5, 8, 10])
+  })
 
 @app.route('/study/<int:idx>/', methods=["POST", "GET"])
 def index_idx(idx):
@@ -149,6 +157,7 @@ def index_idx(idx):
     title = "DBWipes User Study"
     subtitle = "without Scorpion"
 
+  # hard1 sum
   if idx == 4:
     enable_scorpion = 0
 
@@ -158,6 +167,7 @@ def index_idx(idx):
     enable_scorpion = 1
     templates[0] = "study/index4.html"
 
+  # intel
   if idx == 6:
     subtitle = "without Scorpion"
     js = 'study/summary6'
@@ -169,6 +179,7 @@ def index_idx(idx):
     enable_scorpion = 1
     templates[0] = "study/index6.html"
 
+  # hard1 avg
   if idx == 8:
     enable_scorpion = 0
     js = 'study/summary8'
@@ -177,6 +188,31 @@ def index_idx(idx):
   if idx == 9:
     subtitle = "with Scorpion"
     js = 'study/summary8'
+    enable_scorpion = 1
+    templates[0] = "study/index8.html"
+
+
+  # hard2 sum
+  if idx == 10:
+    js = 'study/summary10'
+    enable_scorpion = 0
+    templates[0] = "study/index4.html"
+
+  if idx == 11:
+    subtitle = "with Scorpion"
+    js = 'study/summary10'
+    enable_scorpion = 1
+    templates[0] = "study/index4.html"
+
+  # hard2 avg
+  if idx == 12:
+    js = 'study/summary12'
+    enable_scorpion = 0
+    templates[0] = "study/index8.html"
+
+  if idx == 13:
+    subtitle = "with Scorpion"
+    js = 'study/summary12'
     enable_scorpion = 1
     templates[0] = "study/index8.html"
 
@@ -195,7 +231,57 @@ def index_idx(idx):
 
   return render_template(templates, **context)
 
+@app.route('/tasks/get/', methods=["POST", "GET"])
+@returns_json
+def task_get():
+  name = request.form['name']
+  if not name:
+    return { 'status': False }
 
+  try:
+    db = db_connect("tasks")
+    try:
+      q = """create table tasks(
+        name varchar, 
+        tstamp timestamp default current_timestamp,
+        tasks text
+      )"""
+      db.execute(q)
+    except:
+      pass
+
+
+    q = """select * from tasks where name = %s"""
+    rows = db.execute(q, name).fetchall()
+    if rows:
+      tasks = json.loads(rows[0][2])
+      return {
+        'status': True,
+        'tasks': tasks
+      }
+    else:
+      alltasks = [4, 8, 10, 12]
+      options = np.random.choice(alltasks, 3, replace=False)
+      tasks = []
+      for task in options:
+        enable_scorpion = random.random() > .5
+        if enable_scorpion:
+          task += 1
+        tasks.append(task)
+      q = """insert into tasks values(%s, default, %s)"""
+      db.execute(q, (name, json.dumps(tasks)))
+      return {
+        'status': True,
+        'tasks': tasks
+      }
+  except Exception as e:
+    print e
+    pass
+  finally:
+    if db:
+      db.dispose()
+
+ 
 
 @app.route('/tasks/submit/', methods=["POST", "GET"])
 @returns_json
@@ -207,7 +293,7 @@ def task_submit():
   db = db_connect("tasks")
 
   try:
-    q = """create table tasks(
+    q = """create table responses(
       name varchar, 
       tstamp timestamp default current_timestamp,
       taskid varchar, 
@@ -217,7 +303,7 @@ def task_submit():
   except:
     pass
 
-  q = "insert into tasks values(%s, default, %s, %s)"
+  q = "insert into responses values(%s, default, %s, %s)"
   db.execute(q, (name, taskid, data))
 
   db.dispose()

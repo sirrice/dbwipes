@@ -13,7 +13,7 @@ define(function(require) {
         text: "",
         options: [],      // [ "text", "text",... ]
         textbox: false,   // setting this to True overrides .options
-        largetextbox: false,
+        //largetextbox: false,
         truth: -1,        // a value or a function(answer, Task)
         answer: -1,
         successText: "Nice!  You'll see the next task in 2...1...",
@@ -74,10 +74,10 @@ define(function(require) {
     },
 
     onMouseDown: function(ev) {
-      if (this.model.get('largetextbox'))
-        this.model.set('answer', this.$("textarea[name=text]").val());
-      else
-        this.model.set('answer', this.$("input[name=text]").val());
+      //if (this.model.get('largetextbox'))
+      this.model.set('answer', this.$("textarea[name=text]").val());
+      //else
+      //this.model.set('answer', this.$("input[name=text]").val());
     },
 
 
@@ -105,7 +105,7 @@ define(function(require) {
         }
       }
 
-      text = text + " " + localStorage['name'] + " " + ((this.model.get('endtime') - this.model.get('starttime'))/1000.);
+      //text = text + " " + localStorage['name'] + " " + ((this.model.get('endtime') - this.model.get('starttime'))/1000.);
       this.$(".error").text(text).show();
     },
 
