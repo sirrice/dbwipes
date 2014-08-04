@@ -18,7 +18,6 @@
   {% if enableScorpion == 1 %}
   <span id="togglescorpion" class="btn btn-sm btn-primary walkthrough-btn">toggle scorpion</span>
   {% endif %}
-  <span id="q_loading" style="display:none;">loading query results...</span>
 </h4>
 
 
@@ -50,7 +49,7 @@
     if (!name || name == '') {
       window.location = "/study/dir/";
     }
-    if (stepCompleted < {{idx}}-1) {
+    if ({{idx}} <= 3 && stepCompleted < {{idx}}-1) {
       window.location = '/study/dir';
     } 
   })();
