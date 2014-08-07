@@ -33,9 +33,9 @@ define(function(require) {
     },
 
     onChange: function() {
-      if (this.model.count('selection') == 0) return;
       this.render();
       this.$el.show();
+      return this;
     },
 
     onResult: function(resp) {
