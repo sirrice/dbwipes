@@ -162,7 +162,7 @@ requirejs(['jquery',
   step = addStep('sq', {
     title: "Scorpion Query",
     text: "<p>Whenever you select something in the visualization, this dialog will pop up.</p>"+
-          "<p>It asks you to specify something about the points you just selected.</p>",
+          "<p class='bs-callout bs-callout-danger'>We will walk you through what each part of the interface does, so please click Next and follow the directions.</p>",
     attachTo: "div.walkthrough right"
   });
 
@@ -268,9 +268,14 @@ requirejs(['jquery',
   step.on("show", (function(step) {
     return function() {
       $("#scorpion_submit").click(function() {
+        window.scorpionReturned = false;
         $(step.el).find(".next-btn")
           .removeClass('disabled')
           .click(tour.show.bind(tour, 'psrs'));
+        window.sqv.on('scorpionquery:done', function() {
+          window.scorpionReturned = true;
+        });
+
       });
     }
   })(step));
@@ -299,6 +304,14 @@ requirejs(['jquery',
   });
 
   (function(step) {
+    step.on("show", function() {
+      if (window.scorpionReturned) {
+        $("#psrs-info").show();
+        $(step.el).find('.next-btn')
+          .removeClass("disabled")  
+          .click(function() {tour.show('srs-1');});
+      }
+    });
     window.sqv.on('scorpionquery:done', function() {
       window.sqv.off('scorpionquery:done');
       window.scorpionReturned = true;
