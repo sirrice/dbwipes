@@ -94,6 +94,7 @@ def index():
   context = {
     'enableScorpion': enable_scorpion,
     'js': 'summary',
+    'study': 0,
     'title': title,
     'debug': True
   }
@@ -107,6 +108,7 @@ def drspott():
   context = {
     'enableScorpion': 1,
     'js': 'summarydrspott',
+    'study': 0,
     'title': 'DBWipes + Scorpion!'
   }
   return render_template("index_base.html", **context)
@@ -118,6 +120,7 @@ def hidden():
     'enableScorpion': 1,
     'js': 'summary',
     'title': 'DBWipes + Scorpion!',
+    'study': 0,
     'debug': True
   }
   return render_template("index_base.html", **context)
