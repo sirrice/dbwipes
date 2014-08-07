@@ -302,9 +302,9 @@ define(function(require) {
         .attr('class', 'data-container')
 
       if (this.state.marktype == 'circle') {
-        var r = 4.5;
+        var r = 2.5;
         if (data.length > 50) 
-          r = 3.5;
+          r = 2.25;
         if (data.length > 100)
           r = 2;
         dc.selectAll('circle')
