@@ -38,24 +38,45 @@ define(function(require) {
       if (!window.enableScorpion) this.$('.errcol').hide();
       if (this.model.get('ready')) {
         this.$('.cstat-loading').hide();
-        this.renderPlot(this.$('svg'));
+        this.renderPlot(this.$('svg.cstat-plot-svg'));
       } else {
         this.$('.cstat-loading').show();
-        this.$('svg').hide();
+        this.$('svg.cstat-plot-svg').hide();
       }
+      this.setupDragAndDrop();
       return this;
     },
 
     showLoading: function() {
-      this.$("svg").hide();
+      this.$("svg.cstat-plot-svg").hide();
       this.$('.cstat-loading').show();
       return this;
     },
 
     hideLoading: function() {
-      this.$("svg").show();
+      this.$("svg.cstat-plot-svg").show();
       this.$('.cstat-loading').hide();
       return this;
+    },
+
+    setupDragAndDrop: function() {
+      var _this = this;
+      var el = this.$el.find(".col-name");
+      el.on("mousedown", function(ev) {
+        _this.trigger("dragStart", _this, ev);
+        $("body")
+          .on("mousemove.cstat", function(ev) {
+            _this.trigger("drag", _this, ev);
+          })
+          .on("mouseup.cstat", function(ev) {
+            _this.trigger("dragEnd", _this, ev);
+            $("body")
+              .off("mousemove.cstat")
+              .off("mouseup.cstat")
+          })
+
+      });
+
     },
 
     setupScales: function() {
@@ -448,10 +469,6 @@ define(function(require) {
           .on('mousedown.cstatx', function() {
             if (d3.event.shiftKey) {
               xStart = d3.event.x;
-              el.select('.xaxis')
-                .on('mousedown.zoom', null)
-                .on('mousemove.zoom', null)
-                .on('mouseup.zoom', null);
               curXScale = zoom.scale();
               d3.select('body')
                 .on('mousemove.cstatx', function() {
