@@ -24,8 +24,8 @@
   <div class="col-md-4 col-md-offset-4">
     <h1>Scorpion User Study</h1>
 
-    <h2><span id="nametitle">Before we start, what is your name?</span> <a href="#"><small id="nameclear">clear</small></a></h2>
-    <p><form id="nameform"><input class='input form-control' id="name" style='width:100%'/></form></p>
+    <h3><span id="nametitle">Before we start, what is your full name?</span> <a href="#"><small id="nameclear">clear</small></a></h3>
+    <p><form id="nameform"><input class='input form-control' id="name" style='width:100%' placeholder="press enter to submit"/></form></p>
 
     <div id="next">
       <a href="/study/" class="btn btn-primary" style="padding:1em; font-size: 18pt">Start Study</a>
@@ -49,7 +49,7 @@
         $("#next").show();
       } else {
         delete localStorage['name'];
-        $("#nametitle").text("Before we start, what is your name?")
+        $("#nametitle").text("Before we start, what is your full name?")
         $("#next").hide();
       }
     };
