@@ -135,6 +135,7 @@ requirejs([
       question: "<p>What are the total sales on day 5 if we ignored California sales (round to the nearest 10 thousand)?</p>",
       textbox: true,
       truth: function(answer) {
+        answer = answer.replace(/,/, '');
         return Math.abs(+answer - 40000) < 7000;
       },
       attachTo: '#tasks',
