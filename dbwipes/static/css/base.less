@@ -44,6 +44,22 @@ body {
 
 
 
+  .cstat-col-name {
+    background: whitesmoke;
+    border: 1px solid white;
+    border-radius: 4px;
+    font-size: smaller;
+    padding: 2px;
+    padding-left: .5em;
+    padding-right: .5em;
+    margin: 0px;
+    cursor: pointer;
+  }
+  .cstat-col-name.active {
+    background: steelblue;
+    color: white;
+  }
+
 
   .cstat-label {
     overflow: hidden;
@@ -53,20 +69,21 @@ body {
       display: inline;
       cursor: pointer;
     }
+    .col-name:hover {
+      font-weight: bold;
+      background: steelblue;
+      color: white;
+    }
+
+    .col-name {
+      right: 0px;
+    }
 
     .type label {
       font-size: smaller;
       color: black;
-      background: whitesmoke;
-      border: 1px solid white;
-      border-radius: 4px;
       cursor: pointer;
       min-width: 50px;
-    }
-    .type label:hover {
-      font-weight: bold;
-      background: steelblue;
-      color: white;
     }
    }
 

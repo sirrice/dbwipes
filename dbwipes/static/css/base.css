@@ -31,6 +31,21 @@ body #footer {
   margin-top: 2em;
   border-top: 1px solid #efefef;
 }
+body .cstat-col-name {
+  background: whitesmoke;
+  border: 1px solid white;
+  border-radius: 4px;
+  font-size: smaller;
+  padding: 2px;
+  padding-left: .5em;
+  padding-right: .5em;
+  margin: 0px;
+  cursor: pointer;
+}
+body .cstat-col-name.active {
+  background: steelblue;
+  color: white;
+}
 body .cstat-label {
   overflow: hidden;
   text-align: right;
@@ -40,19 +55,19 @@ body .cstat-label input {
   display: inline;
   cursor: pointer;
 }
-body .cstat-label .type label {
-  font-size: smaller;
-  color: black;
-  background: whitesmoke;
-  border: 1px solid white;
-  border-radius: 4px;
-  cursor: pointer;
-  min-width: 50px;
-}
-body .cstat-label .type label:hover {
+body .cstat-label .col-name:hover {
   font-weight: bold;
   background: steelblue;
   color: white;
+}
+body .cstat-label .col-name {
+  right: 0px;
+}
+body .cstat-label .type label {
+  font-size: smaller;
+  color: black;
+  cursor: pointer;
+  min-width: 50px;
 }
 body .count {
   font-size: 9px;
