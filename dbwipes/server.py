@@ -15,7 +15,7 @@ from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
-from flask.ext.compress import Compress
+from flask_compress import Compress
 
 
 from summary import Summary

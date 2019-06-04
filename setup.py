@@ -30,6 +30,7 @@ setup(name="dbwipes",
       #zip_safe = False,
       install_requires = [
         'flask', 'psycopg2', 'sqlalchemy', 
-        'flask-compress', 'scorpionsql', 'click'
+        'flask-compress', 'scorpionsql', 'click',
+        'bsddb3'
       ],
       keywords= "")

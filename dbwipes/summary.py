@@ -1,5 +1,5 @@
 from functools import wraps
-import bsddb
+import bsddb3 as bsddb
 import json
 import pdb
 from sqlalchemy import create_engine, engine
