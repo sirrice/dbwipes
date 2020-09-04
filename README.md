@@ -60,8 +60,8 @@ The Scorpion paper and demo used the intel sensor dataset.  The following instru
     # create the database
     createdb intel   
     
-    # create the query cache  
-    createdb cache
+    # create the query cache and status databases
+    createdb cache status
 
     # Load the database
     psql -f intel.ddl\?dl=0 intel
