@@ -50,6 +50,31 @@ switch to using virtualenv binaries
     pip install dbwipes
 
 
+## Quick Setup with Intel Dataset
+
+The Scorpion paper and demo used the intel sensor dataset.  The following instructions helps reproduce the demo.
+
+    # download the ddl containing the intel tables (180Mb)
+    wget "https://www.dropbox.com/s/glutiyu2uju4ijq/intel.ddl?dl=0"
+
+    # create the database
+    createdb intel   
+    
+    # create the query cache and status databases
+    createdb cache status
+
+    # Load the database
+    psql -f intel.ddl\?dl=0 intel
+
+
+Now run the dbwipes server and go to the webpage
+
+    dbwipesserver.py --debug --threaded
+
+    # now go to localhost:8111
+
+# Advanced Setup
+
 ## Setup
 
 Load some sample data into the database
