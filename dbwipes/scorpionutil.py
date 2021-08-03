@@ -47,8 +47,11 @@ def scorpion_run(db, requestdata, requestid):
     erreqs = requestdata.get('erreqs', {})
     ignore_attrs = requestdata.get('ignore_cols', [])
     dbname = qjson['db']
+    print(dbname)
     x = qjson['x']
     ys = qjson['ys']
+    print(badsel, goodsel)
+    print(errtypes, erreqs)
 
     obj = SharedObj(db, dbname=dbname, parsed=parsed, params=params)
     obj.dbname = dbname
@@ -107,6 +110,7 @@ def scorpion_run(db, requestdata, requestid):
 
     obj.status = Status(requestid)
     print "status requid = ", requestid
+    print(obj)
 
     start = time.time()
     parallel_debug(

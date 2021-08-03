@@ -14,8 +14,9 @@ from collections import *
 from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, request, render_template, g, redirect, Response, jsonify
 from flask_compress import Compress
+from flask_cors import CORS, cross_origin
 
 
 from summary import Summary
@@ -25,8 +26,18 @@ from db import *
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 print tmpl_dir
 app = Flask(__name__, template_folder=tmpl_dir)
-Compress(app)
+#CORS(Compress(app), supports_credentials=True)
 
+
+def build_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+def build_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 def returns_json(f):
   @wraps(f)
@@ -34,7 +45,13 @@ def returns_json(f):
     r = f(*args, **kwargs)
     if not isinstance(r, basestring):
       r = json.dumps(r, cls=SummaryEncoder)
-    return Response(r, content_type='application/json')
+    resp = Response(r, content_type='application/json')
+    resp.headers["Access-Control-Allow-Origin"] =  "*"
+    resp.headers["Access-Control-Allow-Headers"] =  "*"
+    resp.headers["Access-Control-Allow-Methods"] =  "*"
+    print(resp.headers["Access-Control-Allow-Origin"])
+    #import pdb; pdb.set_trace()
+    return resp
   return json_returner
 
 def cache_result(key, value):
@@ -358,21 +375,27 @@ def schema():
   return ret
 
 
-@app.route('/api/requestid/', methods=['POST', 'GET'])
+@app.route('/api/requestid/', methods=['OPTIONS','POST', 'GET'])
+#@cross_origin(origins="*")
 @returns_json
 def requestid():
+  if request.method == "OPTIONS":
+    print("GOT OPTIONS ALLOWING CORS")
+    return build_preflight_response()
   try:
     from scorpion.util import Status
     status = Status()
     requestid = status.reqid
     status.close()
+    print("returning reqid")
     return {'requestid': requestid}
   except Exception as e:
     return {'error': str(e)}
 
 
 
-@app.route('/api/status/', methods=['POST', 'GET'])
+@app.route('/api/status/')#, methods=['OPTIONS', 'POST', 'GET'])
+#@cross_origin(origins="*")
 @returns_json
 def api_status():
   try:
@@ -560,6 +583,7 @@ def column_distributions():
 
 
 @app.route('/api/scorpion/', methods=['POST', 'GET'])
+#@cross_origin(origins="*")
 @returns_json
 def scorpion():
   try:
@@ -574,6 +598,7 @@ def scorpion():
     fake = request.form.get('fake', False)
     requestid = request.form.get('requestid')
     if not fake or fake == 'false':
+      print("running scorpion")
       results = scorpionutil.scorpion_run(g.db, data, requestid)
       return results
   except:
@@ -680,5 +705,19 @@ def scorpion():
   ret['results'] = results
   ret['top_k_results'] = top_k
   return ret
+
+if __name__ == "__main__":
+
+
+  import psycopg2
+  DEC2FLOAT = psycopg2.extensions.new_type(
+    psycopg2.extensions.DECIMAL.values,
+    'DEC2FLOAT',
+    lambda value, curs: float(value) if value is not None else None)
+  print "registering type"
+  psycopg2.extensions.register_type(DEC2FLOAT)
+
+
+  app.run(host="localhost", port="8111", debug=True, threaded=True)
 
 
